@@ -43,17 +43,17 @@ git clone https://huggingface.co/mradermacher/Med-Qwen2-7B-GGUF
 
 ### 2. 配置LLaMA-Factory
     1. 拉取LLaMA-Factory到本地，并确保LLaMA-Factory目录和Chinese-MedQA-Qwen2目录处于同一层级，例如：
-    ```python
+   
      -----你的本地目录
                 |------Chinese-MedQA-Qwen2
                 |------LLaMA-Factory
-    ```
+  
 
     2. 安装依赖
-    ```python
+ 
     cd LLaMA-Factory
     pip install -r requirements.txt
     pip install -e ".[torch,metrics]"
-    ```
+
 
     
