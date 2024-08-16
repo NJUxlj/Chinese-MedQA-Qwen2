@@ -75,9 +75,25 @@ git clone https://huggingface.co/mradermacher/Med-Qwen2-7B-GGUF
                 |------fastllm
 ```
 1. 安装gcc
+```python
+# 确认是否已经安装
+gcc --version
 
-2. 安装cmake
-3. 编译
+# 安装
+# For Debian based distributions like Ubuntu
+sudo apt-get install gcc
+
+# For RPM-based distributions like CentOS
+sudo yum install gcc
+```
+
+3. 安装cmake
+```python
+sudo apt install cmake -y
+cmake  --version
+```
+
+4. 编译
  ```python
 bash install.sh -DUSE_CUDA=ON # 编译GPU版本
 # bash install.sh -DUSE_CUDA=ON -DCUDA_ARCH=89 # 可以指定CUDA架构，如4090使用89架构, A100使用80架构
