@@ -60,19 +60,20 @@ git clone https://huggingface.co/mradermacher/Med-Qwen2-7B-GGUF
 
 #### 3. 配置fastllm
 ```python
-    git clone https://github.com/ztxz16/fastllm.git
-    
+git clone https://github.com/ztxz16/fastllm.git
+
+cd ./fastllm    
 ```
 
 ```python
-   pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ```python  
-     -----你的本地目录
-                |------Chinese-MedQA-Qwen2
-                |------LLaMA-Factory
-                |------fastllm
+-----你的本地目录
+          |------Chinese-MedQA-Qwen2
+          |------LLaMA-Factory
+          |------fastllm
 ```
 1. 安装gcc
 ```python
