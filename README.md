@@ -1,5 +1,5 @@
 ## Chinese-MedQA-Qwen2
-本项目是一个基于Qwen2基座模型，以及[LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)和[fastllm](https://github.com/ztxz16/fastllm)项目的医疗问答（Medical QA）模型。
+本项目是一个基于Qwen2基座模型，以及基于[LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)训练框架，和[fastllm](https://github.com/ztxz16/fastllm)推理框架的医疗问答（Medical QA）模型。
 该项目的目的，是使用SFT来微调一个使用西医知识来进行疾病诊疗的垂直模型
 
 
