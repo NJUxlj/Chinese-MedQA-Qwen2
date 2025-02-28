@@ -208,7 +208,20 @@ class DeepSpeedSftTrainer:
 
     # 格式化函数（将问答对转换为模型输入格式）  
     def format_instruction(self, sample):  
-        return f"问：{sample['instruction']}\n答：{sample['response']}"  
+        # 拼接对话历史
+        history = sample["history"] or []  
+        
+        return f"指令：{sample['instruction']}\n历史对话：{history}\n问题：{sample['input']}\n回答：{sample['output']}"  
+    
+    # 清洗异常数据  
+    def data_clean(self, sample):  
+        # 过滤空值数据  
+        if not all([sample["instruction"], sample["input"], sample["output"]]):  
+            return False  
+        # 限制输入长度  
+        if len(sample["input"]) > 512 or len(sample["output"]) > 1024:  
+            return False  
+        return True 
     
     
     
