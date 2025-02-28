@@ -178,7 +178,7 @@ class DeepSpeedSftTrainer:
             "gradient_checkpointing":True,  # 激活梯度检查点  
             "optim":"adamw_hf",  
             "report_to":"tensorboard",  
-            "ddp_find_unused_parameters":False,  
+            "ddp_find_unused_parameters":False,    # 必须设置避免内存泄漏  
             "seed":42  
         }
         
