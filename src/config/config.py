@@ -12,11 +12,11 @@ DEEPSPEED_CONFIG_PATH = "./src/config/ds_config.json"
 OUTPUT_DIR = "./output"
 
 
-SFT_MODEL_NAME = "qwen2_cmed_deepspeed"
+SFT_MODEL_NAME = "qwen2_cmed_sft"
 SFT_MODEL_PATH = os.path.join("../../output", SFT_MODEL_NAME)
 
 
-DPO_MODEL_NAME = ""
+DPO_MODEL_NAME = "qwen2_cmed_dpo"
 DPO_MODEL_PATH = ""
 
 

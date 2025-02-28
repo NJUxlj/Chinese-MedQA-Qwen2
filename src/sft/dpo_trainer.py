@@ -20,6 +20,8 @@ from datasets import load_dataset
 # import deepspeed  
 from deepspeed import DeepSpeedEngine 
 
+from config.config import MODEL_PATH
+
 
 class CustomDPODataset(Dataset):  
     def __init__(self, tokenized_data):  
@@ -41,7 +43,7 @@ class CustomDPOTrainer:
         self,  
         output_dir: str,  
         dataset_name_or_path: str,  
-        model_name: str = "qwen/qwen2-7b",  
+        model_name: str = MODEL_PATH,  
         is_ds: bool = True,  
         ds_config_path: Optional[str] = None,  
         is_peft: bool = True,  
@@ -204,7 +206,7 @@ class CustomDPOTrainer:
 
     def save_model(self):  
         """模型保存逻辑"""  
-        save_path = os.path.join(self.output_dir, "qwen2-dpo-custom")  
+        save_path = os.path.join(self.output_dir, "qwen2_cmed_dpo")  
         self.trainer.save_model(save_path)  
         self.tokenizer.save_pretrained(save_path)  
 
@@ -223,7 +225,14 @@ class DPOCallback(TrainerCallback):
             self.ref_model.requires_grad_(False)  
 
     def _clone_model(self, model):  
-        """创建参考模型的深拷贝"""  
+        """
+        创建参考模型的深拷贝
+        
+        
+        type(model)：获取模型的类类型（如 Qwen2ForCausalLM）
+        **model.config.to_dict()：将模型的配置转换为字典并解包为关键字参数
+        type(model)(**model.config.to_dict())：使用原始模型的配置创建一个新的模型实例
+        """  
         return type(model)(**model.config.to_dict()).load_state_dict(model.state_dict())  
 
     def compute_loss(self, model, inputs, return_outputs=False):  
@@ -244,13 +253,13 @@ class DPOCallback(TrainerCallback):
                 input_ids=inputs["input_ids"],  
                 attention_mask=inputs["attention_mask"]  
             )  
-            ref_chosen_log_probs = self._get_log_probs(ref_outputs.logits, inputs["chosen_labels"])  
+            ref_chosen_log_probs = self._get_log_probs(ref_outputs.logits, inputs["chosen_labels"])  # 计算 log(π(y|x))
             ref_rejected_log_probs = self._get_log_probs(ref_outputs.logits, inputs["rejected_labels"])  
         
-        # 计算DPO损失  
+        # 计算DPO损失  L = -log(σ(r(x,y_w) - r(x,y_l))) , where r(x,y) = β * log(π(y|x)/π_ref(y|x)) = β * [log(π(y|x)) - log(π_ref(y|x))]
         losses = -F.logsigmoid(  
             self.beta * (  
-                (chosen_log_probs - ref_chosen_log_probs) -  
+                (chosen_log_probs - ref_chosen_log_probs) -     # log(π(y_win|x)/π_ref(y_win|x))
                 (rejected_log_probs - ref_rejected_log_probs)  
             )  
         )  
@@ -258,6 +267,83 @@ class DPOCallback(TrainerCallback):
         return losses.mean()  
 
     def _get_log_probs(self, logits, labels):  
-        """计算每个token的对数概率"""  
+        """
+        计算每个token的对数概率
+        
+        ##Args:
+        logits: x  shape = (batch_size, seq_len, vocab_size)
+        labels: y  shape = (batch_size, seq_len)
+        
+        计算 log(π(y|x))
+        
+        为了以后计算 reward r(x,y) = β * log(π(y|x)/π_ref(y|x)) 
+        
+        
+        ##Return
+        返回值：(batch_size, seq_len)
+            每个位置的值表示对应token的对数概率
+                
+        """  
         log_probs = F.log_softmax(logits, dim=-1)  
+        # 在 log_probs 的最后一个维度（vocab_size维度）上，根据 labels 的索引收集对应的对数概率
         return torch.gather(log_probs, -1, labels.unsqueeze(-1)).squeeze(-1)  
+    
+    
+    
+        '''
+        log_probs = torch.tensor([
+            [[-0.5, -1.0, -2.0],  # 第一个样本，第一个token的对数概率
+            [-0.8, -1.2, -1.5]], # 第一个样本，第二个token的对数概率
+            [[-0.6, -1.1, -2.1],  # 第二个样本，第一个token的对数概率
+            [-0.9, -1.3, -1.6]]  # 第二个样本，第二个token的对数概率
+        ])  # shape: (2, 2, 3)  (batch_size=2, seq_len=2, vocab_size=3)
+
+        labels = torch.tensor([
+            [0, 2],  # 第一个样本的标签
+            [1, 0]   # 第二个样本的标签
+        ])  # shape: (2, 2)  (batch_size=2, seq_len=2)
+        
+        
+        执行过程：
+        labels.unsqueeze(-1)：
+
+        在 labels 的最后一个维度上增加一个维度
+        结果：
+
+        python
+        Apply
+        tensor([
+            [[0], [2]],  # 第一个样本
+            [[1], [0]]   # 第二个样本
+        ])  # shape: (2, 2, 1)
+        torch.gather(log_probs, -1, labels.unsqueeze(-1))：
+
+        在 log_probs 的最后一个维度（vocab_size维度）上，根据 labels 的索引收集对应的对数概率
+        结果：
+
+        python
+        Apply
+        tensor([
+            [[-0.5], [-1.5]],  # 第一个样本
+            [[-1.1], [-0.9]]   # 第二个样本
+        ])  # shape: (2, 2, 1)
+        .squeeze(-1)：
+
+        移除最后一个维度
+        最终结果：
+
+        python
+        Apply
+        tensor([
+            [-0.5, -1.5],  # 第一个样本
+            [-1.1, -0.9]   # 第二个样本
+        ])  # shape: (2, 2)
+        解释：
+        对于第一个样本的第一个token，labels[0,0]=0，所以收集 log_probs[0,0,0]=-0.5
+        对于第一个样本的第二个token，labels[0,1]=2，所以收集 log_probs[0,1,2]=-1.5
+        对于第二个样本的第一个token，labels[1,0]=1，所以收集 log_probs[1,0,1]=-1.1
+        对于第二个样本的第二个token，labels[1,1]=0，所以收集 log_probs[1,1,0]=-0.9
+        
+        最终得到的矩阵表示每个样本中每个token对应的对数概率值。
+        '''
+    
