@@ -12,7 +12,11 @@ except ImportError:
     print("Install `readline` for a better experience.")
     
     
-    
+
+
+
+class RAGFlow():
+    pass
     
     
     
