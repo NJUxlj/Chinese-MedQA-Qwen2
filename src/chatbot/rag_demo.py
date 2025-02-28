@@ -32,8 +32,14 @@ def build_prompt(query):
         content = response.text
         
         # 使用lxml解析HTML  
+        html = etree.HTML(content)  
         
+        answers = html.xpath("/html/body/div[2]/div/div/b-superframe-body/div/div[2]/div/div/article/section/section/div/div/a/div[2]/text()")[:3]
         
+        if len(answers)==0:
+            answer_texts = "无相似回答"
+        else:
+            answer_texts = {f"相似回答 {i+1}": answer for i, answer in enumerate(answers)}
     
     
     
@@ -42,8 +48,9 @@ def build_prompt(query):
         answer_texts = "无相似回答"
         
         
-        
-    prompt = ""
+    # construct final prompt
+    prompt = prompt = f'现在你是一名专业的中医医生，请回答以下患者的问诊问题：“{query}"。 \
+                            这里有一些相似的回答可能会帮助到你，需要注意的是，在你提供的答案中，请以你的中医知识为主，相似回答仅作为参考。相似回答：{answer_texts}'
     
     return prompt
         
@@ -54,7 +61,39 @@ def build_prompt(query):
 
 
 def main():
-    pass
+    chat_model = ChatModel()
+    history = []
+    print("欢迎使用中医聊天机器人，使用 clear 命令可清除聊天历史，使用 exit 命令可退出应用程序。")
+    
+    
+    while True:
+        try:
+            query = input("\n患者：")
+        except UnicodeDecodeError:
+            print("Detected decoding error at the inputs, please set the terminal encoding to utf-8.")
+            continue
+        except Exception:
+            raise
+        
+        if query.strip() == "exit":
+            break
+
+        if query.strip() == "clear":
+            history = []
+            torch_gc()
+            print("History has been removed.")
+            continue
+        
+        print("医师: ", end="", flush=True)
+        query = build_prompt(query)
+        response = ""
+        
+        for new_token in chat_model.stream_chat(query, history):
+            print(new_token, end="", flush=True)
+            response+=new_token
+        print()
+        
+        history += [(query, response)]
 
 
 

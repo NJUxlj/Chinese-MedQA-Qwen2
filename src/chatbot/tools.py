@@ -367,7 +367,10 @@ class ToolDispatcher:
             engine="google"  # 可切换bing/baidu等  
         )  
     
-    
+
+
+
+
 def summarize_results(results: Dict) -> str:  
     """将原始结果转换为自然语言摘要"""  
     summaries = []  

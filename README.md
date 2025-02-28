@@ -13,28 +13,42 @@ Qwen2-7B-Instruct supports a context length of up to 131,072 tokens.
 
 #### SFT数据集
 
+```python
+from datasets import load_dataset
+
+ds = load_dataset("ticoAg/Chinese-medical-dialogue")
+```
 
 #### DPO数据集
+```python
 
+from datasets import load_dataset
+
+ds = load_dataset("Morefreedai/medical-dpo-v1")
+
+```
 
 
 ## 权重下载
-我们预先加载huggingface上的mradermacher/Med-Qwen2-7B-GGUF的权重到本地
-```python
-git lfs install
-```
-```python
-git clone https://huggingface.co/mradermacher/Med-Qwen2-7B-GGUF
-```
 
-## 微调
-一轮LoRA + 一轮DPO，其余步骤根据后续效果再加
+
+## SFT
+一轮LoRA/SFT + 一轮DPO，其余步骤根据后续效果再加
 
 
 
 
-## 评估
+## Evaluation
 微调结束后，我们会使用evaluate_model.py来让llama3.1给GPT4o和和Qwen2生成的答案打分。
+
+
+## Environment Config
+- AutoDL Cloud Platform
+  
+![env](image/env.png)
+
+- then, make sure to pre-download the model weight (e.g. Qwen2.5-1.5B on the huggingface) to the local storage (e.g., `/root/autodl-tmp/models/Qwen2.5-1.5B`).
+
 
 
 
