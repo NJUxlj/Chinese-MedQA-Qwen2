@@ -28,13 +28,16 @@ class ToolTemplate:
 
 class PromptTemplate:  
     def __init__(self):  
-        self.tools: Dict[str, ToolTemplate] = {}  
+        self.tools: Dict[str, ToolTemplate] = {
+            
+        }  
         self.base_prompt = """你是一个专业助手，可以使用以下工具："""  
         
         # 预置常用工具  
         self.register_tool(self._build_google_template())  
         self.register_tool(self._build_baidu_template())  
         self.register_tool(self._build_wolfram_template())  
+        self.register_tool(self._build_baidu_api_template())
     
     def register_tool(self, tool: ToolTemplate):  
         """注册新工具"""  
@@ -59,7 +62,7 @@ class PromptTemplate:
 
                 请按照以下格式响应：  
                 <思考>分析问题并选择工具</思考>  
-                <工具调用>{'{工具名称}'}('参数1'=值1, '参数2'=值2)</工具调用>"""  
+                <工具调用>{'{工具名称}'}(参数1=值1, 参数2=值2)</工具调用>"""  
 
     @classmethod  
     def _build_google_template(cls) -> ToolTemplate:  
@@ -79,7 +82,7 @@ class PromptTemplate:
     def _build_baidu_template(cls) -> ToolTemplate:  
         return ToolTemplate(  
             name="baidu_search",  
-            description="百度搜索引擎（中文网络信息）",  
+            description="百度搜索引擎",  
             parameters=[  
                 ToolParameter(name="query", type="str",   
                             description="中文搜索关键词"),  
@@ -88,6 +91,18 @@ class PromptTemplate:
             ],  
             call_template="baidu_search(query='{query}', region='{region}')"  
         )  
+        
+    @classmethod  
+    def _build_baidu_api_template(cls) -> ToolTemplate:  
+        return ToolTemplate(  
+            name="baidu_api_search",  
+            description="百度搜索引擎（API版）",  
+            parameters=[  
+                ToolParameter(name="query", type="str",   
+                            description="中文搜索关键词"),  
+            ],  
+            call_template="baidu_api_search(query='{query}')"  
+        ) 
 
     @classmethod  
     def _build_wolfram_template(cls) -> ToolTemplate:  

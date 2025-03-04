@@ -3,6 +3,12 @@ from llmtuner.extras.misc import torch_gc
 import requests
 from lxml import etree 
 
+from model.qwen2.modeling_qwen2 import Qwen2ForCausalLM
+
+from config.config import MODEL_PATH
+
+from prompt_template import PromptTemplate
+
 
 try:
     import platform
@@ -16,7 +22,81 @@ except ImportError:
 
 
 class RAGFlow():
-    pass
+    
+    def __init__(self, use_hf_model = True, use_prompt_template = True):
+        self.use_hf_model = use_hf_model
+        self.use_prompt_template = use_prompt_template
+        
+        if use_hf_model:
+            self.chat_model = Qwen2ForCausalLM(MODEL_PATH)
+        else:
+            self.chat_model = ChatModel()
+        
+        if self.use_prompt_template:
+            self.prompt_template = PromptTemplate()
+            
+            
+        self.db = None # database is temporarily not implemented
+    
+    
+    
+    def build_rag_prompt(self):
+        # 生成工具调用提示  
+        prompt = prompt_template.generate_prompt(query, history)  
+        
+        # 获取模型输出（假设model为LLM实例）  
+        tool_call_str = model.generate(prompt)  
+        
+        # 执行工具调用  
+        raw_result = dispatcher.execute(tool_call_str)  
+        
+        # 结果处理  
+        summary = summarize_results(raw_result)  
+        
+        # 生成最终回答  
+        final_prompt = f"搜索结果：\n{summary}\n\n基于以上信息回答问题：{query}"  
+        return model.generate(final_prompt) 
+            
+    def rag_chat(self, query:str):
+        
+        history = []
+        print("欢迎使用中医聊天机器人，使用 clear 命令可清除聊天历史，使用 exit 命令可退出应用程序。")
+        
+        
+        while True:
+            try:
+                query = input("\n患者：")
+            except UnicodeDecodeError:
+                print("Detected decoding error at the inputs, please set the terminal encoding to utf-8.")
+                continue
+            except Exception:
+                raise
+            
+            if query.strip() == "exit":
+                break
+
+            if query.strip() == "clear":
+                history = []
+                torch_gc()
+                print("History has been removed.")
+                continue
+            
+            print("医师: ", end="", flush=True)
+            query = build_rag_prompt(query)
+            response = ""
+            
+            
+            if self.use_hf_model:
+                for new_token in self.chat_model.generate(query, history):
+                    pass
+            else:
+                for new_token in self.chat_model.stream_chat(query, history):
+                    print(new_token, end="", flush=True)
+                    response+=new_token
+            print()
+            
+            history += [(query, response)]
+
     
     
     

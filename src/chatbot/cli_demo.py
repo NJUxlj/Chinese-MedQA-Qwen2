@@ -10,7 +10,7 @@ except ImportError:
     
     
     
-def main():
+def cli_chat():
     chat_model = ChatModel()
     history = [
                 ('现在你是一名专业的中医医生，请用你的专业知识提供详尽而清晰的关于中医问题的回答。', 
@@ -50,4 +50,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    cli_chat()
