@@ -155,7 +155,7 @@ class Qwen2Config(PretrainedConfig):
         num_key_value_heads=32,
         hidden_act="silu",
         max_position_embeddings=32768,
-        initializer_range=0.02,
+        initializer_range=0.02,  # std
         rms_norm_eps=1e-6,
         use_cache=True,
         tie_word_embeddings=False,
