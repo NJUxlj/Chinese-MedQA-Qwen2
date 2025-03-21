@@ -51,7 +51,7 @@ def bytes_to_unicode():
     decent coverage. This is a significant percentage of your normal, say, 32K bpe vocab. To avoid that, we want lookup
     tables between utf-8 bytes and unicode strings.
     """
-    bs = (
+    bs = (  
         list(range(ord("!"), ord("~") + 1)) + list(range(ord("¡"), ord("¬") + 1)) + list(range(ord("®"), ord("ÿ") + 1))
     )
     cs = bs[:]
@@ -74,7 +74,7 @@ def get_pairs(word):
     """
     pairs = set()
     prev_char = word[0]
-    for char in word[1:]:
+    for char in word[1:]: 
         pairs.add((prev_char, char))
         prev_char = char
     return pairs

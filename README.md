@@ -130,4 +130,13 @@ python3 -m ftllm.chat -t 16 -p ~/Qwen2-7B-Instruct/ --dtype int8
 # 需要安装依赖: pip install streamlit-chat
 python3 -m ftllm.webui -t 16 -p ~/Qwen2-7B-Instruct/ --port 8080
 ```
-6. 
+
+
+
+## 参考的项目
+- Agent部分 参考了：
+  1.  [AgentGPT](https://github.com/reworkd/AgentGPT.git)
+  2.  [Camel](https://github.com/camel-ai/camel.git)
+- PRM模型部分参考了 [PRM](https://github.com/sdiehl/prm.git), 以及论文 [Let's verify step by step](https://arxiv.org/pdf/2305.20050)
+- 医疗RAG实现+工具调用+数据库部分参考了 [Medical-Graph-RAG](https://github.com/SuperMedIntel/Medical-Graph-RAG.git)
+- RAG检索算法+项目结构参考了 [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat.git)

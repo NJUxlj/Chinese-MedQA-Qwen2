@@ -1,0 +1,48 @@
+
+# 核心框架
+transformers>=4.38.0
+torch>=2.1.0
+accelerate>=0.27.0
+bitsandbytes>=0.42.0
+peft>=0.8.0
+datasets>=2.16.0
+evaluate>=0.4.1
+trl>=0.7.10
+
+# LLM接口
+zhipuai>=0.5.0
+openai>=1.12.0  # 用于兼容Qwen API
+
+# 向量存储和嵌入
+chromadb>=0.4.22
+sentence-transformers>=2.4.0
+faiss-cpu>=1.7.0
+langchain>=0.1.0
+langchain_chroma>=0.0.1
+
+# 文档处理
+pypdf>=3.17.0
+pdfminer.six>=20221105
+pytesseract>=0.3.10
+pillow>=10.2.0
+beautifulsoup4>=4.12.2
+lxml>=4.9.3
+
+# PubMed和医学数据处理
+pymed>=0.8.9
+biopython>=1.81
+scispacy>=0.5.3
+nltk>=3.8.1
+
+# Web和API
+fastapi>=0.108.0
+uvicorn>=0.25.0
+gradio>=4.19.1
+pydantic>=2.5.0
+
+# 工具和助手
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+tqdm>=4.66.1
+pandas>=2.1.4
+numpy>=1.26.0
