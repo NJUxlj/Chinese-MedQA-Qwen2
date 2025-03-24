@@ -211,13 +211,13 @@ class MedicalInference:
         tool_desc = "\n".join([f"{t['name']}: {t['description']}" for t in tools])
         return f"""你是一个医疗助手，请根据可用工具选择最合适的工具调用：
         
-当前问题：{prompt}
-可用工具：
-{tool_desc}
+                当前问题：{prompt}
+                可用工具：
+                {tool_desc}
 
-请严格使用以下XML格式响应：
-<function>工具名称</function>
-<params>JSON格式参数</params>"""
+                请严格使用以下XML格式响应：
+                <function>工具名称</function>
+                <params>JSON格式参数</params>"""
 
     def _load_tools(self) -> List[Dict]:
         """加载预定义工具列表"""

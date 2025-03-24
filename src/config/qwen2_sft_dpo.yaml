@@ -1,0 +1,70 @@
+
+# qwen2_sft_dpo.yaml
+# Qwen2.5两阶段训练配置(SFT + DPO)
+# 参考: https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
+
+# 基础模型配置
+model_name_or_path: "Qwen/Qwen2.5-7B-Instruct"
+adapter_name_or_path: null
+template: qwen
+
+# 数据配置
+dataset_dir: data
+dataset:
+  sft_stage: qa_dataset # SFT阶段数据集
+  dpo_stage: dpo_dataset # DPO偏好数据集
+
+# 训练阶段配置
+stages: [sft, dpo] # 两阶段训练顺序
+
+# SFT阶段参数
+sft:
+  # 基础训练参数
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 1e-5
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  fp16: true
+
+  # LoRA参数
+  lora_rank: 64
+  lora_alpha: 128
+  lora_dropout: 0.05
+  use_rslora: false
+
+  # 内存优化
+  flash_attn: true
+  gradient_checkpointing: true
+
+# DPO阶段参数
+dpo:
+  # DPO专用参数
+  dpo_beta: 0.1
+  dpo_loss: sigmoid # 支持sigmoid/hinge/logit类型
+  max_prompt_length: 1024
+  max_length: 2048
+
+  # 训练参数
+  num_train_epochs: 2
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 4
+  learning_rate: 5e-6
+  warmup_ratio: 0.1
+  weight_decay: 0.001
+
+  # 内存优化
+  flash_attn: true
+  gradient_checkpointing: true
+
+# 公共输出配置
+output_dir: outputs/qwen2.5-dpo
+logging_steps: 10
+save_steps: 1000
+save_total_limit: 2
+report_to: tensorboard
+
+# 硬件优化
+deepspeed: deepspeed_zero3.json
