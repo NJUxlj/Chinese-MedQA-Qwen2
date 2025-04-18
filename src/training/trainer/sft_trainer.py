@@ -1,92 +1,143 @@
+
+import os
 import torch
-import torch.nn as nn
+from typing import Dict, List, Optional, Union, Any
+from transformers import Trainer, TrainingArguments, AutoModelForCausalLM, AutoTokenizer
+from datasets import Dataset
+from ..dataset.medical_dataset import MedicalDataset
+from utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
+class SFTTrainer:
+    """基于Hugging Face Trainer的SFT训练器"""
+    
+    def __init__(
+        self,
+        model_name_or_path: str,
+        output_dir: str,
+        training_args: Optional[Dict[str, Any]] = None,
+    ):
+        self.model_name_or_path = model_name_or_path
+        self.output_dir = output_dir
+        self.training_args = training_args or {}
+        self.tokenizer = None
+        self.model = None
+        self.trainer = None
+        
+    def load_model_and_tokenizer(self):
+        """加载模型和分词器"""
+        logger.info(f"Loading model and tokenizer from {self.model_name_or_path}")
+        
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.model_name_or_path,
+            trust_remote_code=True,
+            padding_side="right"
+        )
+        
+        # 确保分词器有正确的填充token
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_name_or_path,
+            trust_remote_code=True,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            device_map="auto" if torch.cuda.is_available() else None
+        )
+        
+        # 为适应医疗问答对话，调整模型配置
+        if hasattr(self.model.config, "max_length"):
+            self.model.config.max_length = 2048
+        
+        return self.model, self.tokenizer
+    
+    def prepare_dataset(self, medical_dataset: MedicalDataset) -> Dataset:
+        """准备训练数据集"""
+        logger.info("Preparing dataset for SFT")
+        return medical_dataset.get_sft_dataset(self.tokenizer)
+    
+    def create_trainer(self, train_dataset, eval_dataset=None):
+        """创建Trainer实例"""
+        default_args = {
+            "output_dir": self.output_dir,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 4,
+            "learning_rate": 2e-5,
+            "num_train_epochs": 3,
+            "logging_steps": 10,
+            "save_steps": 200,
+            "evaluation_strategy": "steps" if eval_dataset else "no",
+            "eval_steps": 200 if eval_dataset else None,
+            "save_total_limit": 3,
+            "lr_scheduler_type": "cosine",
+            "warmup_ratio": 0.1,
+            "fp16": torch.cuda.is_available(),
+            "report_to": "tensorboard",
+            "remove_unused_columns": False,
+            "load_best_model_at_end": True if eval_dataset else False,
+        }
+        
+        # 更新默认参数
+        for key, value in self.training_args.items():
+            default_args[key] = value
+        
+        training_args = TrainingArguments(**default_args)
+        
+        def data_collator(features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
+            """自定义数据整理函数"""
+            batch = {}
+            for key in features[0].keys():
+                if key in ["input_ids", "attention_mask", "labels"]:
+                    batch[key] = torch.tensor([f[key] for f in features], dtype=torch.long)
+            return batch
+        
+        self.trainer = Trainer(
+            model=self.model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
+            tokenizer=self.tokenizer,
+            data_collator=data_collator,
+        )
+        
+        return self.trainer
+    
+    def train(self, medical_dataset: MedicalDataset, eval_split: float = 0.1):
+        """执行SFT训练"""
+        if self.model is None or self.tokenizer is None:
+            self.load_model_and_tokenizer()
+        
+        # 准备数据集
+        dataset = medical_dataset.get_sft_dataset(self.tokenizer)
+        
+        # 划分训练和评估数据集
+        if eval_split > 0:
+            dataset = dataset.train_test_split(test_size=eval_split)
+            train_dataset = dataset["train"]
+            eval_dataset = dataset["test"]
+        else:
+            train_dataset = dataset
+            eval_dataset = None
+        
+        # 创建训练器
+        self.create_trainer(train_dataset, eval_dataset)
+        
+        # 开始训练
+        logger.info("Starting SFT training")
+        self.trainer.train()
+        
+        # 保存最终模型
+        logger.info(f"Saving final model to {self.output_dir}")
+        self.trainer.save_model(self.output_dir)
+        self.tokenizer.save_pretrained(self.output_dir)
+        
+        return self.output_dir
 
 
-from datasets import load_dataset  
-from transformers import (  
-    AutoModelForCausalLM,  
-    AutoTokenizer,  
-    TrainingArguments,  
-    BitsAndBytesConfig  
-)  
-from peft import LoraConfig  
-from trl import SFTTrainer  
-
-from config.config import MODEL_PATH, TOKENIZER_PATH, DEVICE
-
-
-
-# 量化配置（减少显存消耗）  
-bnb_config = BitsAndBytesConfig(  
-    load_in_4bit=True,           # 4位量化加载  
-    bnb_4bit_quant_type="nf4",  # 量化类型  
-    bnb_4bit_compute_dtype=torch.bfloat16,  
-    bnb_4bit_use_double_quant=True  # 嵌套量化  
-)  
-
-
-
-# 加载预训练模型和分词器（使用7B指令版）  
-model = AutoModelForCausalLM.from_pretrained(  
-    MODEL_PATH,  
-    quantization_config=bnb_config,  
-    device_map="auto",  
-    trust_remote_code=True  
-)  
-
-
-tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH, trust_remote_code=True)  
-tokenizer.pad_token = tokenizer.eos_token  # 设置填充token  
 
 
 
 
-# LoRA配置（参数高效微调）  
-peft_config = LoraConfig(  
-    r=64,                # 低秩矩阵维度  
-    lora_alpha=16,       # 缩放系数  
-    lora_dropout=0.05,   # Dropout概率  
-    target_modules=["q_proj", "v_proj"],  # 目标注意力层  
-    bias="none",         # 不训练偏置项  
-    task_type="CAUSAL_LM"  
-)  
-
-# 加载中医问答数据集（假设格式为{"instruction": ..., "response": ...}）  
-dataset = load_dataset("json", data_files="tcm_qa.json")["train"] 
-
-# 格式化函数（将问答对转换为模型输入格式）  
-def format_instruction(sample):  
-    return f"问：{sample['instruction']}\n答：{sample['response']}"  
-
-
-# 训练参数配置  
-training_args = TrainingArguments(  
-    output_dir="./output",          # 输出目录  
-    num_train_epochs=3,              # 训练轮次  
-    per_device_train_batch_size=2,   # 批次大小  
-    gradient_accumulation_steps=4,   # 梯度累积  
-    learning_rate=2e-5,              # 学习率  
-    fp16=True,                       # 混合精度训练  
-    logging_steps=10,                # 日志间隔  
-    save_strategy="epoch",           # 保存策略  
-    report_to="tensorboard"          # 监控工具  
-)  
-
-
-# 初始化SFTTrainer  
-trainer = SFTTrainer(  
-    model=model,  
-    args=training_args,  
-    train_dataset=dataset,  
-    peft_config=peft_config,  
-    max_seq_length=1024,            # 最大序列长度  
-    tokenizer=tokenizer,  
-    formatting_func=format_instruction,  # 数据格式化函数  
-    dataset_text_field="text"       # 数据集文本字段（自动生成）  
-)  
-
-# 开始训练  
-trainer.train()  
-
-# 保存微调后的模型  
-trainer.save_model("qwen2_tcm_sft")  
+if __name__ == "__main__":
+    pass

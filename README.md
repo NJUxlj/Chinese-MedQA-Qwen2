@@ -196,8 +196,8 @@ ds = load_dataset("ticoAg/Chinese-medical-dialogue")
 ```
 
 #### DPO数据集
+- 字段格式：{"prompt"..., "chosen":..., "rejected":...}
 ```python
-
 from datasets import load_dataset
 
 ds = load_dataset("Morefreedai/medical-dpo-v1")
