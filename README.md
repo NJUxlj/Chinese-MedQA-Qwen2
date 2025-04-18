@@ -36,6 +36,149 @@
   - 参考Langchain-Chatchat和Medical-Graph-RAG的项目结构
 
 
+
+## 项目设计图
+```mermaid
+
+flowchart TD
+    subgraph User["用户界面"]
+        UI["Web界面/API"]
+    end
+    
+    subgraph ModelTuning["模型微调模块"]
+        SFT["监督微调(SFT)"]
+        DPO["直接偏好优化(DPO)"]
+        Dataset["医疗数据集"]
+        SFT --> DPO
+        Dataset --> SFT
+    end
+    
+    subgraph KnowledgeBase["医疗知识库"]
+        Documents["医疗文档"]
+        Embedding["文档嵌入"]
+        FAISS["FAISS索引"]
+        Documents --> Embedding
+        Embedding --> FAISS
+    end
+    
+    subgraph Inference["推理模块"]
+        TunedModel["微调后的Qwen2模型"]
+        ApiModel["智谱API调用"]
+        FastLLM["FastLLM加速推理"]
+        VLLM["VLLM加速推理"]
+        TunedModel --> FastLLM
+        TunedModel --> VLLM
+        ApiModel --> Inference["推理结果"]
+        FastLLM --> Inference
+        VLLM --> Inference
+    end
+    
+    subgraph RAG["RAG模块"]
+        QueryEmbed["查询嵌入"]
+        Retrieval["文档检索"]
+        TopK["Top-K选择"]
+        RagPrompt["RAG提示构建"]
+        QueryEmbed --> Retrieval
+        Retrieval --> TopK
+        TopK --> RagPrompt
+    end
+    
+    subgraph AgentModule["Agent模块"]
+        AgentFramework["Agent框架"]
+        ToolCalling["工具调用"]
+        AgentFramework --> ToolCalling
+    end
+    
+    User --> RAG
+    RAG --> Inference
+    Inference --> AgentModule
+    KnowledgeBase --> RAG
+    ModelTuning --> Inference
+    AgentModule --> User
+
+```
+
+
+## 项目文件架构
+```
+chinese-medqa-qwen2/
+├── README.md                          # 项目介绍和使用说明
+├── requirements.txt                   # 项目依赖
+├── config/                            # 配置文件目录
+│   ├── model_config.py                # 模型配置
+│   ├── rag_config.py                  # RAG配置
+│   └── agent_config.py                # Agent配置
+├── data/                              # 数据目录
+│   ├── raw/                           # 原始医疗数据
+│   ├── processed/                     # 处理后的数据
+│   ├── embeddings/                    # 文档嵌入
+│   └── indices/                       # FAISS索引文件
+├── models/                            # 模型相关代码
+│   ├── base_model.py                  # 基础模型类
+│   ├── qwen_model.py                  # Qwen2模型封装
+│   ├── api_model.py                   # 智谱API模型封装
+│   └── model_utils.py                 # 模型工具函数
+├── training/                          # 训练相关代码
+│   ├── trainer/                       # 训练器实现
+│   │   ├── sft_trainer.py             # SFT训练器
+│   │   └── dpo_trainer.py             # DPO训练器(手写)
+│   ├── dataset/                       # 数据集处理
+│   │   ├── medical_dataset.py         # 医疗数据集类
+│   │   └── data_processor.py          # 数据处理工具
+│   └── scripts/                       # 训练脚本
+│       ├── run_sft.py                 # 运行SFT训练
+│       └── run_dpo.py                 # 运行DPO训练
+├── inference/                         # 推理相关代码
+│   ├── fastllm_inference.py           # FastLLM推理
+│   ├── vllm_inference.py              # VLLM推理
+│   ├── api_inference.py               # API推理
+│   └── inference_utils.py             # 推理工具函数
+├── knowledge_base/                    # 知识库相关代码
+│   ├── document_loader.py             # 文档加载器
+│   ├── document_processor.py          # 文档处理
+│   ├── embedding_manager.py           # 嵌入管理
+│   └── retrieval/                     # 检索相关代码
+│       ├── retriever_base.py          # 基础检索器
+│       ├── similarity_retriever.py    # 相似度检索
+│       ├── bm25_retriever.py          # BM25检索
+│       ├── l2_retriever.py            # L2距离检索
+│       └── knn_retriever.py           # KNN检索
+├── rag/                               # RAG相关代码
+│   ├── rag_pipeline.py                # RAG流水线
+│   ├── query_processor.py             # 查询处理
+│   ├── context_builder.py             # 上下文构建
+│   └── response_generator.py          # 响应生成
+├── agent/                             # Agent相关代码
+│   ├── agent_base.py                  # 基础Agent类
+│   ├── medical_agent.py               # 医疗Agent实现
+│   ├── tool_manager.py                # 工具管理
+│   └── tools/                         # 工具实现
+│       ├── tool_base.py               # 基础工具类
+│       ├── search_tool.py             # 搜索工具
+│       ├── calculator_tool.py         # 计算工具
+│       └── medical_reference_tool.py  # 医疗参考工具
+├── web/                               # Web界面
+│   ├── app.py                         # Web应用
+│   ├── static/                        # 静态资源
+│   └── templates/                     # 模板文件
+├── api/                               # API服务
+│   ├── main.py                        # API主入口
+│   ├── routers/                       # API路由
+│   └── schemas/                       # API模式定义
+├── utils/                             # 通用工具
+│   ├── logger.py                      # 日志工具
+│   ├── metrics.py                     # 评估指标
+│   ├── file_utils.py                  # 文件工具
+│   └── text_utils.py                  # 文本处理工具
+└── tests/                             # 测试代码
+    ├── test_models.py                 # 模型测试
+    ├── test_rag.py                    # RAG测试
+    ├── test_agent.py                  # Agent测试
+    └── test_integration.py            # 集成测试
+```
+
+
+
 ## 模型介绍
 Qwen2 is based on the Transformer architecture with SwiGLU activation, attention QKV bias, group query attention, etc. 
 
