@@ -1,6 +1,39 @@
 ## Chinese-MedQA-Qwen2
-本项目是一个基于Qwen2基座模型，以及基于[LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)训练框架，和[fastllm](https://github.com/ztxz16/fastllm)推理框架的医疗问答（Medical QA）模型。
-该项目的目的，是使用SFT来微调一个使用西医知识来进行疾病诊疗的垂直模型
+- 本项目是一个基于Qwen2+Agent+RAG的医疗问答系统
+- 该项目的目的，是使用`SFT+DPO`来微调一个使用西医知识来进行疾病诊疗的垂直qwen2模型, 并将SFT+DPO微调后的模型(也可以用智谱api模型调用进行替换)的回答文本和本地知识库中的文本做匹配，然后使用RAG的方式(参考`Longchain-chatchat`项目)来将原始回答和匹配的top-k个文本段进行拼接，然后再进行回答。
+
+
+## 项目内容
+1. 手动构建 SFT+DPO 的Trainer.(SFT由huggingface的Trainer实现，DPO 是由 [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) 实现, 用户也可以选择我们手动编写的DPOTrainer【注意，这是我手写的！和trl库里的那个DPOTrainer不是同一个】)
+2. 推理实现：用户可以选择两种推理方式：1.使用 [fastllm](https://github.com/ztxz16/fastllm)（一个基于C++的推理库）加速推理。2.用户也可以切换成使用 VLLM 进行推理加速
+3. 本项目也参考了LongChain-Chatchat的项目框架：【1】包括Ollama，XInference的基本使用(主要是模型的加载与推理)。
+4. 参考了LongChain-Chatchat的架构，在Chinese-MedQA的文档匹配算法中加入KNN（原本只有相似度、BM25、L2_distance）。【3】使用FAISS构建了本地医疗知识库。
+
+
+## 参考的项目
+- Agent部分 参考了：
+  1.  [AgentGPT](https://github.com/reworkd/AgentGPT.git)
+  2.  [Camel](https://github.com/camel-ai/camel.git)
+- 医疗RAG实现+工具调用+数据库部分参考了 [Medical-Graph-RAG](https://github.com/SuperMedIntel/Medical-Graph-RAG.git)
+- RAG检索算法+项目结构参考了 [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat.git)
+
+
+
+## 技术栈总结
+1. 基础模型: Qwen2（同时支持本地部署和智谱API调用）
+2. 微调框架:
+  - SFT: 基于Hugging Face Trainer实现
+  - DPO: 手动构建的DPOTrainer，参考LLaMA-Factory
+3. 推理加速:
+  - FastLLM（基于C++的推理库）
+  - VLLM（大规模部署时的推理加速）
+4. 知识库与检索:
+  - FAISS向量数据库（高效相似性搜索）
+  - 多种检索算法：相似度、BM25、L2距离、KNN
+5. Agent实现:
+  - 参考AgentGPT和Camel项目
+6. 项目框架:
+  - 参考Langchain-Chatchat和Medical-Graph-RAG的项目结构
 
 
 ## 模型介绍
@@ -12,7 +45,7 @@ Qwen2-7B-Instruct supports a context length of up to 131,072 tokens.
 ## 数据集
 
 #### SFT数据集
-
+- 字段格式：{"instruction"..., "input":..., "output":...}
 ```python
 from datasets import load_dataset
 
@@ -133,10 +166,4 @@ python3 -m ftllm.webui -t 16 -p ~/Qwen2-7B-Instruct/ --port 8080
 
 
 
-## 参考的项目
-- Agent部分 参考了：
-  1.  [AgentGPT](https://github.com/reworkd/AgentGPT.git)
-  2.  [Camel](https://github.com/camel-ai/camel.git)
-- PRM模型部分参考了 [PRM](https://github.com/sdiehl/prm.git), 以及论文 [Let's verify step by step](https://arxiv.org/pdf/2305.20050)
-- 医疗RAG实现+工具调用+数据库部分参考了 [Medical-Graph-RAG](https://github.com/SuperMedIntel/Medical-Graph-RAG.git)
-- RAG检索算法+项目结构参考了 [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat.git)
+
