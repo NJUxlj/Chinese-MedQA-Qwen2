@@ -17,6 +17,8 @@ from transformers import (
 from .base_model import BaseModel  
 
 
+from .qwen2.modeling_qwen2 import Qwen2ForCausalLM
+
 class Qwen2Model(BaseModel):  
     """  
     Qwen2 model implementation for the Chinese-MedQA-Qwen2 project.  
@@ -76,11 +78,12 @@ class Qwen2Model(BaseModel):
         # Set up quantization configuration  
         quantization_config = None  
         if self.load_in_4bit:  
+            # 大幅减少模型内存占用（约减少 75%）
             quantization_config = BitsAndBytesConfig(  
                 load_in_4bit=True,  
                 bnb_4bit_compute_dtype=torch.bfloat16,  
-                bnb_4bit_use_double_quant=True,  
-                bnb_4bit_quant_type="nf4"  
+                bnb_4bit_use_double_quant=True,    # 启用双重量化，即对量化参数本身再进行一次量化
+                bnb_4bit_quant_type="nf4"    # 使用 NF4 (Normal Float 4) 量化类型，这是一种专门为神经网络权重设计的 4-bit 量化格式
             )  
         elif self.load_in_8bit:  
             quantization_config = BitsAndBytesConfig(  
@@ -119,7 +122,8 @@ class Qwen2Model(BaseModel):
     def generate(  
         self,  
         prompt: str,  
-        max_length: int = 512,  
+        max_length: int = 512,
+        max_new_tokens: int = 200,  
         temperature: float = 0.7,  
         top_p: float = 0.9,  
         top_k: int = 50,  
@@ -154,28 +158,46 @@ class Qwen2Model(BaseModel):
                 {"role": "system", "content": "You are a helpful medical assistant that provides accurate information based on your knowledge."},  
                 {"role": "user", "content": prompt}  
             ]  
-            inputs = self.tokenizer.apply_chat_template(  
+            input_ids = self.tokenizer.apply_chat_template(  
                 messages,   
                 return_tensors="pt",  
                 add_generation_prompt=True  
-            ).to(self.device)  
+            ).to(self.device) 
+            
+            # 确保inputs是字典格式
+            inputs = {
+                "input_ids": input_ids,
+                "attention_mask": torch.ones_like(input_ids)
+            } 
         else:  
             inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)  
         
         # Generate output  
         with torch.no_grad():  
             outputs = self.model.generate(  
-                inputs["input_ids"] if use_chat_template else inputs.input_ids,  
-                max_length=max_length,  
+                inputs["input_ids"],  
+                max_length=max_length,
+                max_new_tokens = max_new_tokens,  
                 temperature=temperature,  
                 top_p=top_p,  
                 top_k=top_k,  
-                num_return_sequences=num_return_sequences,  
+                num_return_sequences=num_return_sequences,   # 控制模型返回的候选序列数量。当值大于1时，模型会返回多个可能的输出序列（beam search）。
                 do_sample=do_sample,  
                 pad_token_id=self.tokenizer.pad_token_id,  
                 attention_mask=inputs["attention_mask"] if use_chat_template else inputs.attention_mask,  
                 **kwargs  
             )  
+            
+            '''
+            当 do_sample=True 时:
+                计算每个token的概率分布
+                根据temperature调整分布平滑度
+                使用top_k/top_p过滤低概率token
+                从剩余token中随机采样
+            当 do_sample=False 时：
+                直接选择概率最高的token
+                相当于temperature=0的确定式生成
+            '''
         
         # Decode the output  
         if use_chat_template:  
@@ -242,7 +264,7 @@ class Qwen2Model(BaseModel):
             embeddings.append(seq_embed)  
         
         # Stack all embeddings  
-        return torch.cat(embeddings, dim=0)  
+        return torch.cat(embeddings, dim=0)  # shape = (n*bsz, hidden_size)
     
     def prepare_inputs_for_rag(self, query: str, context: List[str], **kwargs) -> Dict[str, Any]:  
         """  
@@ -387,10 +409,31 @@ class Qwen2ForMedicalQA(Qwen2Model):
         Evaluation:  
         """  
         
-        evaluation = self.generate(validation_prompt, max_length=256, temperature=0.3)  
+        evaluation = self.generate(validation_prompt, max_length=256, max_new_tokens=200, temperature=0.3)  
         
         return {  
             "is_valid": "accurate" in evaluation.lower() or "correct" in evaluation.lower(),  
             "evaluation": evaluation,  
             "response": response  
         }  
+        
+        
+        
+        
+
+
+
+if __name__ == '__main__':
+    
+    '''
+    python -m src.models.qwen_model
+    '''
+    
+    from ..config.model_config import model_path
+    model = Qwen2Model(model_path=model_path)
+    
+    
+    result = model.generate("今天天气很不错，你觉得呢？")
+
+
+    print(result)

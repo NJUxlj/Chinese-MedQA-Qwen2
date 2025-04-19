@@ -99,7 +99,7 @@ class ZhipuAiModel(ApiModel):
         self,  
         api_key: str = None,  
         api_base: str = None,  # Not needed when using the SDK but kept for compatibility  
-        model_name: str = "glm-4",  
+        model_name: str = "glm-4-flash",  
         **kwargs  
     ):  
         """  
@@ -119,11 +119,9 @@ class ZhipuAiModel(ApiModel):
             **kwargs  
         )  
         
-        # Import and initialize the zhipuai client  
         try:  
-            import zhipuai  
-            zhipuai.api_key = self.api_key  
-            self.client = zhipuai  
+            from zhipuai import ZhipuAI  
+            self.client = ZhipuAI(api_key=self.api_key)  
             print("Successfully initialized zhipuai client")  
         except ImportError:  
             raise ImportError("zhipuai package is required. Install it with 'pip install zhipuai'")  
@@ -132,14 +130,14 @@ class ZhipuAiModel(ApiModel):
         self.available_llm_models = [  
             "glm-3-turbo",   
             "glm-4",   
+            "glm-4-flash",
+            "glm-4-turbo",
             "glm-4-vision",   
-            "chatglm_turbo",   
-            "chatglm_pro",   
-            "chatglm_std"  
         ]  
         
         self.available_embedding_models = [  
             "embedding-2",   
+            "embedding-3"
             "text_embedding"  
         ]  
         

@@ -90,6 +90,15 @@ def calculate_model_size_requirements(
         "Qwen/Qwen2-1.5B-Instruct": 1.5,  
         "Qwen/Qwen2-72B": 72,  
         "Qwen/Qwen2-72B-Instruct": 72,  
+        
+        "Qwen/Qwen2.5-7B": 7,
+        "Qwen/Qwen2.5-7B-Instruct": 7,
+        "Qwen/Qwen2.5-0.5B": 0.5,
+        "Qwen/Qwen2.5-0.5B-Instruct": 0.5,
+        "Qwen/Qwen2.5-1.5B": 1.5,
+        "Qwen/Qwen2.5-1.5B-Instruct": 1.5,
+        "Qwen/Qwen2.5-72B": 72,
+        "Qwen/Qwen2.5-72B-Instruct": 72,
     }  
     
     # Default to 7B if unknown  

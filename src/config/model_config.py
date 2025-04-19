@@ -4,7 +4,7 @@ use_fastllm = False  # 是否使用FastLLM加速
 use_vllm = False  # 是否使用VLLM加速  
 
 # 本地模型配置  
-model_path = "path/to/qwen2/model"  # 本地模型路径  
+model_path = "/root/autodl-tmp/models/Qwen2.5-0.5B"  # 本地模型路径  
 device = "cuda:0"  # 设备  
 
 # API配置（如果使用API）  
