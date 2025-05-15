@@ -32,3 +32,26 @@ class FastLLMModel:
         self.model.save(FLM_MODEL_PATH)
         
         
+    
+    
+    def response(self, x):
+        pass
+    
+    
+    
+    
+    def chat(self):
+        pass
+
+    
+    def chat_with_callback(self):
+        pass
+    
+    
+    
+    @classmethod
+    def convert_model_to_flm(cls, model:Qwen2ForCausalLM, tokenizer:AutoTokenizer, flm_model_path = None, device=None): 
+        pass
+    
+        
+        
