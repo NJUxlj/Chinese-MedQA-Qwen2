@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Union, Any, Tuple, Iterator
 import torch  
 from threading import Lock  
 
-# 确保可以导入项目其他模块  
+# 确保可以导入项目其他模块  【也就是src目录下的其他包】
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 
 from utils.logger import get_logger  
@@ -45,11 +45,11 @@ class VLLMInference:
         """  
         实现单例模式，相同路径的模型只加载一次  
         """  
-        with cls._lock:  
-            if model_path not in cls._instances:  
-                instance = super(VLLMInference, cls).__new__(cls)  
-                cls._instances[model_path] = instance  
-            return cls._instances[model_path]  
+        with cls._lock:     # 加锁保证线程安全
+            if model_path not in cls._instances:    # # 检查是否已有实例
+                instance = super(VLLMInference, cls).__new__(cls)    # 创建新实例
+                cls._instances[model_path] = instance     # 存入字典
+            return cls._instances[model_path]  # 返回单例
     
     def __init__(self,   
                 model_path: str,   
@@ -154,18 +154,40 @@ class VLLMInference:
                 temperature=0.0 if not do_sample else temperature,  
                 top_p=1.0 if not do_sample else top_p,  
                 top_k=-1 if not do_sample else top_k,  
-                repetition_penalty=repetition_penalty,  
-                presence_penalty=presence_penalty,  
-                frequency_penalty=frequency_penalty,  
+                repetition_penalty=repetition_penalty,     # - 重复惩罚系数，默认1.1   值>1.0会降低重复token的概率，值<1.0会增加重复概率
+                presence_penalty=presence_penalty,    # 惩罚已经出现过的token，与频率无关
+                frequency_penalty=frequency_penalty,    # 根据token出现频率进行惩罚
                 stop=stop or ["<|im_end|>"],  
-                n=1,  
+                n=1,    # 每个输入生成的候选数，固定为1. 表示每个prompt只生成1个结果
                 # best_of 相当于 num_beams  
-                best_of=num_beams if not do_sample else 1  
+                best_of=num_beams if not do_sample else 1     # 当不使用采样(do_sample=False)时，使用num_beams参数。当使用采样时，固定为1
             )  
             
             # 执行推理  
             outputs = self.model.generate(prompt, sampling_params)  
             response = outputs[0].outputs[0].text  
+            
+            '''
+            在vLLM的API设计中， outputs[0].outputs[0].text 这种双重访问结构是合理的，原因如下：
+
+                1. 第一层 outputs[0] ：
+                
+                - 这是针对批量请求的返回结果，即使只请求单个prompt，vLLM也会返回一个数组
+                - 每个元素对应一个输入prompt的生成结果
+                2. 第二层 .outputs[0] ：
+                
+                - 每个生成结果可能包含多个候选输出(beam search)
+                - 这里取第一个候选结果(索引0)
+                - 如果设置了 n>1 参数，这里会有多个候选
+                3. .text ：
+                
+                - 最终提取生成的文本内容
+                这种设计保持了API的一致性，可以同时支持：
+
+                - 批量请求(多个prompts)
+                - 多候选输出(beam search)
+                - 流式生成
+            '''
             
             # 后处理  
             return postprocess_response(response)  
@@ -366,7 +388,7 @@ if __name__ == "__main__":
         sys.exit(1)  
         
     # 测试模型路径，请替换为实际的模型路径  
-    model_path = "/path/to/your/model"  
+    model_path = "/root/autodl-tmp/models/Qwen2.5-1.5B-Instruct"  
     
     # 初始化推理类  
     inference = VLLMInference(model_path)  

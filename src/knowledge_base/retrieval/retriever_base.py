@@ -106,7 +106,7 @@ class BaseRetriever(ABC):
             for key, value in filter_dict.items():  
                 if key not in doc.metadata or doc.metadata[key] != value:  
                     matches_all = False  
-                    break  
+                    break    # 如果一个文档片段没有包含所有的过滤条件，那就把他丢掉
                     
             if matches_all:  
                 filtered_results.append((doc, score))  
