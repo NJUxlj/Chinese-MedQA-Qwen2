@@ -45,3 +45,15 @@ huggingface-cli download --repo-type dataset Zaynoid/med-dpo-10k --local-dir med
 2. 对于Qwen2.5-1.5B-Instruct模型，可能需要调整LoRA的`target_modules`以适配模型架构
 
 3. 建议使用wandb或tensorboard监控训练过程中的指标变化
+
+
+
+
+
+## 运行脚本
+```bash
+
+accelerate launch \
+--config_file /root/autodl-tmp/Chinese-MedQA-Qwen2/src/config/deepspeed_config/ds_stage3_config.json \
+/root/autodl-tmp/Chinese-MedQA-Qwen2/src/training/trainer/grpo_from_trl.py
+```

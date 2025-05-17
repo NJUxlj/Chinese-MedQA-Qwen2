@@ -26,12 +26,12 @@ dataset_name = "/root/autodl-tmp/Chinese-MedQA-Qwen2/data/med-dpo-10k"  # 替换
 # )
 
 # 加载模型和分词器
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    # quantization_config=bnb_config,
-    device_map="auto",
-    trust_remote_code=True,
-)
+# model = AutoModelForCausalLM.from_pretrained(
+#     model_name,
+#     # quantization_config=bnb_config,
+#     device_map="auto",
+#     trust_remote_code=True,
+# )
 
 # 为QLoRA准备模型
 # model = prepare_model_for_kbit_training(model)

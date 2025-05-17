@@ -12,7 +12,7 @@
       "stage3_gather_16bit_weights_on_model_save": true
     },
     "bf16": {
-      "enabled": true
+      "enabled": "auto"
     },
     "fp16": {
       "enabled": "auto",
