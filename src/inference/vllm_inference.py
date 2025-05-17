@@ -342,20 +342,21 @@ class VLLMInference:
                 presence_penalty=kwargs.get("presence_penalty", 0.0),  
                 frequency_penalty=kwargs.get("frequency_penalty", 0.0),  
                 stop=kwargs.get("stop", ["<|im_end|>"]),  
-                n=1,  
+                n=1,     # 每个prompt只生成1个结果
                 best_of=kwargs.get("num_beams", 1) if not kwargs.get("do_sample", True) else 1  
             )  
             
             # 执行批量流式推理  
             current_lengths = [0] * len(prompts)  
+            # outputs就是一个宽度逐渐增加的batch
             for outputs in self.model.generate(prompts, sampling_params, stream=True):  
                 new_texts = []  
-                for i, output in enumerate(outputs):  
+                for i, output in enumerate(outputs):    # output 对应一个prompt
                     response = output.outputs[0].text  
                     new_text = response[current_lengths[i]:]  
                     current_lengths[i] = len(response)  
                     new_texts.append(new_text)  
-                yield new_texts  
+                yield new_texts  # 每次返回一个新token的列表
                 
         except Exception as e:  
             logger.error(f"批量流式推理过程中出错: {str(e)}")  
