@@ -67,9 +67,9 @@ def preprocess_function(examples):
     
     # 提取prompt和completion
     model_inputs = {
-        "prompt": [prompt_format.format(prompt=p) for p in examples["question"]],
-        "chosen": [c for c in examples["chosen"]],
-        "rejected": [r for r in examples["rejected"]],
+        "prompt": [prompt_format.format(prompt=p[:100]) for p in examples["question"]],
+        "chosen": [c[:100] for c in examples["chosen"]],
+        "rejected": [r[:100] for r in examples["rejected"]],
     }
     
     return model_inputs
@@ -81,54 +81,63 @@ processed_dataset = train_dataset.map(
     remove_columns=train_dataset.column_names,
 )
 
+
+processed_dataset = processed_dataset.select(range(1000))
+
+
 # 定义GRPO配置
 grpo_config = GRPOConfig(
-    mini_batch_size=1,
-    num_groups=5,  # 根据你的硬件和数据集调整
-    chunk_size=16,
-    beta=0.1,
+    output_dir="save\Qwen2-1.5B-Instruct-GRPO-TRL", 
+    logging_steps=10,
+    per_device_train_batch_size=8,
+    bf16=True,
 )
 
 # 创建数据整理器，用于只对completion部分计算loss
 response_template = "<|im_start|>assistant\n"
-collator = DataCollatorForCompletionOnlyLM(
-    response_template=response_template,
-    tokenizer=tokenizer,
-)
+# collator = DataCollatorForCompletionOnlyLM(
+#     response_template=response_template,
+#     tokenizer=tokenizer,
+# )
 
 # 定义训练参数
-training_args = TrainingArguments(
-    output_dir="./save",
-    num_train_epochs=3,
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=4,
-    gradient_checkpointing=True,
-    optim="paged_adamw_32bit",
-    learning_rate=5e-5,
-    lr_scheduler_type="cosine",
-    warmup_ratio=0.1,
-    weight_decay=0.05,
-    fp16=True,
-    logging_steps=10,
-    evaluation_strategy="steps",
-    eval_steps=100,
-    save_strategy="steps",
-    save_steps=100,
-    report_to="tensorboard",  # 如果不需要wandb，可以改为"none"
-    seed=42,
-    push_to_hub=False,  # 设置为True，如果你想推送到Hugging Face Hub
-)
+# training_args = TrainingArguments(
+#     output_dir="./save",
+#     num_train_epochs=3,
+#     per_device_train_batch_size=4,
+#     gradient_accumulation_steps=4,
+#     gradient_checkpointing=True,
+#     optim="paged_adamw_32bit",
+#     learning_rate=5e-5,
+#     lr_scheduler_type="cosine",
+#     warmup_ratio=0.1,
+#     weight_decay=0.05,
+#     fp16=True,
+#     logging_steps=10,
+#     evaluation_strategy="steps",
+#     eval_steps=100,
+#     save_strategy="steps",
+#     save_steps=100,
+#     report_to="tensorboard",  # 如果不需要wandb，可以改为"none"
+#     seed=42,
+#     push_to_hub=False,  # 设置为True，如果你想推送到Hugging Face Hub
+# )
+
+# Define the reward function, which rewards completions that are close to 200 characters
+def reward_len(completions, **kwargs):
+    return [-abs(200 - len(completion)) for completion in completions]
 
 # 创建GRPO训练器
 trainer = GRPOTrainer(
-    model=model,
-    args=training_args,
+    model=model_name,
+    reward_funcs=reward_len,
+    args=grpo_config,
     train_dataset=processed_dataset,
-    tokenizer=tokenizer,
-    peft_config=peft_config,
-    data_collator=collator,
-    grpo_config=grpo_config,
-    compute_metrics=None,  # 如果需要自定义评估指标，可以添加
+    
+    # tokenizer=tokenizer,
+    # peft_config=peft_config,
+    # data_collator=collator,
+    # compute_metrics=None,  # 如果需要自定义评估指标，可以添加
 )
 
 # 开始训练
