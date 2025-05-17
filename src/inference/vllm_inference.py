@@ -114,7 +114,7 @@ class VLLMInference:
             logger.error(f"加载模型时出错: {str(e)}")  
             raise  
     
-    @measure_latency  
+    @measure_latency   # 测量方法执行的延迟/耗时
     def generate(self,   
                 prompt: str,   
                 max_new_tokens: int = 512,  
