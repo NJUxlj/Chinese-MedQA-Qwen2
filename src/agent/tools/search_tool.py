@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional, List, Union
 import json
 
 from .tool_base import ToolBase
-from ...utils.logger import get_logger
+from utils.logger import setup_logger as get_logger
 
 logger = get_logger(__name__)
 

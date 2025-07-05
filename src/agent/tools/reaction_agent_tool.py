@@ -3,7 +3,7 @@ import json
 import re
 
 from .tool_base import ToolBase
-from ...utils.logger import get_logger
+from utils.logger import setup_logger as get_logger
 
 logger = get_logger(__name__)
 

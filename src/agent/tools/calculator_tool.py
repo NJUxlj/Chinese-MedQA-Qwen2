@@ -3,7 +3,7 @@ import math
 import re
 
 from .tool_base import ToolBase
-from ...utils.logger import get_logger
+from utils.logger import setup_logger as get_logger
 
 logger = get_logger(__name__)
 
@@ -105,6 +105,11 @@ class CalculatorTool(ToolBase):
             }
             
             # 使用eval执行计算
+            # 使用 eval 函数对表达式进行求值计算。
+                # 这里将 expression（用户输入的数学表达式字符串）作为第一个参数传入 eval，
+                # 第二个参数 {"__builtins__": {}} 禁用所有内建函数和变量，防止安全风险，
+                # 第三个参数 safe_dict 只允许表达式中使用 safe_dict 里定义的数学函数和常量。
+                # 这样可以在一定程度上保证表达式求值的安全性，只能调用允许的数学操作。
             result = eval(expression, {"__builtins__": {}}, safe_dict)
             
             return f"计算结果: {result}"
