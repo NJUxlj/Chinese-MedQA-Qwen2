@@ -191,7 +191,7 @@ class XInferenceInference:
                 params["stop"] = kwargs["stop"]  
             
             # 执行推理  
-            response = self.model.chat(messages=messages, **params)  
+            response = self.model.chat(messages=messages, generate_config=params)  
             
             # 提取生成的文本  
             if isinstance(response, dict):  
@@ -248,7 +248,7 @@ class XInferenceInference:
                 params["stop"] = kwargs["stop"]  
             
             # 执行推理  
-            response = self.model.generate(prompt=prompt, **params)  
+            response = self.model.generate(prompt=prompt, generate_config=params)  
             
             # 提取生成的文本  
             if isinstance(response, dict):  
@@ -362,8 +362,7 @@ class XInferenceInference:
                 params["stop"] = kwargs["stop"]  
             
             # 执行流式推理  
-            current_text = ""  
-            for chunk in self.model.chat(messages=messages, stream=True, **params):  
+            for chunk in self.model.chat(messages=messages, stream=True, generate_config=params):  
                 if isinstance(chunk, dict):  
                     chunk_text = chunk.get('choices', [{}])[0].get('delta', {}).get('content', '')  
                 else:  
@@ -418,7 +417,7 @@ class XInferenceInference:
                 params["stop"] = kwargs["stop"]  
             
             # 执行流式推理  
-            for chunk in self.model.generate(prompt=prompt, stream=True, **params):  
+            for chunk in self.model.generate(prompt=prompt, stream=True, generate_config=params):  
                 if isinstance(chunk, dict):  
                     chunk_text = chunk.get('choices', [{}])[0].get('text', '')  
                 else:  

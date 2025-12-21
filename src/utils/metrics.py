@@ -129,10 +129,12 @@ class ModelEvaluator:
     ) -> Dict[str, Dict[str, float]]:
         """计算检索指标（Precision@K, Recall@K, NDCG@K）"""
         metrics = {
-            f"P@{k}": [],
-            f"R@{k}": [],
-            f"NDCG@{k}": []
-        for k in k_values}
+            f"P@{k}": [] for k in k_values
+        }
+        # 添加其他指标列表
+        for k in k_values:
+            metrics[f"R@{k}"] = []
+            metrics[f"NDCG@{k}"] = []
         
         for scores, labels in zip(relevance_scores, relevance_labels):
             # 按分数排序的索引
@@ -181,9 +183,7 @@ class ModelEvaluator:
         results = {}
         
         # 计算生成质量指标
-        predictions_tokens = [p.split() for p in predictions]
-        references_tokens = [[r.split()] for r in references]
-        
+
         # BLEU评分
         bleu_scores = self.calculate_bleu(predictions, [[r] for r in references])
         results.update(bleu_scores)

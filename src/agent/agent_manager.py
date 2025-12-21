@@ -1,14 +1,13 @@
 from typing import Dict, Any, Optional, List, Union
 import uuid
 
-from .agent_base import AgentBase
-from .agent_factory import AgentFactory
-from ..utils.logger import get_logger
-from ..config.agent_config import AgentConfig
-from ..models.base_model import BaseModel
-from ..rag.rag_pipeline import RAGPipeline
+from agent.base_agent import BaseAgent
+from agent.agent_factory import AgentFactory
+from utils.logger import setup_logger
+from config.agent_config import AgentConfig
+from models.api_model import ApiModel
+from rag.rag_pipeline import RAGPipeline
 
-logger = get_logger(__name__)
 
 class AgentManager:
     """
@@ -18,11 +17,12 @@ class AgentManager:
     def __init__(self) -> None:
         """初始化Agent管理器"""
         self.agents = {}  # agent_id -> agent实例
+        self.logger = setup_logger(self.__class__.__name__)
     
     def create_agent(
         self,
         agent_type: str,
-        model: BaseModel,
+        model: ApiModel,
         rag_pipeline: Optional[RAGPipeline] = None,
         config: Optional[AgentConfig] = None,
         agent_id: Optional[str] = None,
@@ -48,7 +48,7 @@ class AgentManager:
         
         # 如果ID已存在，生成一个新的
         if agent_id in self.agents:
-            logger.warning(f"Agent ID '{agent_id}' 已存在，生成新ID")
+            self.logger.warning(f"Agent ID '{agent_id}' 已存在，生成新ID")
             agent_id = str(uuid.uuid4())
         
         # 创建Agent
@@ -63,14 +63,14 @@ class AgentManager:
             )
             
             self.agents[agent_id] = agent
-            logger.info(f"创建Agent '{agent_id}' 成功，类型: {agent_type}")
+            self.logger.info(f"创建Agent '{agent_id}' 成功，类型: {agent_type}")
             return agent_id
             
         except Exception as e:
-            logger.error(f"创建Agent失败: {str(e)}")
+            self.logger.error(f"创建Agent失败: {str(e)}")
             raise
     
-    def get_agent(self, agent_id: str) -> Optional[AgentBase]:
+    def get_agent(self, agent_id: str) -> Optional[BaseAgent]:
         """
         获取Agent实例
         
@@ -94,10 +94,10 @@ class AgentManager:
         """
         if agent_id in self.agents:
             del self.agents[agent_id]
-            logger.info(f"移除Agent '{agent_id}' 成功")
+            self.logger.info(f"移除Agent '{agent_id}' 成功")
             return True
         
-        logger.warning(f"尝试移除不存在的Agent '{agent_id}'")
+        self.logger.warning(f"尝试移除不存在的Agent '{agent_id}'")
         return False
     
     def list_agents(self) -> List[Dict[str, Any]]:
@@ -140,5 +140,5 @@ class AgentManager:
             result = agent.run(query, **kwargs)
             return result
         except Exception as e:
-            logger.error(f"Agent '{agent_id}' 处理查询失败: {str(e)}")
+            self.logger.error(f"Agent '{agent_id}' 处理查询失败: {str(e)}")
             raise

@@ -1,14 +1,17 @@
 import time
 import json
 from typing import Dict, List, Optional, Any, Union, Tuple
+from pathlib import Path
+import os,sys
+sys.path.append(str(Path(__file__).parent.parent))
 
-from .agent_base import AgentBase
-from .tool_manager import ToolManager
-from ..models.base_model import BaseModel
-from ..rag.rag_pipeline import RAGPipeline
-from ..utils.logger import get_logger
+from agent.agent_base import AgentBase
+from tools.tool_manager import ToolManager
+from models.api_model import ApiModel
+from rag.rag_pipeline import RAGPipeline
+from utils.logger import setup_logger
 
-logger = get_logger(__name__)
+logger = setup_logger(__name__, level="INFO")
 
 class MedicalAgent(AgentBase):
     """
@@ -17,7 +20,7 @@ class MedicalAgent(AgentBase):
     
     def __init__(
         self, 
-        model: BaseModel,
+        model: ApiModel,
         rag_pipeline: Optional[RAGPipeline] = None,
         agent_id: Optional[str] = None,
         name: str = "医疗助手",

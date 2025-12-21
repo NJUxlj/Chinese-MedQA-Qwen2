@@ -1,22 +1,25 @@
 from typing import Dict, Any, Optional, List, Union
 import importlib
+from pathlib import Path
+import sys, os
+sys.path.append(str(Path(__file__).parent.parent))
 
-from .agent_base import AgentBase
-from .medical_agent import MedicalAgent
-from .tool_manager import ToolManager
-from .tools.tool_base import ToolBase
-from .tools.search_tool import SearchTool, BingSearchTool
-from .tools.calculator_tool import CalculatorTool
-from .tools.medical_reference_tool import MedicalReferenceTool
-from .tools.reaction_agent_tool import ReActAgentTool
-from .tools.medical_assessment_tool import MedicalAssessmentTool
+from agent.agent_base import AgentBase
+from agent.medical_agent import MedicalAgent
+from tools.tool_manager import ToolManager
+from tools.tool_base import ToolBase
+from tools.search_tool import SearchTool, BingSearchTool
+from tools.calculator_tool import CalculatorTool
+from tools.medical_reference_tool import MedicalReferenceTool
+from tools.reaction_agent_tool import ReActAgentTool
+from tools.medical_assessment_tool import MedicalAssessmentTool
 
-from ..utils.logger import get_logger
-from ..config.agent_config import AgentConfig
-from ..models.base_model import BaseModel
-from ..rag.rag_pipeline import RAGPipeline
+from utils.logger import setup_logger
+from config.agent_config import AgentConfig
+from models.base_model import BaseGenerativeModel
+from rag.rag_pipeline import RAGPipeline
 
-logger = get_logger(__name__)
+logger = setup_logger(__name__, level="INFO")
 
 class AgentFactory:
     """
@@ -26,7 +29,7 @@ class AgentFactory:
     @staticmethod
     def create_agent(
         agent_type: str,
-        model: BaseModel,
+        model: BaseGenerativeModel,
         rag_pipeline: Optional[RAGPipeline] = None,
         config: Optional[AgentConfig] = None,
         **kwargs
@@ -65,7 +68,7 @@ class AgentFactory:
     @staticmethod
     def load_default_tools(
         agent: AgentBase,
-        model: BaseModel,
+        model: BaseGenerativeModel,
         config: AgentConfig
     ) -> None:
         """

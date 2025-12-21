@@ -80,7 +80,7 @@ class OllamaInference:
         self.num_thread = num_thread or os.cpu_count()  
         
         # 设置Ollama客户端  
-        ollama.client._host = self.host  
+        ollama._client = ollama.Client(host=self.host)  
         
         logger.info(f"正在检查模型: {self.model_name}")  
         

@@ -17,3 +17,13 @@ pydantic
 fastapi
 sse-starlette
 matplotlib
+neo4j>=5.0.0
+pypdf>=3.0.0
+pdfplumber>=0.9.0
+spacy>=3.6.0
+langchain-core>=0.1.0
+networkx>=3.0
+python-dotenv>=1.0.0
+langchain-community>=0.0.38
+anthropic>=0.7.0
+openai>=1.0.0

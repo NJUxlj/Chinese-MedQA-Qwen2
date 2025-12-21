@@ -11,7 +11,7 @@ import torch
 from transformers import PreTrainedModel, PreTrainedTokenizer  
 
 
-class BaseModel(ABC):  
+class BaseGenerativeModel(ABC):  
     """  
     Abstract base class for all models in the Chinese-MedQA-Qwen2 project.  
     
@@ -128,3 +128,10 @@ class BaseModel(ABC):
     def __repr__(self) -> str:  
         """String representation of the model"""  
         return f"{self.__class__.__name__}(model_path={self.model_path}, device={self.device})"  
+
+
+
+
+
+
+
