@@ -24,10 +24,10 @@ class RerankerService:
 
     def _load_reranker_model(self) -> None:
         """加载 reranker 模型"""
-        if model_provider == "transformers":
+        if self.model_provider == "transformers":
             pass
         else:
-            raise ValueError(f"Invalid model provider: {model_provider}")
+            raise ValueError(f"Invalid model provider: {self.model_provider}")
 
 
 

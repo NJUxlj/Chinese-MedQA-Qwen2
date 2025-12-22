@@ -24,3 +24,7 @@ uvicorn
 fastapi
 latex2sympy2_extended
 math_verify
+# 新增的依赖 - 用于Ollama推理优化
+psutil>=5.9.0
+GPUtil>=1.4.0
+requests>=2.28.0

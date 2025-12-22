@@ -12,7 +12,7 @@ from threading import Lock
 # 确保可以导入项目其他模块  【也就是src目录下的其他包】
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 
-from utils.logger import get_logger  
+from utils.logger import setup_logger  
 from config.model_config import ModelConfig  
 from inference.inference_utils import (  
     format_prompt,   
@@ -23,16 +23,13 @@ from inference.inference_utils import (
     get_inference_params  
 )  
 
-logger = get_logger("vllm_inference")  
+logger = setup_logger("vllm_inference", level="INFO")  
 
 # 尝试导入vLLM  
 try:  
     from vllm import LLM, SamplingParams  
-    VLLM_AVAILABLE = True  
 except ImportError:  
-    logger.warning("vLLM未安装，无法使用vLLM进行推理。请使用以下命令安装vLLM：")  
-    logger.warning("pip install vllm")  
-    VLLM_AVAILABLE = False  
+    raise ImportError("vLLM未安装，无法使用vLLM进行推理。请使用以下命令安装vLLM：pip install vllm")  
 
 class VLLMInference:  
     """  
@@ -47,7 +44,7 @@ class VLLMInference:
         """  
         with cls._lock:     # 加锁保证线程安全
             if model_path not in cls._instances:    # # 检查是否已有实例
-                instance = super(VLLMInference, cls).__new__(cls)    # 创建新实例
+                instance = super(VLLMInference, cls).__new__(cls)    # 创建新实例 【调用父类的 __new__ 方法来创建 VLLMInference 类的一个新实例】
                 cls._instances[model_path] = instance     # 存入字典
             return cls._instances[model_path]  # 返回单例
     
@@ -69,8 +66,6 @@ class VLLMInference:
             max_model_len: 最大模型长度  
             quantization: 量化方法，awq、squeezellm或gptq  
         """  
-        if not VLLM_AVAILABLE:  
-            raise ImportError("请先安装vLLM库")  
         
         # 防止重复初始化  
         if hasattr(self, 'model'):  
@@ -384,12 +379,9 @@ class VLLMInference:
 
 # 测试代码  
 if __name__ == "__main__":  
-    if not VLLM_AVAILABLE:  
-        print("请先安装vLLM库")  
-        sys.exit(1)  
         
     # 测试模型路径，请替换为实际的模型路径  
-    model_path = "/root/autodl-tmp/models/Qwen2.5-1.5B-Instruct"  
+    model_path = "Desktop/code/models/gpt2"  
     
     # 初始化推理类  
     inference = VLLMInference(model_path)  
