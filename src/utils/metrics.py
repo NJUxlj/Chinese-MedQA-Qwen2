@@ -8,6 +8,7 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge import Rouge
 import torch
 from utils.logger import setup_logger
+from transformers import AutoTokenizer
 
 logger = setup_logger(__name__)
 
@@ -249,6 +250,277 @@ class DPOMetrics:
             "rewards_margin_mean": (chosen_rewards - rejected_rewards).mean().item(),
             "rewards_margin_std": (chosen_rewards - rejected_rewards).std().item()
         }
+
+
+
+
+
+class MathEvaluator:
+    # 定义评估函数，用于计算数学题准确率
+    def compute_math_accuracy(self, eval_preds, tokenizer: AutoTokenizer):
+        """
+        计算数学题准确率的评估函数
+        
+        基于AIME和GSM8K等数据集的评估方式：
+        - 使用Exact Match (EM)指标：生成的答案必须与标准答案完全匹配
+        - 支持从模型输出中提取最终答案
+        - 支持数值比较和字符串匹配
+        
+        Args:
+            eval_preds: 评估预测结果，包含 predictions 和 label_ids
+            tokenizer: 分词器实例，用于解码文本
+            
+        Returns:
+            dict: 包含准确率指标的字典
+        """
+        import re
+        import numpy as np
+        
+        predictions, labels = eval_preds
+        
+        # 解码预测结果和标签
+        # 需要使用argmax获取预测的token ID，然后进行解码
+        if hasattr(predictions, 'argmax'):
+            pred_ids = predictions.argmax(axis=-1)
+        else:
+            pred_ids = predictions
+        
+        decoded_preds = tokenizer.batch_decode(
+            pred_ids, 
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False
+        )
+        
+        # 解码标签（用于调试，通常不需要显示）
+        decoded_labels = tokenizer.batch_decode(
+            labels,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False
+        )
+        
+        # 从模型输出中提取最终答案
+        extracted_answers = []
+        standard_answers = []
+        
+        for pred_text, label_text in zip(decoded_preds, decoded_labels):
+            # 从预测文本中提取答案
+            pred_answer = self._extract_final_answer_from_text(pred_text)
+            extracted_answers.append(pred_answer)
+            
+            # 从标签文本中提取标准答案
+            label_answer = self._extract_final_answer_from_text(label_text)
+            standard_answers.append(label_answer)
+        
+        # 计算Exact Match准确率
+        exact_matches = 0
+        total_samples = len(extracted_answers)
+        
+        for pred_answer, std_answer in zip(extracted_answers, standard_answers):
+            if self._is_answer_correct_logic(pred_answer, std_answer):
+                exact_matches += 1
+        
+        # 计算准确率
+        accuracy = exact_matches / total_samples if total_samples > 0 else 0.0
+        
+        return {
+            "math_accuracy": float(accuracy),
+            "accuracy": float(accuracy),
+            "exact_match": float(accuracy),
+            "total_samples": int(total_samples),
+            "correct_predictions": int(exact_matches)
+        }
+    
+    def _extract_final_answer_from_text(self, text: str):
+        """
+        从文本中提取最终答案
+        
+        支持多种答案格式：
+        1. 直接数字答案：如 "答案是 42"、"答案是: 3.14"
+        2. 数学表达式：如 "答案: 2+3=5"、"答案是 2+3"
+        3. 分数答案：如 "答案是 3/4"
+        4. 括号答案：如 "答案 (42)"、"答案是(3)"
+        
+        Args:
+            text: 输入文本
+            
+        Returns:
+            str: 提取的答案字符串
+        """
+        import re
+        
+        if not text:
+            return ""
+        
+        # 清理文本
+        text = text.strip()
+        
+        # 提取答案的多种模式
+        patterns = [
+            r'答案是?\s*[:：]?\s*([^\n\r]*)',  # "答案是："或"答案："
+            r'答案\s*[:：]?\s*([^\n\r]*)',     # "答案："  
+            r'答[:：]\s*([^\n\r]*)',          # "答："
+            r'最终答案\s*[:：]?\s*([^\n\r]*)', # "最终答案："
+            r'答案\s*\(([^)]*)\)',           # "答案(42)"
+            r'最终答案\s*\(([^)]*)\)',        # "最终答案(42)"
+            r'答案是?\s*([0-9]+\.?[0-9]*\s*[+\-*/]\s*[0-9]+\.?[0-9]*)',  # 数学表达式
+            r'答案是?\s*([0-9]+\.?[0-9]*)',    # 简单数字
+            r'答案\s*([0-9]+\.?[0-9]*)',      # 简单数字
+            
+            # 英文格式答案
+            r'(?i)answer\s*[:：]?\s*([^\n\r]*)',  # "Answer:" 或 "answer："
+            r'(?i)the answer\s*[:：]?\s*([^\n\r]*)',  # "The answer:"
+            r'(?i)final answer\s*[:：]?\s*([^\n\r]*)',  # "Final answer:"
+            
+            # 负数答案
+            r'[负-]\s*([0-9]+\.?[0-9]*)',      # "负5" 或 "-5"
+            r'负\s*数\s*[:：]?\s*([^\n\r]*)',   # "负数："
+            
+            # 百分数答案
+            r'([0-9]+\.?[0-9]*)\s*%',          # "50%" 或 "0.5%"
+            r'([0-9]+\.?[0-9]*)\s*个百分点',    # "50个百分点"
+            r'([0-9]+\.?[0-9]*)\s*百分',       # "50百分"
+            
+            # 科学计数法
+            r'([0-9]+\.?[0-9]*[eE][+\-]?[0-9]+)',  # "1.5e-3", "2.3E+5"
+            
+            # 分数答案
+            r'([0-9]+\.?[0-9]*)\s*/\s*([0-9]+\.?[0-9]*)',  # "3/4"
+            r'二分之一|三分之一|四分之一|五分之一|六分之一|七分之一|八分之一|九分之一|十分之一',  # 中文分数
+            r'([一二三四五六七八九十]+)\s*分之\s*([一二三四五六七八九十]+)',  # "四分之三"
+            
+            # 带单位的数字
+            r'([0-9]+\.?[0-9]*)\s*[个只条件件元角分厘毫克公斤吨米厘米毫米千米公里升毫升年天日月时分秒]',  # "42个", "100元", "50公斤"
+            
+            # 复数答案
+            r'([0-9]+\.?[0-9]*)\s*\+\s*([0-9]+\.?[0-9]*)\s*i',  # "3+4i"
+            r'([0-9]+\.?[0-9]*)\s*[+\-]\s*([0-9]+\.?[0-9]*)\s*[jJ]',  # "3+4j" 或 "3-4j"
+            
+            # 根号答案
+            r'√\s*([0-9]+\.?[0-9]*)',        # "√16"
+            r'根号\s*([0-9]+\.?[0-9]*)',      # "根号16"
+            r'√\s*\(\s*([0-9]+\.?[0-9]*)\s*\)',  # "√(16)"
+            
+            # 罗马数字
+            r'\b[IVX]+\b',                    # "I", "II", "III", "IV", "V"
+            
+            # 括号内的各种答案格式
+            r'\(\s*([^\)]*)\s*\)',            # 任意括号内容
+            r'【\s*([^\]]*)\s*】',            # 方括号内容
+            r'《\s*([^\>]*)\s*》',            # 书名号内容
+            r'"([^"]*)"',                     # 双引号内容
+            r"'([^']*)'",                     # 单引号内容
+            
+            # 更多数学符号
+            r'≈\s*([0-9]+\.?[0-9]*)',         # "≈3.14"
+            r'约\s*([0-9]+\.?[0-9]*)',        # "约3.14"
+            r'大约\s*([0-9]+\.?[0-9]*)',      # "大约3.14"
+            r'大概\s*([0-9]+\.?[0-9]*)',      # "大概3.14"
+            
+            # 中文数字
+            r'[零一二三四五六七八九十百千万亿]+',  # "一百二十三"
+            r'[0-9]+\.?[0-9]*\s*[、，,\s]*\s*[0-9]+\.?[0-9]*\s*[、，,\s]*\s*[0-9]+\.?[0-9]*',  # "1、2、3" 或 "1，2，3"
+            
+            # 比例答案
+            r'([0-9]+\.?[0-9]*)\s*[:：]\s*([0-9]+\.?[0-9]*)',  # "3:4" 或 "3：4"
+            r'([0-9]+\.?[0-9]*)\s*比\s*([0-9]+\.?[0-9]*)',    # "3比4"
+            
+            # 幂运算
+            r'([0-9]+\.?[0-9]*)\s*\^\s*([0-9]+\.?[0-9]*)',    # "2^3"
+            r'([0-9]+\.?[0-9]*)\s*\*\*\s*([0-9]+\.?[0-9]*)',  # "2**3"
+            
+            # 更多英文数学表达
+            r'(?i)equals?\s*[:：]?\s*([^\n\r]*)',  # "equals:" 或 "equal:"
+            r'(?i)result\s*[:：]?\s*([^\n\r]*)',   # "result:"
+            r'(?i)solution\s*[:：]?\s*([^\n\r]*)', # "solution:"
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, text)
+            if match:
+                answer = match.group(1).strip()
+                # 清理答案，移除多余的符号
+                answer = re.sub(r'[。！？.,，；：\s]+$', '', answer)
+                if answer:
+                    return answer
+        
+        # 如果没有找到明确的答案标记，尝试提取末尾的数字
+        numbers = re.findall(r'[0-9]+\.?[0-9]*', text)
+        if numbers:
+            return numbers[-1]  # 返回最后一个数字作为答案
+        
+        return ""
+    
+    def _is_answer_correct_logic(self, predicted_answer: str, standard_answer: str):
+        """
+        判断预测答案是否正确
+        
+        支持多种答案格式的比较：
+        1. 精确字符串匹配
+        2. 数值比较（处理小数和分数）
+        3. 数学表达式计算结果比较
+        
+        Args:
+            predicted_answer: 预测的答案
+            standard_answer: 标准答案
+            
+        Returns:
+            bool: 答案是否正确
+        """
+        import re
+        
+        if not predicted_answer or not standard_answer:
+            return False
+        
+        # 清理答案
+        predicted_answer = predicted_answer.strip()
+        standard_answer = standard_answer.strip()
+        
+        # 1. 直接字符串匹配
+        if predicted_answer.lower() == standard_answer.lower():
+            return True
+        
+        # 2. 尝试数值比较
+        try:
+            # 提取数字
+            pred_nums = re.findall(r'[0-9]+\.?[0-9]*', predicted_answer)
+            std_nums = re.findall(r'[0-9]+\.?[0-9]*', standard_answer)
+            
+            if pred_nums and std_nums:
+                # 尝试将答案转换为数值
+                pred_val = float(pred_nums[0])
+                std_val = float(std_nums[0])
+                
+                # 数值相等检查（考虑浮点精度）
+                if abs(pred_val - std_val) < 1e-6:
+                    return True
+        except (ValueError, IndexError):
+            pass
+        
+        # 3. 分数比较（如 3/4 = 0.75）
+        try:
+            # 检查是否是分数格式
+            if '/' in predicted_answer and '/' in standard_answer:
+                pred_parts = predicted_answer.split('/')
+                std_parts = standard_answer.split('/')
+                
+                if len(pred_parts) == 2 and len(std_parts) == 2:
+                    pred_val = float(pred_parts[0]) / float(pred_parts[1])
+                    std_val = float(std_parts[0]) / float(std_parts[1])
+                    
+                    if abs(pred_val - std_val) < 1e-6:
+                        return True
+        except (ValueError, ZeroDivisionError):
+            pass
+        
+        # 4. 移除空格和标点符号后比较
+        cleaned_pred = re.sub(r'[^\w]', '', predicted_answer.lower())
+        cleaned_std = re.sub(r'[^\w]', '', standard_answer.lower())
+        
+        if cleaned_pred == cleaned_std:
+            return True
+        
+        return False
+        
 
 
 # 使用示例

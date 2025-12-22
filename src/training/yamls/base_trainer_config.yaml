@@ -1,0 +1,35 @@
+model_name_or_path: "/Users/xiniuyiliao/Desktop/code/models/gpt2"
+max_seq_length: 512
+use_gradient_checkpointing: false
+device_map: "auto"
+
+use_4bit: false
+use_fp16: true
+use_bf16: false
+trust_remote_code: false
+
+output_dir: "output/math_training"
+num_train_epochs: 2
+per_device_train_batch_size: 2
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 1
+learning_rate: 2e-5
+logging_steps: 10
+save_steps: 100
+
+save_total_limit: 2
+warmup_ratio: 0.03
+lr_scheduler_type: "cosine"
+report_to: "none"
+eval_strategy: "steps"
+eval_steps: 1
+load_best_model_at_end: false
+metric_for_best_model: "eval_loss"
+greater_is_better: false
+max_grad_norm: 1.0
+dataloader_pin_memory: false
+remove_unused_columns: false
+do_train: true
+do_eval: true
+
+dataloader_num_workers: 0

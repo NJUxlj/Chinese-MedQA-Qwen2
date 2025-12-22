@@ -1,6 +1,6 @@
 from dataclasses import dataclass  
 from typing import Optional, Dict , List, Tuple, Callable
-import os  
+import os, sys
 import torch  
 import torch.nn.functional as F  
 from torch.utils.data import Dataset  
@@ -13,14 +13,14 @@ from transformers import (
     TrainerCallback  
 )  
 
-from model.qwen2.modeling_qwen2 import Qwen2ForCausalLM
+from transformers import AutoModelForCausalLM
 from peft import LoraConfig, get_peft_model  
 from datasets import load_dataset  
 # from trl import DPOTrainer  
 # import deepspeed  
 from deepspeed import DeepSpeedEngine 
 
-from config.config import MODEL_PATH
+from config.training_config import DPOTrainingConfig
 
 
 class CustomDPODataset(Dataset):  
