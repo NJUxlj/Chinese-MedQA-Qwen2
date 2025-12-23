@@ -5,13 +5,14 @@ import logging
 from typing import List, Dict, Any, Optional  
 import unicodedata  
 import jieba  
-from langchain.schema import Document  
-from langchain.text_splitter import RecursiveCharacterTextSplitter  
+import jieba.analyse  
+from langchain_core.documents import Document  
+from langchain_text_splitters import RecursiveCharacterTextSplitter  
 
 logger = logging.getLogger(__name__)  
 
 # This class handles document chunking, cleaning, and preparation for embedding:
-class DocumentProcessor:  
+class DocumentChunker:  
     """  
     Processes documents for the medical knowledge base by cleaning text,  
     splitting into chunks, and enhancing metadata.  

@@ -18,7 +18,7 @@ from langchain_community.document_loaders import (
 # For processing web content  
 import requests  
 from bs4 import BeautifulSoup  
-from langchain.schema import Document  
+from langchain_core.documents import Document  
 
 logger = logging.getLogger(__name__)  
 
