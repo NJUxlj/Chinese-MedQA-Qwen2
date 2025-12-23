@@ -1,14 +1,25 @@
 import os
 import sys
 import json
-from typing import List, Dict
+from typing import List, Dict, Any, Union
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
 
 
+from models.api_model import ApiModel
+from config.llm_config import LLMConfig
+from config.milvus_config import MilvusConfig
+from knowledge_base.milvus.milvus_client import MilvusClient
+from knowledge_base.lda.lda_pipeline import LDAPipeline
 
 class MedQaDataGenerator:
     """ 医疗问答数据生成器"""
 
-    def __init__(self, data_num: int = 1000):
+    def __init__(self, 
+        milvus_config: MilvusConfig,
+        llm_config: LLMConfig, 
+        save_path: str, 
+        data_num: int = 1000):
         """
         初始化问答数据生成器
         
@@ -16,17 +27,55 @@ class MedQaDataGenerator:
             data_num: 生成的问答数据数量
         """
         self.data_num = data_num
+        self.llm_config = llm_config
+        self.api_model = ApiModel(llm_config)
+        self.save_path = save_path
+
+        self.mbti_personality_types = [
+            "ISTJ", "ISFJ", "INFJ", "INTJ",
+            "ISTP", "ISFP", "INFP", "INTP",
+            "ESTP", "ESFP", "ENFP", "ENTP",
+            "ESTJ", "ESFJ", "ENFJ", "ENTJ"
+        ]
+
+        self.milvus_client = MilvusClient(milvus_config)
+        self.llm = ApiModel(llm_config)
+
+        self.doctor_gen_prompt = None
+        self.patient_gen_prompt = None
 
 
 
-    def generate_doctor(self):
+    def generate_doctor(self, subtopic: str):
+        '''
+        根据 MBTI 16 人格来生成医生的背景资料
+
+        1. 使用 retriever 在 milvus 中搜索 top-k 与 subtopic 相关的文档
+        2. 使用 reranker 重排序， 再取 top-kk 个最相关的文档 (top-kk < top-k)
+        3. 调用 LLM 生成医生的背景资料， 将文档段， mbti 人格类型 作为 context 封装进 prompt， 生成医生的背景资料
+
+        '''
+        context = None
+
+
+    def generate_patient(self, subtopic: str):
+        '''
+        根据 MBTI 16 人格来生成患者的背景资料
+
+        1. 使用 retriever 在 milvus 中搜索 top-k 与 subtopic 相关的文档
+        2. 使用 reranker 重排序， 再取 top-kk 个最相关的文档 (top-kk < top-k)
+        3. 调用 LLM 生成患者的背景资料， 将文档段， mbti 人格类型 作为 context 封装进 prompt， 生成患者的背景资料
+
+        '''
+        context = None
+    
+
+    def load_documents_from_milvus(self, collection_name:str):
         pass
 
 
-    def generate_patient(self):
+    def modeling_topics_using_milvus(self):
         pass
-
-
 
     def generate_qa_topics(self, num_topics: int = 5):
         """
@@ -103,4 +152,9 @@ class MedQaDataGenerator:
 
 
     def generate_qa_data(self):
+        pass
+
+
+
+    def save_generated_qa_data(self):
         pass

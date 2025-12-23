@@ -22,6 +22,7 @@ from zhipuai import ZhipuAI
 import openai  
 
 from utils.logger import setup_logger
+from retrying import retry
 
 
 
@@ -176,6 +177,10 @@ class ApiModel(ABC):
             raise ValueError(f"API calling request error: {e}")
         except Exception as e:
             raise ValueError(f"API calling exception: {e}")
+    
+    @retry(wait_fixed=3000, stop_max_attempt_number=2)
+    def retry_generate(self, prompt: str, additional_args={}, messages = None,**kwargs):
+        return self.generate(prompt, additional_args, messages, **kwargs)
     
  
 
