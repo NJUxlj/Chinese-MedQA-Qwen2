@@ -16,6 +16,8 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 import evaluate  
 
+from typing import Dict, List, Any
+
 
 from config.evaluator_config import BleuRougeEvaluatorConfig
 from evaluation.base_evaluator import BaseEvaluator, EvaluatorDataset
