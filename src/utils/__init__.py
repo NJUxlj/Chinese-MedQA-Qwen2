@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .performance import GPUMemoryLogger, log_gpu_memory_usage, simple_timer
-from .profile import DistProfilerExtension, ProfilerConfig
+from pathlib import Path
+import sys,os
+sys.path.append(str(Path(__file__).parent.parent))
 
-if is_nvtx_available():
-    from .nvtx_profile import NsightSystemsProfiler as DistProfiler
-    from .nvtx_profile import mark_annotate, mark_end_range, mark_start_range, marked_timer
-else:
-    from .performance import marked_timer
-    from .profile import DistProfiler, mark_annotate, mark_end_range, mark_start_range
+from utils.performance import GPUMemoryLogger, log_gpu_memory_usage, simple_timer
+from utils.profiler.profile import DistProfilerExtension, ProfilerConfig
+
+
+from utils.performance import marked_timer
+from utils.profiler.profile import DistProfiler, mark_annotate, mark_end_range, mark_start_range
+
 
 __all__ = [
     "GPUMemoryLogger",

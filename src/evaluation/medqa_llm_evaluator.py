@@ -8,41 +8,34 @@ from torch.utils.data import DataLoader
 import evaluate  
 
 
-from config.config import (
-    MODEL_PATH, 
-    SFT_MODEL_PATH, 
-    DPO_MODEL_PATH,
-    SFT_DPO_MODEL_PATH,
-    TOKENIZER_PATH,
-)
+from config.evaluator_config import MedQALLMEvaluatorConfig
+from config.llm_config import LLMConfig
 
-class MedicalQAEvaluator:  
-    def __init__(self, model_path, tokenizer_path, device="cuda:0"):  
+class MedQALLMEvaluator:  
+    def __init__(
+        self,
+        llm_config: LLMConfig,
+        config: MedQALLMEvaluatorConfig):  
         """  
         初始化评估器  
-        :param model_path: 微调后的模型路径  
-        :param tokenizer_path: 分词器路径  
-        :param device: 计算设备 (default: cuda:0)  
         """  
-        self.device = torch.device(device)  
+        self.config = config
+        self.llm_config = llm_config
         
         # 加载模型和分词器  
         self.model = AutoModelForCausalLM.from_pretrained(  
-            model_path,  
+            self.config.model_name_or_path,  
             trust_remote_code=True,  
             torch_dtype=torch.bfloat16  
-        ).to(self.device)  
+        ).to(self.config.device)  
         
         self.tokenizer = AutoTokenizer.from_pretrained(  
-            tokenizer_path,  
+            self.config.model_name_or_path,     
             trust_remote_code=True  
         )  
+
         self.tokenizer.pad_token = self.tokenizer.eos_token  
         
-        # 初始化评估指标  
-        self.bleu = evaluate.load("bleu")  
-        self.rouge = evaluate.load("rouge")  
-        self.bertscore = evaluate.load("bertscore")  
         
         
         # 生成参数配置  

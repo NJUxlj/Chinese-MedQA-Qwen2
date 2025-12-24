@@ -3,7 +3,7 @@ import time
 import uuid
 import json
 
-from .agent_base import AgentBase
+from .base_agent import BaseAgent
 from .agent_factory import AgentFactory
 from .agent_manager import AgentManager
 from ..utils.logger import setup_logger
