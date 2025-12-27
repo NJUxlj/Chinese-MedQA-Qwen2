@@ -1,16 +1,19 @@
 # knowledge_base/retrieval/l2_retriever.py  
 from typing import List, Dict, Any, Optional, Tuple  
-import os  
+import os,sys  
 import numpy as np  
 import logging  
 import pickle  
 from pathlib import Path  
+sys.path.append(str(Path(__file__).parent.parent.parent))
 import json  
 import time  
-from langchain.schema import Document  
+from langchain_core.documents import Document  
 
-from knowledge_base.retrieval.retriever_base import BaseRetriever  
-from knowledge_base.embedding_manager import EmbeddingManager  
+from knowledge_base.retrieval.base_retriever import BaseRetriever  
+from knowledge_base.embedding.embedding_manager import EmbeddingManager  
+from utils.logger import setup_logger
+from config.retriever_config import L2RetrieverConfig
 
 logger = logging.getLogger(__name__)  
 
@@ -22,9 +25,8 @@ class L2Retriever(BaseRetriever):
     
     def __init__(  
         self,  
+        config: L2RetrieverConfig,
         embedding_manager: EmbeddingManager,  
-        name: str = "l2_retriever",  
-        distance_threshold: float = 0.5  
     ):  
         """  
         Initialize the L2 retriever.  
@@ -34,14 +36,16 @@ class L2Retriever(BaseRetriever):
             name: Name of the retriever  
             distance_threshold: Maximum L2 distance threshold (lower is better)  
         """  
-        super().__init__(name=name)  
+        super().__init__(config=config)  
         self.embedding_manager = embedding_manager  
-        self.distance_threshold = distance_threshold  
+        self.distance_threshold = config.distance_threshold  
         
         # Storage for documents and embeddings  
         self.documents: List[Document] = []  
         self.document_ids: List[str] = []  
-        self.document_embeddings: List[np.ndarray] = []  
+        self.document_embeddings: List[np.ndarray] = [] 
+
+        self.logger = setup_logger() 
     
     def add_documents(self, documents: List[Document]) -> None:  
         """  
@@ -242,3 +246,21 @@ class L2Retriever(BaseRetriever):
             "embedding_model": self.embedding_manager.embedding_model_name,  
             "distance_threshold": self.distance_threshold  
         }  
+
+
+
+
+
+
+def run():
+    pass
+
+
+
+
+
+if __name__ == '__main__':
+    run()
+
+
+

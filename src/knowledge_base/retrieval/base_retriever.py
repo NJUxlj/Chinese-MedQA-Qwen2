@@ -1,7 +1,13 @@
 # knowledge_base/retrieval/retriever_base.py  
+import os, sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from utils.logger import setup_logger
 from abc import ABC, abstractmethod  
 from typing import List, Dict, Any, Optional, Tuple  
-from langchain.schema import Document  
+from langchain_core.documents import Document  
+from config.retriever_config import RetrieverConfig
 
 class BaseRetriever(ABC):  
     """  
@@ -9,14 +15,15 @@ class BaseRetriever(ABC):
     All retrieval methods should inherit from this class.  
     """  
     
-    def __init__(self, name: str):  
+    def __init__(self, config: RetrieverConfig):  
         """  
         Initialize the base retriever.  
         
         Args:  
             name: Name of the retriever  
         """  
-        self.name = name  
+        self.config = config  
+        self.logger = setup_logger(self.__class__.__name__, level="INFO")
     
     @abstractmethod  
     def add_documents(self, documents: List[Document]) -> None:  

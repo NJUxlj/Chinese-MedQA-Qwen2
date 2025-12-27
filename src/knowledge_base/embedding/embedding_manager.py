@@ -7,7 +7,7 @@ from pathlib import Path
 import torch  
 import json  
 import time  
-from langchain.schema import Document  
+from langchain_core.documents import Document  
 from langchain.embeddings.base import Embeddings  
 from langchain_community.embeddings import HuggingFaceEmbeddings  
 from langchain_community.embeddings.huggingface import HuggingFaceBgeEmbeddings  

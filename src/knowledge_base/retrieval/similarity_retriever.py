@@ -1,18 +1,18 @@
 # knowledge_base/retrieval/similarity_retriever.py  
 from typing import List, Dict, Any, Optional, Tuple  
-import os  
+import os,sys
 import numpy as np  
 import logging  
 import pickle  
 from pathlib import Path  
 import json  
 import time  
-from langchain.schema import Document  
+from langchain_core.documents import Document  
 
-from knowledge_base.retrieval.retriever_base import BaseRetriever  
-from knowledge_base.embedding_manager import EmbeddingManager  
+from knowledge_base.retrieval.base_retriever import BaseRetriever  
+from knowledge_base.embedding.embedding_manager import EmbeddingManager  
+from config.retriever_config import SimilarityRetrieverConfig
 
-logger = logging.getLogger(__name__)  
 
 class SimilarityRetriever(BaseRetriever):  
     """  
@@ -22,9 +22,8 @@ class SimilarityRetriever(BaseRetriever):
     
     def __init__(  
         self,  
+        config: SimilarityRetrieverConfig,
         embedding_manager: EmbeddingManager,  
-        name: str = "similarity_retriever",  
-        score_threshold: float = 0.5  
     ):  
         """  
         Initialize the similarity retriever.  
@@ -34,9 +33,9 @@ class SimilarityRetriever(BaseRetriever):
             name: Name of the retriever  
             score_threshold: Minimum similarity score threshold  
         """  
-        super().__init__(name=name)  
+        super().__init__(config=config)  
         self.embedding_manager = embedding_manager  
-        self.score_threshold = score_threshold  
+        self.score_threshold = config.score_threshold  
         
         # Storage for documents and embeddings  
         self.documents: List[Document] = []  
@@ -54,7 +53,7 @@ class SimilarityRetriever(BaseRetriever):
             return  
             
         # Embed the documents  
-        logger.info(f"Embedding {len(documents)} documents for similarity retriever")  
+        self.logger.info(f"Embedding {len(documents)} documents for similarity retriever")  
         start_time = time.time()  
         
         # Get document texts and IDs  
@@ -76,11 +75,11 @@ class SimilarityRetriever(BaseRetriever):
                     self.document_ids.append(doc_id)  
                     self.document_embeddings.append(np.array(embeddings_dict[doc_id]))  
                 else:  
-                    logger.warning(f"No embedding found for document {doc_id}")  
+                    self.logger.warning(f"No embedding found for document {doc_id}")  
                     
-            logger.info(f"Added {len(documents)} documents to similarity retriever in {time.time()-start_time:.2f}s")  
+            self.logger.info(f"Added {len(documents)} documents to similarity retriever in {time.time()-start_time:.2f}s")  
         except Exception as e:  
-            logger.error(f"Error adding documents to similarity retriever: {str(e)}")  
+            self.logger.error(f"Error adding documents to similarity retriever: {str(e)}")  
             raise  
     
     def delete_documents(self, document_ids: List[str]) -> None:  
@@ -105,7 +104,7 @@ class SimilarityRetriever(BaseRetriever):
             self.document_ids.pop(idx)  
             self.document_embeddings.pop(idx)  
             
-        logger.info(f"Deleted {len(indices_to_delete)} documents from similarity retriever")  
+        self.logger.info(f"Deleted {len(indices_to_delete)} documents from similarity retriever")  
     
     def search(  
         self,   
@@ -125,7 +124,7 @@ class SimilarityRetriever(BaseRetriever):
             List of (document, score) tuples  
         """  
         if not self.documents:  
-            logger.warning("No documents in similarity retriever")  
+            self.logger.warning("No documents in similarity retriever")  
             return []  
             
         # Use instance threshold if not specified  
@@ -163,7 +162,7 @@ class SimilarityRetriever(BaseRetriever):
             return results  
             
         except Exception as e:  
-            logger.error(f"Error searching in similarity retriever: {str(e)}")  
+            self.logger.error(f"Error searching in similarity retriever: {str(e)}")  
             return []  
     
     def save(self, directory: str) -> None:  
@@ -197,7 +196,7 @@ class SimilarityRetriever(BaseRetriever):
         with open(save_dir / "config.json", "w") as f:  
             json.dump(config, f)  
             
-        logger.info(f"Saved similarity retriever to {directory}")  
+        self.logger.info(f"Saved similarity retriever to {directory}")  
     
     def load(self, directory: str) -> None:  
         """  
@@ -230,7 +229,7 @@ class SimilarityRetriever(BaseRetriever):
             self.name = config.get("name", self.name)  
             self.score_threshold = config.get("score_threshold", self.score_threshold)  
             
-        logger.info(f"Loaded similarity retriever from {directory} with {len(self.documents)} documents")  
+        self.logger.info(f"Loaded similarity retriever from {directory} with {len(self.documents)} documents")  
     
     def print_stats(self) -> Dict[str, Any]:  
         """  
@@ -246,3 +245,14 @@ class SimilarityRetriever(BaseRetriever):
             "embedding_model": self.embedding_manager.embedding_model_name,  
             "score_threshold": self.score_threshold  
         }  
+
+
+
+def run():
+    pass
+
+
+
+
+if __name__ == "__main__":
+    run()

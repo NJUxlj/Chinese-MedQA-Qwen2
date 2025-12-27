@@ -275,3 +275,19 @@ class PubMedRetriever:
         article_data['pubmed_link'] = f"https://pubmed.ncbi.nlm.nih.gov/{article_data['pmid']}/"
         
         return article_data
+
+
+
+
+
+
+
+def run():
+    pass
+
+
+
+
+
+if __name__ == "__main__":
+    run()

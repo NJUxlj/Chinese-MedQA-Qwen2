@@ -1,17 +1,24 @@
 # src/rag/rag_pipeline.py
 
-import os
+import os,sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+
 from typing import Dict, List, Optional, Union, Any, Tuple
 from knowledge_base.retrieval.knn_retriever import KNNRetriever
 from knowledge_base.retrieval.similarity_retriever import SimilarityRetriever
 from knowledge_base.retrieval.bm25_retriever import BM25Retriever
 from knowledge_base.retrieval.l2_retriever import L2Retriever
-from knowledge_base.embedding_manager import EmbeddingManager
-from .query_processor import QueryProcessor
-from .context_builder import ContextBuilder
-from .response_generator import ResponseGenerator
-from models.base_model import BaseModel
+from knowledge_base.embedding.embedding_manager import EmbeddingManager
+from rag.query_processor import QueryProcessor
+from rag.context_builder import ContextBuilder
+from rag.response_generator import ResponseGenerator
+from models.base_model import BaseGenerativeModel
 from utils.logger import setup_logger
+
+from config.rag_config import RAGConfig
+from config.embedding_config import EmbeddingConfig
 
 logger = setup_logger(__name__)
 
@@ -27,7 +34,7 @@ class RAGPipeline:
         embedding_dimension: int = 384,
         index_path: Optional[str] = None,
         top_k: int = 5,
-        model: Optional[BaseModel] = None,
+        model: Optional[BaseGenerativeModel] = None,
         cache_dir: Optional[str] = None,
         reranker_model_name: Optional[str] = None,
         use_reranker: bool = False,
@@ -131,7 +138,7 @@ class RAGPipeline:
         else:
             self.response_generator = None
     
-    def set_model(self, model: BaseModel) -> None:
+    def set_model(self, model: BaseGenerativeModel) -> None:
         """
         设置用于生成响应的模型
         

@@ -12,7 +12,8 @@ from transformers import (
     Trainer,  
     TrainerCallback  
 )  
-
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
 from transformers import AutoModelForCausalLM
 from peft import LoraConfig, get_peft_model  
 from datasets import load_dataset  

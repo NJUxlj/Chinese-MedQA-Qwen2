@@ -6,6 +6,10 @@ from pydantic import BaseModel, Field
 from omegaconf import OmegaConf
 
 
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'   # 解决 macOS上OpenMP库冲突的问题
+
+
 class BaseConfig(BaseModel):
     '''
     基础配置类
