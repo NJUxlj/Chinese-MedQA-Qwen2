@@ -1,5 +1,8 @@
 import os, sys
 import json
+from pathlib import Path
+sys.path.append(str(Path(__file__)).parent.parent)
+import json
 from pydantic import BaseModel, Field
 from typing import List, Dict, Tuple, Any
 

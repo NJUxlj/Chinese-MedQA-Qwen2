@@ -1,0 +1,431 @@
+2025-12-28 17:30:31,574 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:30:31,575 - CodeEvaluatorTester - INFO - CodeEvaluator 全面测试开始
+2025-12-28 17:30:31,575 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:30:31,575 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,575 - CodeEvaluatorTester - INFO - 测试 1: 正确代码评估
+2025-12-28 17:30:31,575 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,602 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #1 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,620 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #2 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,640 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #3 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,658 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #4 (python): 通过率: 0.33, 通过数: 1/3
+2025-12-28 17:30:31,677 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #5 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,677 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,677 - CodeEvaluatorTester - INFO - 测试 2: 错误代码评估
+2025-12-28 17:30:31,677 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,691 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #1: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:30:31,699 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #2: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:30:31,714 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #3: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:30:31,715 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,715 - CodeEvaluatorTester - INFO - 测试 3: 安全检查功能
+2025-12-28 17:30:31,715 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,716 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #1 (os.system 调用): 检测到恶意代码: 是
+2025-12-28 17:30:31,716 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #2 (subprocess 调用): 检测到恶意代码: 是
+2025-12-28 17:30:31,716 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #3 (eval 动态执行): 检测到恶意代码: 是
+2025-12-28 17:30:31,716 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #4 (exec 动态执行): 检测到恶意代码: 是
+2025-12-28 17:30:31,716 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #5 (文件读取操作): 检测到恶意代码: 是
+2025-12-28 17:30:31,717 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,717 - CodeEvaluatorTester - INFO - 测试 4: CodeSecurityChecker 类测试
+2025-12-28 17:30:31,717 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,717 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #1 (正常代码): 预期安全: True, 实际安全: True
+2025-12-28 17:30:31,717 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #2 (os 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #3 (subprocess 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #4 (eval 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #5 (exec 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #6 (文件操作): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #7 (socket 操作): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #8 (正常函数定义): 预期安全: True, 实际安全: True
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #9 (sys 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #10 (HTTP 请求): 预期安全: False, 实际安全: False
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - 测试 5: 批量评估功能
+2025-12-28 17:30:31,718 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,739 - CodeEvaluatorTester - ERROR - ✗ 批量评估功能测试: 批量评估样本数: 3, 通过: 0
+2025-12-28 17:30:31,740 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,740 - CodeEvaluatorTester - INFO - 测试 6: 完整评估流程
+2025-12-28 17:30:31,740 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,928 - CodeEvaluatorTester - INFO - ✓ 完整评估流程测试: 评估样本数: 10, 测试通过率: 0.03
+2025-12-28 17:30:31,929 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,929 - CodeEvaluatorTester - INFO - 测试 7: 多语言支持
+2025-12-28 17:30:31,929 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,937 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #1 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:30:31,937 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #2 (javascript): 语言: javascript, 执行成功: False, 输出正确: False
+2025-12-28 17:30:31,945 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #3 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:30:31,946 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,946 - CodeEvaluatorTester - INFO - 测试 8: 边界情况处理
+2025-12-28 17:30:31,946 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,947 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #1 (空代码测试): 预期错误: 代码为空, 实际错误: 代码为空
+2025-12-28 17:30:31,947 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #2 (不支持语言测试): 预期错误: 不支持的语言, 实际错误: 不支持的语言: unsupported_language
+2025-12-28 17:30:31,947 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:30:31,947 - CodeEvaluatorTester - INFO - 测试 9: 超时处理
+2025-12-28 17:30:31,948 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:30:31,956 - CodeEvaluatorTester - ERROR - ✗ 超时处理测试: 超时检测: False, 执行成功: True
+2025-12-28 17:30:31,956 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:30:31,956 - CodeEvaluatorTester - INFO - 测试执行完成
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - INFO - 总测试数: 31
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - INFO - 通过: 21
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - INFO - 失败: 10
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - INFO - 成功率: 67.7%
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #1 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   code_preview: def add(a, b):
+    return a + b
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #2 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   code_preview: def is_even(n):
+    return n % 2 == 0
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #3 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   code_preview: def factorial(n):
+    if n <= 1:
+        return 1
+...
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #4 (python): 通过率: 0.33, 通过数: 1/3
+2025-12-28 17:30:31,957 - CodeEvaluatorTester - ERROR -   code_preview: def reverse_string(s):
+    return s[::-1]
+2025-12-28 17:30:31,958 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:30:31,958 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #5 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:30:31,958 - CodeEvaluatorTester - ERROR -   code_preview: def sum_list(lst):
+    return sum(lst)
+2025-12-28 17:30:31,958 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:30:31,958 - CodeEvaluatorTester - ERROR - 失败详情 - 批量评估功能测试: 批量评估样本数: 3, 通过: 0
+2025-12-28 17:30:31,958 - CodeEvaluatorTester - ERROR -   total_samples: 3
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   passed_samples: 0
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   total_tests: 3
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   passed_tests: 0
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #1 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   code: print("Hello, World!")
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   error: Unknown option: - 
+usage: python3 [option] ... [-c cmd | -m mod | file | -] [arg] ...
+Try `python -h
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #2 (javascript): 语言: javascript, 执行成功: False, 输出正确: False
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   code: console.log("Hello from JavaScript")
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR -   error: 执行异常: too many values to unpack (expected 2)
+2025-12-28 17:30:31,959 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #3 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR -   code: print(sum([1, 2, 3, 4, 5]))
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR -   error: Unknown option: - 
+usage: python3 [option] ... [-c cmd | -m mod | file | -] [arg] ...
+Try `python -h
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR - 失败详情 - 超时处理测试: 超时检测: False, 执行成功: True
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR -   timeout: False
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR -   success: False
+2025-12-28 17:30:31,960 - CodeEvaluatorTester - ERROR -   error: Unknown option: - 
+usage: python3 [option] ... [-c cmd | -m mod | file | -] [arg] ...
+Try `python -h
+2025-12-28 17:33:25,881 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:33:25,881 - CodeEvaluatorTester - INFO - CodeEvaluator 全面测试开始
+2025-12-28 17:33:25,881 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:33:25,881 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,881 - CodeEvaluatorTester - INFO - 测试 1: 正确代码评估
+2025-12-28 17:33:25,881 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #1 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #2 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #3 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #4 (python): 通过率: 0.33, 通过数: 1/3
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #5 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,884 - CodeEvaluatorTester - INFO - 测试 2: 错误代码评估
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #1: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #2: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #3: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - 测试 3: 安全检查功能
+2025-12-28 17:33:25,885 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #1 (os.system 调用): 检测到恶意代码: 是
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #2 (subprocess 调用): 检测到恶意代码: 是
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #3 (eval 动态执行): 检测到恶意代码: 是
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #4 (exec 动态执行): 检测到恶意代码: 是
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #5 (文件读取操作): 检测到恶意代码: 是
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - 测试 4: CodeSecurityChecker 类测试
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #1 (正常代码): 预期安全: True, 实际安全: True
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #2 (os 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,886 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #3 (subprocess 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #4 (eval 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #5 (exec 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #6 (文件操作): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #7 (socket 操作): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #8 (正常函数定义): 预期安全: True, 实际安全: True
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #9 (sys 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #10 (HTTP 请求): 预期安全: False, 实际安全: False
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - 测试 5: 批量评估功能
+2025-12-28 17:33:25,887 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,888 - CodeEvaluatorTester - ERROR - ✗ 批量评估功能测试: 批量评估样本数: 3, 通过: 0
+2025-12-28 17:33:25,888 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,888 - CodeEvaluatorTester - INFO - 测试 6: 完整评估流程
+2025-12-28 17:33:25,888 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,890 - CodeEvaluatorTester - INFO - ✓ 完整评估流程测试: 评估样本数: 10, 测试通过率: 0.03
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - INFO - 测试 7: 多语言支持
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #1 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #2 (javascript): 语言: javascript, 执行成功: False, 输出正确: False
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #3 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,891 - CodeEvaluatorTester - INFO - 测试 8: 边界情况处理
+2025-12-28 17:33:25,892 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,892 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #1 (空代码测试): 预期错误: 代码为空, 实际错误: 代码为空
+2025-12-28 17:33:25,892 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #2 (不支持语言测试): 预期错误: 不支持的语言, 实际错误: 不支持的语言: unsupported_language
+2025-12-28 17:33:25,892 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:33:25,892 - CodeEvaluatorTester - INFO - 测试 9: 超时处理
+2025-12-28 17:33:25,893 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:33:25,893 - CodeEvaluatorTester - ERROR - ✗ 超时处理测试: 超时检测: False, 执行成功: True
+2025-12-28 17:33:25,893 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:33:25,893 - CodeEvaluatorTester - INFO - 测试执行完成
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - INFO - 总测试数: 31
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - INFO - 通过: 21
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - INFO - 失败: 10
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - INFO - 成功率: 67.7%
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #1 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   code_preview: def add(a, b):
+    return a + b
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #2 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   code_preview: def is_even(n):
+    return n % 2 == 0
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #3 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   code_preview: def factorial(n):
+    if n <= 1:
+        return 1
+...
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #4 (python): 通过率: 0.33, 通过数: 1/3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   code_preview: def reverse_string(s):
+    return s[::-1]
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #5 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   code_preview: def sum_list(lst):
+    return sum(lst)
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 批量评估功能测试: 批量评估样本数: 3, 通过: 0
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   total_samples: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   passed_samples: 0
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   total_tests: 3
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   passed_tests: 0
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #1 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:33:25,894 - CodeEvaluatorTester - ERROR -   code: print("Hello, World!")
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   error: 执行异常: too many values to unpack (expected 2)
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #2 (javascript): 语言: javascript, 执行成功: False, 输出正确: False
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   code: console.log("Hello from JavaScript")
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   error: 执行异常: too many values to unpack (expected 2)
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #3 (python): 语言: python, 执行成功: False, 输出正确: False
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   code: print(sum([1, 2, 3, 4, 5]))
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   error: 执行异常: too many values to unpack (expected 2)
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR - 失败详情 - 超时处理测试: 超时检测: False, 执行成功: True
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   timeout: False
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   success: False
+2025-12-28 17:33:25,895 - CodeEvaluatorTester - ERROR -   error: 执行异常: too many values to unpack (expected 2)
+2025-12-28 17:36:32,421 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:36:32,421 - CodeEvaluatorTester - INFO - CodeEvaluator 全面测试开始
+2025-12-28 17:36:32,421 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:36:32,422 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:32,422 - CodeEvaluatorTester - INFO - 测试 1: 正确代码评估
+2025-12-28 17:36:32,422 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:32,545 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #1 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:32,663 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #2 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:32,771 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #3 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:32,864 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #4 (python): 通过率: 0.33, 通过数: 1/3
+2025-12-28 17:36:32,959 - CodeEvaluatorTester - ERROR - ✗ 正确代码测试 #5 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:32,960 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:32,960 - CodeEvaluatorTester - INFO - 测试 2: 错误代码评估
+2025-12-28 17:36:32,960 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:33,064 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #1: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:36:33,106 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #2: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:36:33,194 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #3: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:36:33,195 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:33,195 - CodeEvaluatorTester - INFO - 测试 3: 安全检查功能
+2025-12-28 17:36:33,195 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:33,196 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #1 (os.system 调用): 检测到恶意代码: 是
+2025-12-28 17:36:33,196 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #2 (subprocess 调用): 检测到恶意代码: 是
+2025-12-28 17:36:33,196 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #3 (eval 动态执行): 检测到恶意代码: 是
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #4 (exec 动态执行): 检测到恶意代码: 是
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #5 (文件读取操作): 检测到恶意代码: 是
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - 测试 4: CodeSecurityChecker 类测试
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #1 (正常代码): 预期安全: True, 实际安全: True
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #2 (os 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #3 (subprocess 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,197 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #4 (eval 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #5 (exec 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #6 (文件操作): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #7 (socket 操作): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #8 (正常函数定义): 预期安全: True, 实际安全: True
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #9 (sys 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #10 (HTTP 请求): 预期安全: False, 实际安全: False
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - 测试 5: 批量评估功能
+2025-12-28 17:36:33,198 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:33,303 - CodeEvaluatorTester - ERROR - ✗ 批量评估功能测试: 批量评估样本数: 3, 通过: 0
+2025-12-28 17:36:33,303 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:33,303 - CodeEvaluatorTester - INFO - 测试 6: 完整评估流程
+2025-12-28 17:36:33,304 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:34,356 - CodeEvaluatorTester - INFO - ✓ 完整评估流程测试: 评估样本数: 10, 测试通过率: 0.03
+2025-12-28 17:36:34,356 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:34,356 - CodeEvaluatorTester - INFO - 测试 7: 多语言支持
+2025-12-28 17:36:34,356 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:34,396 - CodeEvaluatorTester - INFO - ✓ 多语言测试 #1 (python): 语言: python, 执行成功: True, 输出正确: True
+2025-12-28 17:36:34,409 - CodeEvaluatorTester - ERROR - ✗ 多语言测试 #2 (javascript): 语言: javascript, 执行成功: False, 输出正确: False
+2025-12-28 17:36:34,444 - CodeEvaluatorTester - INFO - ✓ 多语言测试 #3 (python): 语言: python, 执行成功: True, 输出正确: True
+2025-12-28 17:36:34,445 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:34,445 - CodeEvaluatorTester - INFO - 测试 8: 边界情况处理
+2025-12-28 17:36:34,445 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:34,446 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #1 (空代码测试): 预期错误: 代码为空, 实际错误: 代码为空
+2025-12-28 17:36:34,446 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #2 (不支持语言测试): 预期错误: 不支持的语言, 实际错误: 不支持的语言: unsupported_language
+2025-12-28 17:36:34,446 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:36:34,447 - CodeEvaluatorTester - INFO - 测试 9: 超时处理
+2025-12-28 17:36:34,447 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:36:41,452 - CodeEvaluatorTester - INFO - ✓ 超时处理测试: 超时检测: True, 执行成功: True
+2025-12-28 17:36:41,453 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - INFO - 测试执行完成
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - INFO - 总测试数: 31
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - INFO - 通过: 24
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - INFO - 失败: 7
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - INFO - 成功率: 77.4%
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #1 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR -   code_preview: def add(a, b):
+    return a + b
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #2 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR -   code_preview: def is_even(n):
+    return n % 2 == 0
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #3 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:41,454 - CodeEvaluatorTester - ERROR -   code_preview: def factorial(n):
+    if n <= 1:
+        return 1
+...
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #4 (python): 通过率: 0.33, 通过数: 1/3
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR -   code_preview: def reverse_string(s):
+    return s[::-1]
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR - 失败详情 - 正确代码测试 #5 (python): 通过率: 0.00, 通过数: 0/3
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR -   code_preview: def sum_list(lst):
+    return sum(lst)
+2025-12-28 17:36:41,455 - CodeEvaluatorTester - ERROR -   test_cases_count: 3
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR - 失败详情 - 批量评估功能测试: 批量评估样本数: 3, 通过: 0
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   total_samples: 3
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   passed_samples: 0
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   total_tests: 3
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   passed_tests: 0
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR - 失败详情 - 多语言测试 #2 (javascript): 语言: javascript, 执行成功: False, 输出正确: False
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   code: console.log("Hello from JavaScript")
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   output: 
+2025-12-28 17:36:41,456 - CodeEvaluatorTester - ERROR -   error: -e: node: command not found
+
+2025-12-28 17:42:46,813 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:42:46,814 - CodeEvaluatorTester - INFO - CodeEvaluator 全面测试开始
+2025-12-28 17:42:46,814 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:42:46,814 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:46,814 - CodeEvaluatorTester - INFO - 测试 1: 正确代码评估
+2025-12-28 17:42:46,814 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:46,961 - CodeEvaluatorTester - INFO - ✓ 正确代码测试 #1 (python): 通过率: 1.00, 通过数: 3/3
+2025-12-28 17:42:47,045 - CodeEvaluatorTester - INFO - ✓ 正确代码测试 #2 (python): 通过率: 1.00, 通过数: 3/3
+2025-12-28 17:42:47,138 - CodeEvaluatorTester - INFO - ✓ 正确代码测试 #3 (python): 通过率: 1.00, 通过数: 3/3
+2025-12-28 17:42:47,139 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:47,139 - CodeEvaluatorTester - INFO - 测试 2: 错误代码评估
+2025-12-28 17:42:47,139 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:47,199 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #1: 通过率: 0.50, 预期失败，实际通过率: 0.50
+2025-12-28 17:42:47,228 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #2: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:42:47,287 - CodeEvaluatorTester - INFO - ✓ 错误代码测试 #3: 通过率: 0.00, 预期失败，实际通过率: 0.00
+2025-12-28 17:42:47,288 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:47,288 - CodeEvaluatorTester - INFO - 测试 3: 安全检查功能
+2025-12-28 17:42:47,288 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:47,289 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #1 (os.system 调用): 检测到恶意代码: 是
+2025-12-28 17:42:47,289 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #2 (subprocess 调用): 检测到恶意代码: 是
+2025-12-28 17:42:47,289 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #3 (eval 动态执行): 检测到恶意代码: 是
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #4 (exec 动态执行): 检测到恶意代码: 是
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查测试 #5 (文件读取操作): 检测到恶意代码: 是
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - 测试 4: CodeSecurityChecker 类测试
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #1 (正常代码): 预期安全: True, 实际安全: True
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #2 (os 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #3 (subprocess 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #4 (eval 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #5 (exec 函数): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,290 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #6 (文件操作): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #7 (socket 操作): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #8 (正常函数定义): 预期安全: True, 实际安全: True
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #9 (sys 模块导入): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - ✓ 安全检查器测试 #10 (HTTP 请求): 预期安全: False, 实际安全: False
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - 测试 5: 批量评估功能
+2025-12-28 17:42:47,291 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:47,377 - CodeEvaluatorTester - INFO - ✓ 批量评估功能测试: 批量评估样本数: 3, 通过: 3
+2025-12-28 17:42:47,378 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:47,378 - CodeEvaluatorTester - INFO - 测试 6: 完整评估流程
+2025-12-28 17:42:47,378 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:48,201 - CodeEvaluatorTester - INFO - ✓ 完整评估流程测试: 评估样本数: 10, 测试通过率: 1.00
+2025-12-28 17:42:48,202 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:48,202 - CodeEvaluatorTester - INFO - 测试 7: 多语言支持
+2025-12-28 17:42:48,202 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:48,230 - CodeEvaluatorTester - INFO - ✓ 多语言测试 #1 (python): 语言: python, 执行成功: True, 输出正确: True
+2025-12-28 17:42:48,230 - CodeEvaluatorTester - INFO - ⏭ 跳过 JavaScript 测试 (node 未安装)
+2025-12-28 17:42:48,230 - CodeEvaluatorTester - INFO - ✓ 多语言测试 #2 (javascript): 跳过：node 未安装
+2025-12-28 17:42:48,259 - CodeEvaluatorTester - INFO - ✓ 多语言测试 #3 (python): 语言: python, 执行成功: True, 输出正确: True
+2025-12-28 17:42:48,259 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:48,259 - CodeEvaluatorTester - INFO - 测试 8: 边界情况处理
+2025-12-28 17:42:48,260 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:48,260 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #1 (空代码测试): 预期错误: 代码为空, 实际错误: 代码为空
+2025-12-28 17:42:48,260 - CodeEvaluatorTester - INFO - ✓ 边界情况测试 #2 (不支持语言测试): 预期错误: 不支持的语言, 实际错误: 不支持的语言: unsupported_language
+2025-12-28 17:42:48,260 - CodeEvaluatorTester - INFO - 
+========================================
+2025-12-28 17:42:48,261 - CodeEvaluatorTester - INFO - 测试 9: 超时处理
+2025-12-28 17:42:48,261 - CodeEvaluatorTester - INFO - ========================================
+2025-12-28 17:42:55,266 - CodeEvaluatorTester - INFO - ✓ 超时处理测试: 超时检测: True, 执行成功: True
+2025-12-28 17:42:55,268 - CodeEvaluatorTester - INFO - ============================================================
+2025-12-28 17:42:55,269 - CodeEvaluatorTester - INFO - 测试执行完成
+2025-12-28 17:42:55,269 - CodeEvaluatorTester - INFO - 总测试数: 29
+2025-12-28 17:42:55,269 - CodeEvaluatorTester - INFO - 通过: 29
+2025-12-28 17:42:55,269 - CodeEvaluatorTester - INFO - 失败: 0
+2025-12-28 17:42:55,269 - CodeEvaluatorTester - INFO - 成功率: 100.0%
+2025-12-28 17:42:55,269 - CodeEvaluatorTester - INFO - ============================================================

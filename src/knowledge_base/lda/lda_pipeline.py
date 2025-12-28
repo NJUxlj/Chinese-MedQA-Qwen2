@@ -23,10 +23,16 @@ from umap import UMAP
 from hdbscan import HDBSCAN
 from sentence_transformers import SentenceTransformer
 
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__)).parent.parent)
+
+from config.lda_config import LDAConfig
+
 # 导入本地PDF解析器（可选）
 PdfParser = None
 try:
-    from ...pdf.pdf_parser import PdfParser
+    from knowledge_base.pdf.pdf_parser import PdfParser
 except ImportError:
     try:
         # 如果相对导入失败，使用绝对路径导入
@@ -45,9 +51,9 @@ except ImportError:
             spec.loader.exec_module(pdf_parser_module)
             PdfParser = pdf_parser_module.PdfParser
         else:
-            logger.warning("未找到PDF解析器，PDF功能将被禁用")
+            print("未找到PDF解析器，PDF功能将被禁用")
     except Exception as e:
-        logger.warning(f"无法加载PDF解析器: {e}，PDF功能将被禁用")
+        print(f"无法加载PDF解析器: {e}，PDF功能将被禁用")
 
 warnings.filterwarnings("ignore")
 
@@ -67,9 +73,7 @@ class LDAPipeline:
     """
 
     def __init__(self, 
-                 embedding_model: str = "/Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B",
-                 language: str = "chinese",
-                 offline_mode: bool = False):
+                 config: LDAConfig):
         """
         初始化主题建模管道
         
@@ -78,12 +82,13 @@ class LDAPipeline:
             language: 处理语言，支持 'chinese' 和 'english'
             offline_mode: 是否使用离线模式（不使用在线模型）
         """
-        self.embedding_model_name = embedding_model
-        self.language = language
+        self.config = config
+        self.embedding_model_name = config.embedding_model_name
+        self.language = config.language
         self.pdf_parser = PdfParser() if PdfParser else None
         self.embedding_model = None
         self.topic_model = None
-        self.offline_mode = offline_mode
+        self.offline_mode = config.offline_mode
         
         # 中文停用词列表
         self.chinese_stopwords = {

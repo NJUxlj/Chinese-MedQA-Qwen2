@@ -1,0 +1,52 @@
+2025-12-28 17:30:31,741 - CodeEvaluator - INFO - 开始评估，测试集大小: 10
+2025-12-28 17:30:31,741 - CodeEvaluator - INFO - 评估样本 1/10
+2025-12-28 17:30:31,759 - CodeEvaluator - INFO - 评估样本 2/10
+2025-12-28 17:30:31,777 - CodeEvaluator - INFO - 评估样本 3/10
+2025-12-28 17:30:31,794 - CodeEvaluator - INFO - 评估样本 4/10
+2025-12-28 17:30:31,812 - CodeEvaluator - INFO - 评估样本 5/10
+2025-12-28 17:30:31,831 - CodeEvaluator - INFO - 评估样本 6/10
+2025-12-28 17:30:31,851 - CodeEvaluator - INFO - 评估样本 7/10
+2025-12-28 17:30:31,871 - CodeEvaluator - INFO - 评估样本 8/10
+2025-12-28 17:30:31,889 - CodeEvaluator - INFO - 评估样本 9/10
+2025-12-28 17:30:31,908 - CodeEvaluator - INFO - 评估样本 10/10
+2025-12-28 17:30:31,927 - CodeEvaluator - INFO - 评估完成: 0/10 样本通过, 1/30 测试用例通过
+2025-12-28 17:30:31,928 - CodeEvaluator - INFO - 样本通过率: 0.00%, 测试用例通过率: 3.33%
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 开始评估，测试集大小: 10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 1/10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 2/10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 3/10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 4/10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 5/10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 6/10
+2025-12-28 17:33:25,889 - CodeEvaluator - INFO - 评估样本 7/10
+2025-12-28 17:33:25,890 - CodeEvaluator - INFO - 评估样本 8/10
+2025-12-28 17:33:25,890 - CodeEvaluator - INFO - 评估样本 9/10
+2025-12-28 17:33:25,890 - CodeEvaluator - INFO - 评估样本 10/10
+2025-12-28 17:33:25,890 - CodeEvaluator - INFO - 评估完成: 0/10 样本通过, 1/30 测试用例通过
+2025-12-28 17:33:25,890 - CodeEvaluator - INFO - 样本通过率: 0.00%, 测试用例通过率: 3.33%
+2025-12-28 17:36:33,304 - CodeEvaluator - INFO - 开始评估，测试集大小: 10
+2025-12-28 17:36:33,305 - CodeEvaluator - INFO - 评估样本 1/10
+2025-12-28 17:36:33,402 - CodeEvaluator - INFO - 评估样本 2/10
+2025-12-28 17:36:33,504 - CodeEvaluator - INFO - 评估样本 3/10
+2025-12-28 17:36:33,616 - CodeEvaluator - INFO - 评估样本 4/10
+2025-12-28 17:36:33,722 - CodeEvaluator - INFO - 评估样本 5/10
+2025-12-28 17:36:33,832 - CodeEvaluator - INFO - 评估样本 6/10
+2025-12-28 17:36:33,935 - CodeEvaluator - INFO - 评估样本 7/10
+2025-12-28 17:36:34,042 - CodeEvaluator - INFO - 评估样本 8/10
+2025-12-28 17:36:34,136 - CodeEvaluator - INFO - 评估样本 9/10
+2025-12-28 17:36:34,235 - CodeEvaluator - INFO - 评估样本 10/10
+2025-12-28 17:36:34,355 - CodeEvaluator - INFO - 评估完成: 0/10 样本通过, 1/30 测试用例通过
+2025-12-28 17:36:34,355 - CodeEvaluator - INFO - 样本通过率: 0.00%, 测试用例通过率: 3.33%
+2025-12-28 17:42:47,379 - CodeEvaluator - INFO - 开始评估，测试集大小: 10
+2025-12-28 17:42:47,379 - CodeEvaluator - INFO - 评估样本 1/10
+2025-12-28 17:42:47,468 - CodeEvaluator - INFO - 评估样本 2/10
+2025-12-28 17:42:47,553 - CodeEvaluator - INFO - 评估样本 3/10
+2025-12-28 17:42:47,633 - CodeEvaluator - INFO - 评估样本 4/10
+2025-12-28 17:42:47,709 - CodeEvaluator - INFO - 评估样本 5/10
+2025-12-28 17:42:47,786 - CodeEvaluator - INFO - 评估样本 6/10
+2025-12-28 17:42:47,864 - CodeEvaluator - INFO - 评估样本 7/10
+2025-12-28 17:42:47,944 - CodeEvaluator - INFO - 评估样本 8/10
+2025-12-28 17:42:48,025 - CodeEvaluator - INFO - 评估样本 9/10
+2025-12-28 17:42:48,110 - CodeEvaluator - INFO - 评估样本 10/10
+2025-12-28 17:42:48,201 - CodeEvaluator - INFO - 评估完成: 10/10 样本通过, 30/30 测试用例通过
+2025-12-28 17:42:48,201 - CodeEvaluator - INFO - 样本通过率: 100.00%, 测试用例通过率: 100.00%

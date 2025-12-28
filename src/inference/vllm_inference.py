@@ -13,7 +13,7 @@ from threading import Lock
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 
 from utils.logger import setup_logger  
-from config.model_config import ModelConfig  
+from config.local_model_config import LocalModelConfig  
 from inference.inference_utils import (  
     format_prompt,   
     format_rag_prompt,   
@@ -23,7 +23,7 @@ from inference.inference_utils import (
     get_inference_params  
 )  
 
-logger = setup_logger("vllm_inference", level="INFO")  
+
 
 # 尝试导入vLLM  
 try:  
@@ -70,6 +70,8 @@ class VLLMInference:
         # 防止重复初始化  
         if hasattr(self, 'model'):  
             return  
+
+        self.logger = setup_logger("vllm_inference", level="INFO")  
             
         self.model_path = get_model_path(model_path)  
         self.dtype = dtype  
@@ -78,14 +80,14 @@ class VLLMInference:
         self.max_model_len = max_model_len  
         self.quantization = quantization  
         
-        logger.info(f"正在加载模型: {self.model_path}")  
+        self.logger.info(f"正在加载模型: {self.model_path}")  
         start_time = time.time()  
         
         try:  
             # 配置GPU选项  
             gpu_count = torch.cuda.device_count() if torch.cuda.is_available() else 0  
             if gpu_count < self.tensor_parallel_size:  
-                logger.warning(f"可用GPU数量({gpu_count})小于请求的张量并行大小({self.tensor_parallel_size})，将使用所有可用GPU")  
+                self.logger.warning(f"可用GPU数量({gpu_count})小于请求的张量并行大小({self.tensor_parallel_size})，将使用所有可用GPU")  
                 self.tensor_parallel_size = max(1, gpu_count)  
             
             # 加载模型  
@@ -103,10 +105,10 @@ class VLLMInference:
             self.tokenizer = self.model.get_tokenizer()  
             
             # 打印模型信息  
-            logger.info(f"模型加载完成，耗时 {time.time() - start_time:.2f} 秒")  
+            self.logger.info(f"模型加载完成，耗时 {time.time() - start_time:.2f} 秒")  
             
         except Exception as e:  
-            logger.error(f"加载模型时出错: {str(e)}")  
+            self.logger.error(f"加载模型时出错: {str(e)}")  
             raise  
     
     @measure_latency   # 测量方法执行的延迟/耗时
@@ -188,7 +190,7 @@ class VLLMInference:
             return postprocess_response(response)  
             
         except Exception as e:  
-            logger.error(f"推理过程中出错: {str(e)}")  
+            self.logger.error(f"推理过程中出错: {str(e)}")  
             return f"推理出错: {str(e)}"  
     
     def answer_question(self,   
@@ -272,7 +274,7 @@ class VLLMInference:
             return [postprocess_response(response) for response in responses]  
             
         except Exception as e:  
-            logger.error(f"批量推理过程中出错: {str(e)}")  
+            self.logger.error(f"批量推理过程中出错: {str(e)}")  
             return [f"推理出错: {str(e)}"] * len(prompts)  
     
     def stream_generate(self,   
@@ -311,7 +313,7 @@ class VLLMInference:
                 yield new_text  
                 
         except Exception as e:  
-            logger.error(f"流式推理过程中出错: {str(e)}")  
+            self.logger.error(f"流式推理过程中出错: {str(e)}")  
             yield f"推理出错: {str(e)}"  
     
     def batch_stream_generate(self,   
@@ -354,7 +356,7 @@ class VLLMInference:
                 yield new_texts  # 每次返回一个新token的列表
                 
         except Exception as e:  
-            logger.error(f"批量流式推理过程中出错: {str(e)}")  
+            self.logger.error(f"批量流式推理过程中出错: {str(e)}")  
             yield [f"推理出错: {str(e)}"] * len(prompts)  
     
     def unload(self):  
@@ -374,7 +376,7 @@ class VLLMInference:
                 if self.model_path in self.__class__._instances:  
                     del self.__class__._instances[self.model_path]  
                     
-            logger.info(f"模型 {self.model_path} 已卸载")  
+            self.logger.info(f"模型 {self.model_path} 已卸载")  
 
 
 # 测试代码  

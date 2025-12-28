@@ -119,15 +119,15 @@ class CodeExecutor:
     '''
     
     LANGUAGE_COMMANDS = {
-        # Python: 使用 python3 解释器执行，通过 heredoc 传入代码
-        # 执行方式：将代码作为标准输入传递给 python3
-        # 优点：无需创建临时文件，自动清理
-        'python': ['python3', '- <<EOF\n{}\nEOF'],
-        'python3': ['python3', '- <<EOF\n{}\nEOF'],
+        # Python: 使用 bash 执行，通过 heredoc 传入代码
+        # 执行方式：使用 bash -c 配合 heredoc 语法
+        # 优点：无需创建临时文件，自动清理，兼容性好
+        'python': ['bash', '-c', 'python3 - <<\'EOF\'\n{}\nEOF'],
+        'python3': ['bash', '-c', 'python3 - <<\'EOF\'\n{}\nEOF'],
         
         # JavaScript: 使用 node 解释器执行
         # 执行方式：通过 -e 参数直接执行代码字符串
-        'javascript': ['node', '-e', '{}'],
+        'javascript': ['bash', '-c', 'node -e \'{}\''],
         
         # Java: 需要编译和运行两步
         # 执行方式：
@@ -135,6 +135,12 @@ class CodeExecutor:
         # 2. 使用 javac 编译
         # 3. 使用 java 运行
         # 注意：Java 代码必须包含 Main 类
+
+        # 具体执行步骤：
+        # Java: 使用 bash 一次性完成写文件、编译、运行的三步骤
+        # 1. cat > Main.java <<'EOF' … EOF：将代码块写入 Main.java
+        # 2. javac Main.java：编译生成字节码
+        # 3. java Main：运行主类（要求源码必须含 public class Main{...}）
         'java': ['bash', '-c', 'cat > Main.java <<\'EOF\'\n{}\nEOF\njavac Main.java && java Main'],
         
         # C++: 使用 g++ 编译并运行
@@ -203,13 +209,21 @@ class CodeExecutor:
                     'oom': False
                 }
             
-            cmd_template, cmd_args = self.LANGUAGE_COMMANDS[language]
-            code_with_input = self._wrap_input(code, input_data)
+            cmd_parts = self.LANGUAGE_COMMANDS[language]
+            code_with_input = self._wrap_input(code, input_data, language)
             
-            if '{}' in cmd_args:
-                cmd = [cmd_template, cmd_args.format(code_with_input)]
+            if len(cmd_parts) == 3:
+                cmd_template, cmd_flag, cmd_args = cmd_parts
+                if '{}' in cmd_args:
+                    cmd = f"{cmd_template} {cmd_flag} {cmd_args.format(code_with_input)}"
+                else:
+                    cmd = f"{cmd_template} {cmd_flag} {cmd_args}"
             else:
-                cmd = cmd_args.format(code_with_input)
+                cmd_template, cmd_args = cmd_parts
+                if '{}' in cmd_args:
+                    cmd = [cmd_template, cmd_args.format(code_with_input)]
+                else:
+                    cmd = cmd_args.format(code_with_input)
             
             result = self._run_in_sandbox(cmd)
             
@@ -248,27 +262,69 @@ class CodeExecutor:
                 'oom': False
             }
     
-    def _wrap_input(self, code: str, input_data: str) -> str:
-        '''包装输入数据'''
+    def _wrap_input(self, code: str, input_data: str, language: str = 'python', input_mode: str = 'code') -> str:
+        '''包装输入数据
+        
+        支持两种输入模式：
+        - input_mode='code': input_data 是需要执行的测试代码（如 print(add(1, 2))）
+          直接将测试代码拼接到函数定义后面执行
+        - input_mode='stdin': input_data 是真正的 stdin 输入数据
+          通过重定向 sys.stdin 来模拟输入
+        
+        Args:
+            code: 要执行的代码
+            input_data: 输入数据（测试代码或 stdin 输入）
+            language: 编程语言
+            input_mode: 输入模式，'code' 或 'stdin'
+        '''
         if not input_data:
             return code
         
-        if 'python' in self.LANGUAGE_COMMANDS.get('language', 'python'):
+        if 'python' not in language.lower():
+            return input_data
+        
+        if input_mode == 'code':
+            return f"{code}\n\n{input_data}"
+        else:
             wrapped_code = f"""
 import sys
 import io
 
+# 将输入数据存储为多行字符串
+# 为什么要用三引号？这样可以保留输入数据中的换行符，
+# 使得多行输入（如数组、多行字符串等）能够被正确模拟
 input_data = '''{input_data}'''
+
+# 使用 io.StringIO 创建一个内存中的文件对象来模拟 stdin
+# StringIO 可以像文件一样被读取，但数据存储在内存中
+# 这样做的好处是：
+# 1. 不需要创建真实的文件，避免了 I/O 开销和文件系统操作
+# 2. 可以在内存中快速创建和销毁，非常适合测试场景
+# 3. 保持了与真实文件相同的读取接口（readline、readlines 等）
 sys.stdin = io.StringIO(input_data)
 
+# 执行原始代码，此时代码中的 input() 调用会从我们创建的 StringIO 对象中读取数据
 {code}
 """
             return wrapped_code
-        
-        return code
     
     def _run_in_sandbox(self, cmd: Union[str, List[str]]) -> Dict[str, Any]:
         '''在沙箱中运行命令'''
+        '''
+        在沙箱环境中执行命令的核心方法
+        
+        执行流程：
+        1. 获取执行锁，确保同一时间只有一个代码执行（防止并发冲突）
+        2. 统一命令格式（支持字符串和列表两种形式）
+        3. 使用 subprocess 运行命令，配置适当的执行环境
+        4. 记录执行结果和耗时
+        
+        注意事项：
+        - 使用 lock 会限制并发性能，但确保了文件操作的安全性
+        - 设置 PYTHONUNBUFFERED 确保 Python 输出立即可见
+        - 设置 NODE_PATH 为空避免 Node.js 模块查找问题
+        - 超时设置为 timeout+5，给进程清理留出额外时间
+        '''
         with self._execution_lock:
             try:
                 if isinstance(cmd, str):

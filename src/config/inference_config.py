@@ -10,6 +10,12 @@ load_dotenv()
 from config.base_config import BaseConfig
 
 
+
+class InferenceConfig(BaseConfig):
+    # 推理配置 
+    model_name_or_path: str = Field(default="Qwen/Qwen3-14B", description="微调后的模型路径")
+
+
 class VLLMConfig(BaseConfig):
     """ VLLM 配置
     """
@@ -28,3 +34,9 @@ class VLLMConfig(BaseConfig):
     port: int = Field(default=8000, description="服务端口号 (default: 8000)")
     debug: bool = Field(default=False, description="是否开启调试模式 (default: False)")
     verbose: bool = Field(default=False, description="是否开启详细日志 (default: False)")
+
+
+
+
+class TransformersGenerationConfig(InferenceConfig):
+    pass

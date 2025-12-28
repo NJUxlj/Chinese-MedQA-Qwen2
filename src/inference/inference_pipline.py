@@ -6,12 +6,13 @@ import sys
 import time  
 from typing import Dict, List, Optional, Union, Any, Tuple, Iterator, Callable  
 import torch  
+from pathlib import Path
 
 # 确保可以导入项目其他模块  
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 
-from utils.logger import get_logger  
-from config.model_config import ModelConfig  
+from utils.logger import setup_logger  
+from config.local_model_config import LocalModelConfig  
 from config.rag_config import RAGConfig  
 from inference.inference_utils import (  
     format_prompt,   
@@ -33,7 +34,7 @@ from inference.api_inference import (
     OPENAI_AVAILABLE  
 )  
 
-logger = get_logger("inference_pipeline")  
+logger = setup_logger("inference_pipeline")  
 
 class InferencePipeline:  
     """  
