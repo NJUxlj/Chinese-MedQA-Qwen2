@@ -13,7 +13,7 @@ from utils.logger import setup_logger
 from config.vllm_deployer_config import VLLMDeployerConfig
 
 
-class VllmDeployer:
+class VLLMDeployer:
     def __init__(self, config: VLLMDeployerConfig) -> None:
         self.config = config
         self.process: Optional[subprocess.Popen] = None
