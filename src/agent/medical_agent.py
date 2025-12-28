@@ -1,11 +1,12 @@
 import time
 import json
+import re
 from typing import Dict, List, Optional, Any, Union, Tuple
 from pathlib import Path
-import os,sys
+import os, sys
 sys.path.append(str(Path(__file__).parent.parent))
 
-from agent.agent_base import AgentBase
+from agent.base_agent import BaseAgent
 from tools.tool_manager import ToolManager
 from models.api_model import ApiModel
 from rag.rag_pipeline import RAGPipeline
@@ -13,7 +14,7 @@ from utils.logger import setup_logger
 
 logger = setup_logger(__name__, level="INFO")
 
-class MedicalAgent(AgentBase):
+class MedicalAgent(BaseAgent):
     """
     医疗Agent实现，基于RAG和大型语言模型
     """
@@ -45,10 +46,9 @@ class MedicalAgent(AgentBase):
             verbose: 是否输出详细日志
         """
         super().__init__(
-            agent_id=agent_id,
-            name=name,
-            description=description,
-            model_name=model.model_name if hasattr(model, 'model_name') else None,
+            model=model,
+            system_prompt=system_prompt,
+            tools=None,
             max_iterations=max_iterations,
             verbose=verbose
         )
@@ -57,10 +57,36 @@ class MedicalAgent(AgentBase):
         self.rag_pipeline = rag_pipeline
         self.tool_manager = ToolManager()
         self.temperature = temperature
+        self.agent_id = agent_id
+        self.name = name
+        self.description = description
         
-        # 设置系统提示词
         self.system_prompt = system_prompt or self._get_default_system_prompt()
-        self.add_to_memory("system", self.system_prompt)
+        self._memory = [{"role": "system", "content": self.system_prompt}]
+        
+    @property
+    def memory(self) -> List[Dict[str, str]]:
+        """获取对话记忆"""
+        return self._memory
+    
+    @memory.setter
+    def memory(self, value: List[Dict[str, str]]):
+        """设置对话记忆"""
+        self._memory = value
+    
+    def add_to_memory(self, role: str, content: str) -> None:
+        """
+        向记忆中添加消息
+        
+        Args:
+            role: 消息角色 (system, user, assistant)
+            content: 消息内容
+        """
+        self._memory.append({"role": role, "content": content})
+    
+    def clear_memory(self) -> None:
+        """清空记忆，保留系统提示词"""
+        self._memory = [{"role": "system", "content": self.system_prompt}]
         
     def _get_default_system_prompt(self) -> str:
         """获取默认的系统提示词"""
@@ -132,7 +158,6 @@ class MedicalAgent(AgentBase):
         # 寻找工具调用的格式，例如：
         # 调用工具: 工具名称
         # 参数: {...}
-        import re
         
         # 匹配模式1: 标准格式
         pattern1 = r"调用工具[:：]\s*([^\n]+)\n参数[:：]\s*({[^}]+})"
@@ -343,3 +368,251 @@ class MedicalAgent(AgentBase):
         
         if system_prompt:
             self.add_to_memory("system", system_prompt)
+    
+    def _assess_query_complexity(self, query: str) -> Dict[str, Any]:
+        """
+        评估查询复杂度，用于决定处理策略
+        
+        Args:
+            query: 用户查询
+            
+        Returns:
+            复杂度评估结果
+        """
+        complexity_keywords = {
+            "CRITICAL": ["急诊", "急救", "生命危险", "胸痛", "呼吸困难", "昏迷", "大出血"],
+            "HIGH": ["诊断", "治疗方案", "药物相互作用", "手术", "肿瘤", "慢性病"],
+            "MODERATE": ["症状", "检查", "预防", "康复", "生活建议"],
+            "LOW": ["常识", "保健", "营养", "运动建议"]
+        }
+        
+        query_lower = query.lower()
+        max_severity = "LOW"
+        matched_keywords = []
+        
+        for severity, keywords in complexity_keywords.items():
+            for keyword in keywords:
+                if keyword in query:
+                    if severity in ["CRITICAL", "HIGH"]:
+                        return {"complexity": severity, "requires_evidence": True, "matched_keywords": [keyword]}
+                    elif severity == "MODERATE" and max_severity != "CRITICAL":
+                        max_severity = "MODERATE"
+                        matched_keywords.append(keyword)
+        
+        return {
+            "complexity": max_severity,
+            "requires_evidence": max_severity in ["HIGH", "MODERATE"],
+            "matched_keywords": matched_keywords
+        }
+    
+    def _verify_response_safety(self, response: str, query: str) -> Dict[str, Any]:
+        """
+        验证响应安全性
+        
+        Args:
+            response: 生成的回答
+            query: 原始查询
+            
+        Returns:
+            安全性验证结果
+        """
+        safety_issues = []
+        
+        dangerous_patterns = [
+            (r"建议.*自行.*治疗", "不建议自行治疗复杂疾病"),
+            (r"不用.*去医院", "对于严重症状应建议就医"),
+            (r"一定.*治愈", "医学上很少有绝对的治愈保证"),
+            (r"没有任何.*副作用", "所有药物都可能有副作用"),
+            (r"代替.*医生", "AI不能代替专业医生的诊断")
+        ]
+        
+        for pattern, warning in dangerous_patterns:
+            if re.search(pattern, response):
+                safety_issues.append(warning)
+        
+        return {
+            "is_safe": len(safety_issues) == 0,
+            "issues": safety_issues,
+            "warnings": []
+        }
+    
+    def _calculate_confidence_score(self, response: str, context: str) -> float:
+        """
+        计算回答的置信度
+        
+        Args:
+            response: 生成的回答
+            context: 检索到的上下文
+            
+        Returns:
+            置信度分数 (0-1)
+        """
+        base_confidence = 0.5
+        
+        if context:
+            base_confidence += 0.3
+        
+        if re.search(r"根据.*研究|根据.*指南|循证医学", response):
+            base_confidence += 0.1
+        
+        if re.search(r"建议.*咨询医生|建议.*就医|建议.*专业医师", response):
+            base_confidence += 0.05
+        
+        if re.search(r"可能|也许|不确定|研究表明", response):
+            base_confidence -= 0.05
+        
+        return min(1.0, max(0.0, base_confidence))
+    
+    def _extract_medical_evidence(self, response: str) -> List[str]:
+        """
+        提取回答中的医学证据引用
+        
+        Args:
+            response: 生成的回答
+            
+        Returns:
+            证据列表
+        """
+        evidence_patterns = [
+            r"根据([^\n，]+)",
+            r"研究显示([^\n。]+)",
+            r"指南建议([^\n。]+)",
+            r"循证医学([^\n。]+)"
+        ]
+        
+        evidence = []
+        for pattern in evidence_patterns:
+            matches = re.findall(pattern, response)
+            evidence.extend(matches)
+        
+        return evidence[:5] if evidence else []
+    
+    def _enhanced_run(self, query: str, **kwargs) -> Dict[str, Any]:
+        """
+        增强版运行方法，包含安全性和质量保证
+        
+        Args:
+            query: 用户查询
+            kwargs: 其他参数
+            
+        Returns:
+            包含响应和完整元数据的字典
+        """
+        start_time = time.time()
+        self.add_to_memory("user", query)
+        
+        complexity_assessment = self._assess_query_complexity(query)
+        
+        iteration = 0
+        response = None
+        metadata = {
+            "query": query,
+            "complexity_assessment": complexity_assessment,
+            "iterations": 0,
+            "tool_calls": [],
+            "rag_used": False,
+            "retrieved_documents": [],
+            "safety_verification": None,
+            "confidence_score": 0.0,
+            "evidence_references": [],
+            "timing": {},
+            "warnings": []
+        }
+        
+        if complexity_assessment["complexity"] == "CRITICAL":
+            metadata["warnings"].append("警告：此查询涉及紧急医疗情况，建议用户立即就医或拨打急救电话")
+        
+        should_use_tools = self._should_use_tools(query)
+        metadata["tool_usage_decision"] = should_use_tools
+        
+        rag_start_time = time.time()
+        context = ""
+        if self.rag_pipeline:
+            context = self._retrieve_medical_knowledge(query)
+            metadata["rag_used"] = bool(context)
+            if context:
+                documents = self.rag_pipeline.get_last_retrieval_documents()
+                metadata["retrieved_documents"] = [
+                    {
+                        "content": doc.page_content[:500],
+                        "metadata": doc.metadata
+                    } for doc in documents
+                ]
+        metadata["timing"]["rag_retrieval"] = time.time() - rag_start_time
+        
+        while iteration < self.max_iterations:
+            iteration += 1
+            metadata["iterations"] = iteration
+            
+            if context:
+                augmented_query = (
+                    f"用户查询: {query}\n\n"
+                    f"相关医疗知识:\n{context}\n\n"
+                    "请基于上述信息回答用户的问题。你的回答必须：\n"
+                    "1. 基于医学证据，避免编造信息\n"
+                    "2. 对于不确定的信息，明确表达不确定性\n"
+                    "3. 对于严重症状，建议咨询专业医生\n"
+                    "4. 引用具体的医学指南或研究支持你的建议\n"
+                    "如果提供的信息不足以回答问题，可以使用工具或基于你的医学知识回答。"
+                )
+            else:
+                augmented_query = query
+            
+            if iteration > 1:
+                self.memory[-1]["content"] = augmented_query
+            
+            generation_start_time = time.time()
+            response_text = self.model.generate(
+                self.memory,
+                temperature=self.temperature,
+                **kwargs
+            )
+            metadata["timing"][f"generation_{iteration}"] = time.time() - generation_start_time
+            
+            safety_check = self._verify_response_safety(response_text, query)
+            metadata["safety_verification"] = safety_check
+            
+            if not should_use_tools or iteration == self.max_iterations:
+                response = response_text
+                self.add_to_memory("assistant", response)
+                break
+            
+            tool_calls = self._parse_tool_calls(response_text)
+            
+            if not tool_calls:
+                response = response_text
+                self.add_to_memory("assistant", response)
+                break
+            
+            tool_results = []
+            for tool_call in tool_calls:
+                metadata["tool_calls"].append(tool_call)
+                success, result = self._execute_tool(tool_call)
+                tool_name = tool_call.get("name", "未知工具")
+                
+                tool_results.append({
+                    "tool": tool_name,
+                    "success": success,
+                    "result": result
+                })
+            
+            tools_response = "工具执行结果:\n"
+            for result in tool_results:
+                tools_response += f"工具: {result['tool']}\n"
+                tools_response += f"执行状态: {'成功' if result['success'] else '失败'}\n"
+                tools_response += f"结果: {result['result']}\n\n"
+            
+            self.add_to_memory("user", tools_response)
+        
+        metadata["confidence_score"] = self._calculate_confidence_score(response or "", context)
+        metadata["evidence_references"] = self._extract_medical_evidence(response or "")
+        metadata["timing"]["total"] = time.time() - start_time
+        
+        if metadata["safety_verification"] and not metadata["safety_verification"]["is_safe"]:
+            for issue in metadata["safety_verification"]["issues"]:
+                metadata["warnings"].append(f"安全提醒: {issue}")
+        
+        return {
+            "response": response,
+            "metadata": metadata
+        }
