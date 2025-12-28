@@ -107,13 +107,15 @@ class RAGPipeline:
                 index_path=index_path
             )
         elif retriever_type == "hybrid":
-            # 混合检索需要同时初始化向量检索和BM25
+            dense_index_path = self._get_variant_index_path(index_path, "dense") if index_path else None
+            sparse_index_path = self._get_variant_index_path(index_path, "sparse") if index_path else None
+            
             self.dense_retriever = KNNRetriever(
                 embedding_manager=self.embedding_manager,
-                index_path=index_path.replace(".bin", "_dense.bin") if index_path else None
+                index_path=dense_index_path
             )
             self.sparse_retriever = BM25Retriever(
-                index_path=index_path.replace(".bin", "_sparse.bin") if index_path else None
+                index_path=sparse_index_path
             )
             self.retriever = None  # 混合模式下不使用单一检索器
         else:
@@ -137,6 +139,28 @@ class RAGPipeline:
             )
         else:
             self.response_generator = None
+    
+    def _get_variant_index_path(self, index_path: str, variant: str) -> str:
+        """
+        获取变体索引路径
+        
+        Args:
+            index_path: 原始索引路径
+            variant: 变体类型 ("dense" 或 "sparse")
+            
+        Returns:
+            变体索引路径
+        """
+        if variant not in ["dense", "sparse"]:
+            raise ValueError(f"不支持的变体类型: {variant}")
+        
+        base_path = Path(index_path)
+        if index_path.endswith(".bin"):
+            new_name = base_path.stem.replace("_hybrid", "") + f"_{variant}.bin"
+        else:
+            new_name = base_path.stem + f"_{variant}.bin"
+        
+        return str(base_path.parent / new_name)
     
     def set_model(self, model: BaseGenerativeModel) -> None:
         """
@@ -335,12 +359,10 @@ class RAGPipeline:
             save_path: 保存路径
         """
         if self.retriever_type == "hybrid":
-            # 更新密集检索器
-            dense_save_path = save_path.replace(".bin", "_dense.bin") if save_path else None
-            self.dense_retriever.build_index(documents, dense_save_path)
+            dense_save_path = self._get_variant_index_path(save_path, "dense") if save_path else None
+            sparse_save_path = self._get_variant_index_path(save_path, "sparse") if save_path else None
             
-            # 更新稀疏检索器
-            sparse_save_path = save_path.replace(".bin", "_sparse.bin") if save_path else None
+            self.dense_retriever.build_index(documents, dense_save_path)
             self.sparse_retriever.build_index(documents, sparse_save_path)
         else:
             # 更新单一检索器

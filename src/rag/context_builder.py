@@ -64,7 +64,6 @@ class ContextBuilder:
         Returns:
             文本块列表
         """
-        # 先按段落分割
         paragraphs = re.split(r'\n+', text)
         
         chunks = []
@@ -75,23 +74,20 @@ class ContextBuilder:
             if not paragraph:
                 continue
             
-            # 如果段落本身就超过chunk_size，需要进一步分割
             if len(paragraph) > self.chunk_size:
-                # 如果当前chunk不为空，先添加到chunks
                 if current_chunk:
                     chunks.append(current_chunk)
                     current_chunk = ""
                 
-                # 按句子分割长段落
-                sentences = re.split(r'([.。!！?？;；])', paragraph)
-                current_sentence = ""
+                sentence_pattern = r'[^.。!！?？;；]*[.。!！?？;；]?'
+                sentence_matches = re.findall(sentence_pattern, paragraph)
+                sentences = [s for s in sentence_matches if s.strip()]
                 
-                for i in range(0, len(sentences), 2):
-                    if i+1 < len(sentences):
-                        sentence = sentences[i] + sentences[i+1]
-                    else:
-                        sentence = sentences[i]
-                    
+                if not sentences:
+                    sentences = [paragraph]
+                
+                current_sentence = ""
+                for sentence in sentences:
                     if len(current_sentence) + len(sentence) <= self.chunk_size:
                         current_sentence += sentence
                     else:
@@ -102,7 +98,6 @@ class ContextBuilder:
                 if current_sentence:
                     chunks.append(current_sentence)
             
-            # 正常处理不超过chunk_size的段落
             elif len(current_chunk) + len(paragraph) <= self.chunk_size:
                 current_chunk += "\n" + paragraph if current_chunk else paragraph
             else:
@@ -110,7 +105,6 @@ class ContextBuilder:
                     chunks.append(current_chunk)
                 current_chunk = paragraph
         
-        # 添加最后一个chunk
         if current_chunk:
             chunks.append(current_chunk)
         

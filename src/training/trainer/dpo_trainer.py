@@ -24,7 +24,7 @@ from deepspeed import DeepSpeedEngine
 from config.training_config import DPOTrainingConfig
 
 
-class CustomDPODataset(Dataset):  
+class DPODataset(Dataset):  
     def __init__(self, tokenized_data):  
         self.data = tokenized_data  
         
@@ -39,7 +39,7 @@ class CustomDPODataset(Dataset):
             "rejected_labels": self.data["rejected_labels"][idx]  
         }  
 
-class CustomDPOTrainer:  
+class DPOTrainer:  
     def __init__(  
         self,  
         output_dir: str,  

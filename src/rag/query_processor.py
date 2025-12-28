@@ -127,17 +127,19 @@ class QueryProcessor:
         if not self.use_query_expansion:
             return query
         
-        # 使用TextRank提取关键词
-        keywords = jieba.analyse.textrank(query, topK=3, withWeight=True)
+        use_weight = getattr(jieba.analyse, 'textrank', None) is not None
+        if use_weight:
+            keywords = jieba.analyse.textrank(query, topK=3, withWeight=True)
+        else:
+            keywords = [(word, 0.5) for word in jieba.analyse.extract_tags(query, topK=3)]
         
-        # 如果没有提取到关键词，返回原查询
         if not keywords:
             return query
         
-        # 添加权重较高的关键词到查询中
         expanded_terms = []
+        query_tokens_set = set(tokens)
         for word, weight in keywords:
-            if word not in tokens and weight > 0.2:  # 只添加权重高且不在原查询中的词
+            if word not in query_tokens_set and weight > 0.2:
                 expanded_terms.append(word)
         
         # 如果有扩展词，添加到查询末尾
@@ -161,11 +163,13 @@ class QueryProcessor:
         # 使用医学词典进行分词，获取可能的医学概念
         words = list(jieba.cut(query))
         
-        # 使用TextRank算法提取关键词，这些更可能是医学概念
-        keywords = jieba.analyse.textrank(query, topK=5, withWeight=True)
-        
-        # 提取权重较高的关键词
-        concepts = [word for word, weight in keywords if weight > 0.1]
+        use_weight = getattr(jieba.analyse, 'textrank', None) is not None
+        if use_weight:
+            keywords = jieba.analyse.textrank(query, topK=5, withWeight=True)
+            concepts = [word for word, weight in keywords if weight > 0.1]
+        else:
+            keywords = jieba.analyse.extract_tags(query, topK=5)
+            concepts = list(keywords)
         
         return concepts
     

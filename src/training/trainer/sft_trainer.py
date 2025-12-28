@@ -10,13 +10,18 @@ from transformers import (
     Trainer,
     DataCollatorForSeq2Seq
 )
+from pathlib import Path
+import os, sys
+sys.path.append(str(Path(__file__).parent.parent.parent))
 from peft import LoraConfig, get_peft_model, TaskType
 from accelerate import Accelerator, DistributedDataParallelKwargs
 from utils.logger import setup_logger
 from trainer.base_trainer import BaseTrainer
 from config.training_config import BaseTrainingConfig
+from trainer.base_trainer import BaseTrainer
 
-class BaseTrainer:
+
+class SFTTrainer(BaseTrainer):
     '''
     基础训练器
     - 目的是为了训练模型

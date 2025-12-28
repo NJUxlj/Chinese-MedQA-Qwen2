@@ -27,6 +27,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 from utils.logger import setup_logger
 from embedding.embedder import TextEmbedder
 from config.embedding_config import EmbeddingConfig
+from config.milvus_config import MilvusConfig
 
 
 class MilvusClient:
@@ -39,12 +40,8 @@ class MilvusClient:
     
     def __init__(
         self,
-        uri: str = "http://localhost:19530",
-        token: str = "root:Milvus",
-        db_name: str = "default",
-        index_type: str = "FLAT",
-        metric_type: str = "L2",
-        consistency_level: str = "Strong"
+        milvus_config:MilvusConfig,
+        embedding_config:EmbeddingConfig
     ):
         """
         初始化 Milvus 客户端
@@ -59,15 +56,18 @@ class MilvusClient:
             metric_type: 距离度量类型 (L2, IP, COSINE)
             consistency_level: 一致性级别
         """
-        self.uri = uri
-        self.token = token
-        self.db_name = db_name
-        self.index_type = index_type
-        self.metric_type = metric_type
-        self.consistency_level = consistency_level
+        self.milvus_config = milvus_config
+        self.embedding_config = embedding_config
+
+        self.uri = self.milvus_config.uri
+        self.token = self.milvus_config.token
+        self.db_name = self.milvus_config.db_name
+        self.index_type = self.milvus_config.index_type
+        self.metric_type = self.milvus_config.metric_type
+        self.consistency_level = self.milvus_config.consistency_level
         
         # 初始化嵌入函数
-        self.embedder = TextEmbedder(config=EmbeddingConfig())
+        self.embedder = TextEmbedder(config=self.embedding_config)
         
         # 初始化 Milvus 向量存储
         self.vector_store = None
@@ -185,7 +185,7 @@ class MilvusClient:
             bool: 创建是否成功
         """
         if not self._connected:
-            logger.error("请先连接到 Milvus 服务器")
+            self.logger.error("请先连接到 Milvus 服务器")
             return False
         
         try:

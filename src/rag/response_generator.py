@@ -3,7 +3,7 @@
 from typing import Dict, List, Optional, Union, Any, Tuple  
 import re  
 import time  
-from models.base_model import BaseModel  
+from models.base_model import BaseGenerativeModel  
 from utils.logger import setup_logger  
 
 logger = setup_logger(__name__)  
@@ -15,7 +15,7 @@ class ResponseGenerator:
     
     def __init__(  
         self,  
-        model: BaseModel,  
+        model: BaseGenerativeModel,  
         max_new_tokens: int = 1024,  
         temperature: float = 0.7,  
         top_p: float = 0.9,  
