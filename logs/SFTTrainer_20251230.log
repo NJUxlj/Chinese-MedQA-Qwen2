@@ -1,0 +1,108 @@
+2025-12-30 00:00:49,469 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:00:49,470 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:00:49,470 - SFTTrainer - INFO - 微调类型: lora
+2025-12-30 00:00:50,472 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:00:51,470 - SFTTrainer - INFO - 配置 LoRA 微调...
+2025-12-30 00:00:51,470 - SFTTrainer - INFO - LoRA 配置: rank=16, alpha=32
+2025-12-30 00:00:51,548 - SFTTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2025-12-30 00:00:51,549 - SFTTrainer - INFO - 启用梯度检查点
+2025-12-30 00:00:51,555 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:00:51,568 - SFTTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-30 00:00:53,505 - SFTTrainer - INFO - 分词完成，数据集包含 2 个样本
+2025-12-30 00:00:53,513 - SFTTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-30 00:00:54,199 - SFTTrainer - INFO - 分词完成，数据集包含 1 个样本
+2025-12-30 00:00:54,201 - SFTTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2025-12-30 00:00:54,213 - SFTTrainer - INFO - 开始训练...
+2025-12-30 00:05:06,926 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:05:06,926 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:05:06,926 - SFTTrainer - INFO - 微调类型: lora
+2025-12-30 00:05:18,193 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:05:19,281 - SFTTrainer - INFO - 配置 LoRA 微调...
+2025-12-30 00:05:19,281 - SFTTrainer - INFO - LoRA 配置: rank=16, alpha=32
+2025-12-30 00:05:19,364 - SFTTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2025-12-30 00:05:19,365 - SFTTrainer - INFO - 启用梯度检查点
+2025-12-30 00:05:19,371 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:06:00,615 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:06:00,615 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:06:00,615 - SFTTrainer - INFO - 微调类型: lora
+2025-12-30 00:06:05,596 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:06:06,693 - SFTTrainer - INFO - 配置 LoRA 微调...
+2025-12-30 00:06:06,693 - SFTTrainer - INFO - LoRA 配置: rank=16, alpha=32
+2025-12-30 00:06:06,741 - SFTTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2025-12-30 00:06:06,742 - SFTTrainer - INFO - 启用梯度检查点
+2025-12-30 00:06:06,748 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:06:06,785 - SFTTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-30 00:06:08,869 - SFTTrainer - INFO - 分词完成，数据集包含 2 个样本
+2025-12-30 00:06:08,874 - SFTTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-30 00:06:09,487 - SFTTrainer - INFO - 分词完成，数据集包含 1 个样本
+2025-12-30 00:06:09,489 - SFTTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2025-12-30 00:06:09,502 - SFTTrainer - INFO - 开始训练...
+2025-12-30 00:26:25,667 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:26:25,667 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:26:25,667 - SFTTrainer - INFO - 微调类型: lora
+2025-12-30 00:26:30,661 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:26:31,691 - SFTTrainer - INFO - 配置 LoRA 微调...
+2025-12-30 00:26:31,692 - SFTTrainer - INFO - 已调用 enable_input_require_grads() 以支持梯度计算
+2025-12-30 00:26:31,692 - SFTTrainer - INFO - LoRA 配置: rank=16, alpha=32
+2025-12-30 00:26:31,763 - SFTTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2025-12-30 00:26:31,769 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:26:31,798 - SFTTrainer - INFO - 数据集准备完成，包含 5 个样本
+2025-12-30 00:26:33,825 - SFTTrainer - INFO - 分词完成，数据集包含 5 个样本
+2025-12-30 00:26:33,829 - SFTTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-30 00:26:34,607 - SFTTrainer - INFO - 分词完成，数据集包含 1 个样本
+2025-12-30 00:26:34,608 - SFTTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2025-12-30 00:26:34,619 - SFTTrainer - INFO - 开始训练...
+2025-12-30 00:26:50,631 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:26:50,631 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:26:50,631 - SFTTrainer - INFO - 微调类型: full
+2025-12-30 00:26:51,417 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:26:52,453 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:26:52,468 - SFTTrainer - INFO - 数据集准备完成，包含 5 个样本
+2025-12-30 00:26:53,028 - SFTTrainer - INFO - 分词完成，数据集包含 5 个样本
+2025-12-30 00:26:53,032 - SFTTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-30 00:26:53,514 - SFTTrainer - INFO - 分词完成，数据集包含 1 个样本
+2025-12-30 00:26:53,515 - SFTTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2025-12-30 00:26:53,526 - SFTTrainer - INFO - 开始训练...
+2025-12-30 00:27:11,171 - SFTTrainer - INFO - 全量模型保存到: ./test_output/gpt2_full
+2025-12-30 00:27:11,197 - SFTTrainer - INFO - 训练完成！损失: 4.0086
+2025-12-30 00:27:11,197 - SFTTrainer - INFO - 模型保存到: ./test_output/gpt2_full
+2025-12-30 00:27:22,239 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:27:22,239 - SFTTrainer - INFO - 加载基础模型: openai-community/gpt2
+2025-12-30 00:27:23,356 - SFTTrainer - INFO - 加载 LoRA adapter: ./test_output/gpt2_lora
+2025-12-30 00:27:23,357 - SFTTrainer - ERROR - 模型合并失败: Can't find 'adapter_config.json' at './test_output/gpt2_lora'
+2025-12-30 00:27:36,293 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:27:36,293 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:27:36,293 - SFTTrainer - INFO - 微调类型: lora
+2025-12-30 00:27:37,083 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:27:38,036 - SFTTrainer - INFO - 配置 LoRA 微调...
+2025-12-30 00:27:38,036 - SFTTrainer - INFO - 已调用 enable_input_require_grads() 以支持梯度计算
+2025-12-30 00:27:38,037 - SFTTrainer - INFO - LoRA 配置: rank=16, alpha=32
+2025-12-30 00:27:38,085 - SFTTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2025-12-30 00:27:38,091 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:27:38,104 - SFTTrainer - INFO - 数据集准备完成，包含 5 个样本
+2025-12-30 00:27:39,365 - SFTTrainer - INFO - 分词完成，数据集包含 5 个样本
+2025-12-30 00:27:39,369 - SFTTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-30 00:27:40,060 - SFTTrainer - INFO - 分词完成，数据集包含 1 个样本
+2025-12-30 00:27:40,061 - SFTTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2025-12-30 00:27:40,070 - SFTTrainer - INFO - 开始训练...
+2025-12-30 00:27:40,311 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:27:40,311 - SFTTrainer - INFO - 加载模型: openai-community/gpt2
+2025-12-30 00:27:40,311 - SFTTrainer - INFO - 微调类型: full
+2025-12-30 00:27:41,183 - SFTTrainer - INFO - 已将 pad_token 设置为 eos_token
+2025-12-30 00:27:42,094 - SFTTrainer - INFO - 模型和分词器加载完成
+2025-12-30 00:27:42,102 - SFTTrainer - INFO - 数据集准备完成，包含 5 个样本
+2025-12-30 00:27:42,622 - SFTTrainer - INFO - 分词完成，数据集包含 5 个样本
+2025-12-30 00:27:42,626 - SFTTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-30 00:27:43,112 - SFTTrainer - INFO - 分词完成，数据集包含 1 个样本
+2025-12-30 00:27:43,112 - SFTTrainer - INFO - 发现检查点，将从 ./test_output/gpt2_full/checkpoint-3 恢复训练
+2025-12-30 00:27:43,113 - SFTTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2025-12-30 00:27:43,118 - SFTTrainer - INFO - 开始训练...
+2025-12-30 00:27:59,020 - SFTTrainer - INFO - 全量模型保存到: ./test_output/gpt2_full
+2025-12-30 00:27:59,049 - SFTTrainer - INFO - 训练完成！损失: 4.0086
+2025-12-30 00:27:59,049 - SFTTrainer - INFO - 模型保存到: ./test_output/gpt2_full
+2025-12-30 00:27:59,061 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:27:59,061 - SFTTrainer - INFO - 加载基础模型: openai-community/gpt2
+2025-12-30 00:28:00,098 - SFTTrainer - INFO - 加载 LoRA adapter: ./test_output/gpt2_lora
+2025-12-30 00:28:00,098 - SFTTrainer - ERROR - 模型合并失败: Can't find 'adapter_config.json' at './test_output/gpt2_lora'
+2025-12-30 00:28:00,103 - SFTTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2025-12-30 00:28:00,103 - SFTTrainer - INFO - 加载推理模型: ./test_output/gpt2_merged
