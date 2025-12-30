@@ -1,17 +1,24 @@
 import json  
 import numpy as np  
+import re
+import numpy as np
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
 from tqdm import tqdm  
 from datasets import load_dataset  
 from transformers import AutoModelForCausalLM, AutoTokenizer  
 import torch  
 from torch.utils.data import DataLoader  
 import evaluate  
+from typing import Dict, Any, List, Optional
 
 
 from config.evaluator_config import MedQALLMEvaluatorConfig
 from config.llm_config import LLMConfig
+from evaluation.base_evaluator import BaseEvaluator, EvaluatorDataset
 
-class MedQALLMEvaluator:  
+class MedQALLMEvaluator(BaseEvaluator):  
     def __init__(
         self,
         llm_config: LLMConfig,
@@ -19,155 +26,82 @@ class MedQALLMEvaluator:
         """  
         初始化评估器  
         """  
+        super().__init__(config)
         self.config = config
         self.llm_config = llm_config
         
-        # 加载模型和分词器  
-        self.model = AutoModelForCausalLM.from_pretrained(  
-            self.config.model_name_or_path,  
-            trust_remote_code=True,  
-            torch_dtype=torch.bfloat16  
-        ).to(self.config.device)  
-        
-        self.tokenizer = AutoTokenizer.from_pretrained(  
-            self.config.model_name_or_path,     
-            trust_remote_code=True  
-        )  
-
-        self.tokenizer.pad_token = self.tokenizer.eos_token  
-        
-        
-        
-        # 生成参数配置  
-        self.generation_config = {  
-            "max_new_tokens": 512,  
-            "temperature": 0.7,  
-            "top_p": 0.9,  
-            "do_sample": True,  
-            "pad_token_id": self.tokenizer.eos_token_id  
-        }  
-        
     
     def format_prompt(self, sample):  
-        """构建模型输入格式"""  
+        """构建模型评估指令"""  
+
+        system_prompt  =f"""
+        ## 角色
+        你是一个拥有丰富临床经验的医疗专家，你的任务是根据用户的问题和上下文，判断模型的回答是否与标准答案一致。
+
+        ## 任务：
+        请根据用户问题，判断模型回答是否与标准答案一致。
+
+        ## 规则:
+        - 模型回答必须与标准答案完全一致，包括大小写、标点符号等。
+        - 如果模型回答中包含多个选项，必须全部选择正确。
+        - 如果模型回答中包含数值，必须与标准答案完全一致。
+
+        ## 用户问题
+        {sample['question']}
+
+        ## 模型回答
+        {sample['output']}
+
+        ## 标准答案
+        {sample[self.config.ground_true_answer_key]}
+
+        ## 输出格式
+        你只能输出 True 或 False， 除此以外不能输出任何东西。
+
+        ## 请你开始判断
+
+
+        """
         return f"指令：{sample['instruction']}\n问题：{sample['input']}\n回答："  
     
     
     
-    def evaluate_dataset(self, dataset_path, batch_size=4, max_samples=100):  
+    def evaluate_one_sample(self, sample: Dict[str, Any]) -> Dict[str, float]:  
         """  
-        评估数据集  
-        :param dataset_path: 数据集路径（本地或HuggingFace）  
-        :param batch_size: 批量大小  
-        :param max_samples: 最大评估样本数（调试用）  
-        :return: 评估指标字典  
+        对单个样本进行评估  
         """  
-        # 加载数据  
-        dataset = load_dataset("json", data_files=dataset_path)["train"]  
-        dataset = dataset.select(range(min(max_samples, len(dataset))))  
-        dataloader = DataLoader(dataset, batch_size=batch_size)  
+        prompt = self.format_prompt(sample)  
+        output = self.model.generate(
+            prompt,
+            max_new_tokens=self.config.max_new_tokens,
+            temperature=self.config.temperature,
+            top_p=self.config.top_p,
+        )
 
-        results = {  
-            "perplexity": [],  
-            "bleu": [],  
-            "rouge": [],  
-            "bertscore": []  
-        }  
 
-        with torch.no_grad():  
-            for batch in tqdm(dataloader, desc="Evaluating"):  
-                # 生成回答  
-                prompts = [self.format_prompt(sample) for sample in batch]  
-                inputs = self.tokenizer(  
-                    prompts,  
-                    return_tensors="pt",  
-                    padding=True,  
-                    truncation=True,  
-                    max_length=1024  
-                ).to(self.device)  
-                
-                # 生成文本  
-                outputs = self.model.generate(  
-                    **inputs,  
-                    **self.generation_config  
-                )  
-                predictions = self.tokenizer.batch_decode(  
-                    outputs[:, inputs["input_ids"].shape[1]:],   
-                    skip_special_tokens=True  
-                )  
-                
-                # 计算困惑度  
-                loss = self.model(  
-                    inputs["input_ids"],  
-                    labels=inputs["input_ids"]  
-                ).loss  
-                perplexity = torch.exp(loss).item()  
-                results["perplexity"].append(perplexity)  
+    
+    def evaluate_batch_sample(self, samples: List[Dict[str, Any]]) -> Dict[str, float]:  
+        """  
+        对批量样本进行评估  
+        """  
+        prompts = [self.format_prompt(sample) for sample in samples]  
+        
 
-                # 计算文本相似度指标  
-                references = batch["output"]  
-                results["bleu"].extend([  
-                    self.bleu.compute(  
-                        predictions=[p],   
-                        references=[r]  
-                    )["bleu"] for p, r in zip(predictions, references)  
-                ])  
-                
-                rouge_scores = self.rouge.compute(  
-                    predictions=predictions,  
-                    references=references,  
-                    rouge_types=["rougeL"]  
-                )  
-                results["rouge"].extend(rouge_scores["rougeL"])  
-                
-                bert_scores = self.bertscore.compute(  
-                    predictions=predictions,  
-                    references=references,  
-                    lang="zh"  
-                )  
-                results["bertscore"].extend(bert_scores["f1"])  
 
-        # 汇总结果  
-        return {  
-            "perplexity": np.mean(results["perplexity"]),  
-            "bleu": np.mean(results["bleu"]),  
-            "rougeL": np.mean(results["rouge"]),  
-            "bertscore": np.mean(results["bertscore"])  
-        }  
-
-    def save_results(self, results, output_path="eval_results.json"):  
-        """保存评估结果"""  
-        with open(output_path, "w", encoding="utf-8") as f:  
-            json.dump(results, f, ensure_ascii=False, indent=2) 
-            
+    
+    def evaluate(self):
+        pass
+        
             
 
 
+
+def run():
+    pass
 
 
 
 
 # 使用示例  
 if __name__ == "__main__":  
-    evaluator = MedicalQAEvaluator(  
-        model_path=MODEL_PATH,  
-        tokenizer_path=TOKENIZER_PATH  
-    )  
-    
-    results = evaluator.evaluate_dataset(  
-        dataset_path="path/to/test_dataset.json",  
-        batch_size=4,  
-        max_samples=100  
-    )  
-    
-    print("评估结果：")  
-    for k, v in results.items():  
-        print(f"{k}: {v:.4f}")  
-    
-    evaluator.save_results(results)  
-    
-    
-    # 结果解读建议：  
-    # - Perplexity < 30：优秀  
-    # - BLEU > 0.25：合格  
-    # - BERTScore > 0.75：优秀  
+    pass

@@ -38,3 +38,4 @@ bs4
 rank_bm25
 faiss-cpu
 Bio
+pymilvus

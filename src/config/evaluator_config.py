@@ -19,6 +19,16 @@ class EvaluatorConfig(BaseModel):
 
     ground_true_answer_key: str = Field(default="ground_true_answer", description="数据集中用于存储 ground true answer 的键名")
     
+    padding_side: str = Field(default="left", description="填充侧 (default: left)")
+
+    use_fast: bool = Field(default=False, description="是否使用快速分词器 (default: False)")
+
+    enable_thinking: bool = Field(default=True, description="是否启用思考模式")
+
+    temperature: float = Field(default=0.7, description="生成温度 (default: 0.7)")
+    max_new_tokens: int = Field(default=512, description="最大生成令牌数 (default: 512)")
+    top_p: float = Field(default=0.9, description="生成概率阈值 (default: 0.9)")
+    do_sample: bool = Field(default=True, description="是否启用采样 (default: True)")
 
     per_device_eval_batch_size: int = Field(default=4, description="每个设备的评估批量大小")
     dataloader_num_workers: int = Field(default=4, description="数据加载器的工作线程数")

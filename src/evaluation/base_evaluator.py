@@ -13,6 +13,8 @@ from utils.logger import setup_logger
 from config.evaluator_config import EvaluatorConfig
 from utils.logger import setup_logger
 
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 
 class EvaluatorDataset(Dataset):
@@ -43,6 +45,25 @@ class BaseEvaluator:
             shuffle=False,
             num_workers=self.config.dataloader_num_workers,
         )
+
+        self.model = None
+        self.tokenizer = None
+
+    def load_model_and_tokenizer(self):
+        """
+        加载模型和分词器
+        """
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.config.model_name_or_path,
+            torch_dtype=torch.bfloat16,
+            device_map=self.config.device
+        )
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.config.model_name_or_path,
+            padding_side=self.config.padding_side,
+            use_fast=self.config.use_fast,
+        )
+        self.tokenizer.pad_token = self.tokenizer.eos_token  
 
 
 

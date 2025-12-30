@@ -143,6 +143,12 @@ class GSPOTrainingConfig(BaseTrainingConfig):
     pass
 
 
+class TRPOTrainingConfig(BaseTrainingConfig):
+    pass
+
+
+
+
 
 
 class SFTTrainingConfig(BaseTrainingConfig):

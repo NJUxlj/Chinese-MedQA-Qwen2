@@ -1,350 +1,934 @@
-from dataclasses import dataclass  
-from typing import Optional, Dict , List, Tuple, Callable
-import os, sys
-import torch  
-import torch.nn.functional as F  
-from torch.utils.data import Dataset  
-from transformers import (  
-    TrainingArguments,  
-    AutoTokenizer,  
-    # Qwen2ForCausalLM,  
-    BitsAndBytesConfig,
-    Trainer,  
-    TrainerCallback  
-)  
+"""
+DPOTrainer - 基于直接偏好优化（Direct Preference Optimization）的对齐训练器
+
+================================================================================
+DPO 核心原理详解
+================================================================================
+
+【什么是 DPO？】
+
+DPO（Direct Preference Optimization，直接偏好优化）是一种用于大语言模型对齐的新方法，
+由 Stanford 大学等机构于 2023 年提出。它的核心思想是：绕过传统 RLHF 中复杂的强化学习
+过程，直接通过偏好数据优化模型。
+
+【为什么需要 DPO？】
+
+传统 RLHF（基于人类反馈的强化学习）存在以下问题：
+1. 需要训练一个独立的奖励模型（Reward Model）
+2. 使用 PPO 算法进行策略优化，训练不稳定
+3. 涉及四个模型（Actor, Critic, Reward, Reference），计算开销大
+4. 超参数调优困难
+
+DPO 的革命性在于：将 RLHF 转化为简单的监督学习问题，只需要两个模型即可。
+
+================================================================================
+DPO 数学原理
+================================================================================
+
+【偏好数据的格式】
+
+每条训练样本包含：
+- prompt (x): 用户输入的提示
+- chosen (y_w): 人类偏好的回答（winner）
+- rejected (y_l): 人类不偏好的回答（loser）
+
+【优化目标】
+
+给定偏好对 (y_w, y_l)，我们希望模型 π_θ 满足：
+  log(π_θ(y_w|x) / π_ref(y_w|x)) - log(π_θ(y_l|x) / π_ref(y_l|x)) > 0
+
+其中：
+- π_θ: 当前训练的策略模型（我们想要优化的模型）
+- π_ref: 参考模型（通常是 SFT 后的初始模型，不更新）
+- β: temperature 参数，控制偏好强度
+
+【损失函数】
+
+L_DPO = -E_{(x, y_w, y_l) ~ D} [ log(σ(β * (log(π_θ(y_w|x)) - log(π_ref(y_w|x)) 
+                                         - log(π_θ(y_l|x)) + log(π_ref(y_l|x))))) ]
+
+其中 σ 是 sigmoid 函数。
+
+【直观理解】
+
+- 当 y_w 的概率相对于参考模型提高，且 y_l 的概率相对于参考模型降低时，损失降低
+- β 越大，对偏好差异的惩罚越重，训练越保守
+- log(π_θ(y|x) / π_ref(y|x)) 可以理解为模型对答案 y 的"偏好得分"
+
+【与 RLHF 的关系】
+
+当使用 KL 散度约束时，PPO 的优化目标可以简化为：
+L_RLHF ≈ -E_{(x, y_w, y_l)} [ log(σ(β * (r(x, y_w) - r(x, y_l)))) ]
+
+其中 r(x, y) 是奖励模型给出的分数。DPO 证明了：
+  r(x, y) = β * log(π(y|x) / π_ref(y|x))
+
+因此，我们可以直接使用策略模型的概率比来替代奖励模型，省去奖励模型的训练！
+
+================================================================================
+代码实现要点
+================================================================================
+
+【参考模型的管理】
+
+1. 参考模型 π_ref 是参考模型的深拷贝，在训练过程中不更新梯度
+2. 每个训练步开始时，需要确保 ref_model 的参数与 π_ref 一致
+3. 为什么要用深拷贝？因为我们要保留一个"不带梯度"的固定参考点
+
+【训练策略】
+
+1. 偏好数据构建：
+   - 可以来自人类标注
+   - 可以来自模型采样后的人工筛选
+   - 可以来自规则或奖励模型的高分/低分答案
+
+2. 数据格式设计：
+   - prompt 字段：用户输入
+   - chosen 字段：偏好的回答
+   - rejected 字段：不偏好的回答
+
+3. 训练技巧：
+   - β 通常取 0.1 到 0.5
+   - 学习率通常比 SFT 稍低（如 1e-5 到 5e-5）
+   - 可以使用 LoRA 进行参数高效微调
+
+【与 SFT 的区别】
+
+- SFT：监督学习，学习生成符合格式的文本
+- DPO：偏好学习，学习区分"好的回答"和"坏的回答"
+- 两者通常结合使用：先用 SFT 建立基础能力，再用 DPO 进行对齐
+
+================================================================================
+"""
+
+import os
+import sys
+import torch
+import torch.nn.functional as F
+from typing import Dict, List, Optional, Union, Any
 from pathlib import Path
+from dataclasses import dataclass
+from datasets import Dataset
+from transformers import (
+    TrainingArguments,
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    Trainer,
+    DataCollatorForSeq2Seq,
+    BitsAndBytesConfig,
+    TrainerCallback
+)
+from transformers import TrainerControl
+from peft import LoraConfig, get_peft_model, TaskType
+from accelerate import Accelerator, DistributedDataParallelKwargs
+from deepspeed import DeepSpeedEngine
+
 sys.path.append(str(Path(__file__).parent.parent.parent))
-from transformers import AutoModelForCausalLM
-from peft import LoraConfig, get_peft_model  
-from datasets import load_dataset  
-# from trl import DPOTrainer  
-# import deepspeed  
-from deepspeed import DeepSpeedEngine 
 
+from utils.logger import setup_logger
 from config.training_config import DPOTrainingConfig
+from training.trainer.base_trainer import BaseTrainer
 
 
-class DPODataset(Dataset):  
-    def __init__(self, tokenized_data):  
-        self.data = tokenized_data  
-        
-    def __len__(self):  
-        return len(self.data["input_ids"])  
+class DPODataset(Dataset):
+    """
+    DPO 偏好数据集封装
     
-    def __getitem__(self, idx):  
-        return {  
-            "input_ids": self.data["input_ids"][idx],  
-            "attention_mask": self.data["attention_mask"][idx],  
-            "chosen_labels": self.data["chosen_labels"][idx],  
-            "rejected_labels": self.data["rejected_labels"][idx]  
-        }  
+    DPO 数据与标准 SFT 数据不同，每条样本包含：
+    - input_ids: prompt 的分词结果
+    - attention_mask: 注意力掩码
+    - chosen_labels: 偏好答案的分词结果
+    - rejected_labels: 不偏好答案的分词结果
+    """
+    
+    def __init__(self, tokenized_data: Dict[str, List]):
+        self.data = tokenized_data
+    
+    def __len__(self) -> int:
+        return len(self.data["input_ids"])
+    
+    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
+        return {
+            "input_ids": self.data["input_ids"][idx],
+            "attention_mask": self.data["attention_mask"][idx],
+            "chosen_labels": self.data["chosen_labels"][idx],
+            "rejected_labels": self.data["rejected_labels"][idx]
+        }
 
-class DPOTrainer:  
-    def __init__(  
-        self,  
-        output_dir: str,  
-        dataset_name_or_path: str,  
-        model_name: str = MODEL_PATH,  
-        is_ds: bool = True,  
-        ds_config_path: Optional[str] = None,  
-        is_peft: bool = True,  
-        peft_config: Optional[LoraConfig] = None,  
-        is_quantized: bool = False,  
-        bnb_config: Optional[BitsAndBytesConfig] = None,  
-        max_seq_length: int = 1024,  
-        beta: float = 0.1  
-    ):  
-        self.output_dir = output_dir  
-        self.dataset_name_or_path = dataset_name_or_path  
-        self.beta = beta  
-        self.max_seq_length = max_seq_length  
 
-        # 初始化模型和tokenizer  
-        self.model, self.tokenizer = self._init_model_and_tokenizer(  
-            model_name, is_quantized, bnb_config  
-        )  
-        
-        # 应用LoRA  
-        if is_peft:  
-            self.peft_config = peft_config or self._default_lora_config()  
-            self.model = get_peft_model(self.model, self.peft_config)  
-
-        # 准备数据集  
-        self.dataset = self._prepare_dataset()  
-
-        # 配置训练参数  
-        self.training_args = TrainingArguments(  
-            output_dir=output_dir,  
-            deepspeed=ds_config_path if is_ds else None,  
-            per_device_train_batch_size=4,  
-            gradient_accumulation_steps=2,  
-            learning_rate=2e-5,  
-            bf16=True,  
-            logging_steps=10,  
-            save_steps=500,  
-            remove_unused_columns=False,  
-            optim="adamw_torch",  
-            max_grad_norm=0.3,  
-            num_train_epochs=3  
-        )  
-
-        # 初始化自定义Trainer  
-        self.trainer = Trainer(  
-            model=self.model,  
-            args=self.training_args,  
-            train_dataset=self.dataset,  
-            data_collator=self.dpo_collator,  
-            compute_metrics=self._compute_metrics,  
-            callbacks=[DPOCallback()]  
-        )  
-
-    def _init_model_and_tokenizer(self, model_name, is_quantized, bnb_config):  
-        """初始化模型和分词器"""  
-        bnb_config = bnb_config or BitsAndBytesConfig(  
-            load_in_4bit=True,  
-            bnb_4bit_quant_type="nf4",  
-            bnb_4bit_compute_dtype=torch.bfloat16,  
-            bnb_4bit_use_double_quant=True,  
-        ) if is_quantized else None  
-
-        tokenizer = AutoTokenizer.from_pretrained(model_name)  
-        tokenizer.pad_token = tokenizer.eos_token  
-
-        model = Qwen2ForCausalLM.from_pretrained(  
-            model_name,  
-            quantization_config=bnb_config,  
-            device_map="auto",  
-            trust_remote_code=True  
-        )  
-        return model, tokenizer  
-
-    def _default_lora_config(self):  
-        """默认LoRA配置"""  
-        return LoraConfig(  
-            r=64,  
-            lora_alpha=16,  
-            lora_dropout=0.05,  
-            target_modules=["q_proj", "v_proj"],  
-            bias="none",  
-            task_type="CAUSAL_LM"  
-        )  
-
-    def _prepare_dataset(self):  
-        """数据预处理管道"""  
-        dataset = load_dataset(self.dataset_name_or_path, split="train")  
-        dataset = dataset.filter(self._data_filter)  
-        
-        # 并行化tokenize处理  
-        tokenized_data = dataset.map(  
-            self._tokenize_function,  
-            batched=True,  
-            num_proc=4,  
-            remove_columns=dataset.column_names  
-        )  
-        
-        return CustomDPODataset(tokenized_data)  
-
-    def _data_filter(self, sample):  
-        """数据过滤逻辑"""  
-        return all([sample["prompt"], sample["chosen"], sample["rejected"]]) and \
-               len(sample["prompt"]) <= 512 and \
-               len(sample["chosen"]) <= 1024 and \
-               len(sample["rejected"]) <= 1024  
-
-    def _tokenize_function(self, samples):  
-        """DPO专用tokenize处理"""  
-        batch = {"input_ids": [], "attention_mask": [],   
-                "chosen_labels": [], "rejected_labels": []}  
-        
-        for prompt, chosen, rejected in zip(samples["prompt"], samples["chosen"], samples["rejected"]):  
-            # 生成prompt模板  
-            full_prompt = f"Instruction: {prompt}\nResponse: "  
-            
-            # Tokenize chosen响应  
-            chosen_tokens = self.tokenizer(  
-                full_prompt + chosen,  
-                max_length=self.max_seq_length,  
-                padding="max_length",  
-                truncation=True,  
-                return_tensors="pt"  
-            )  
-            
-            # Tokenize rejected响应  
-            rejected_tokens = self.tokenizer(  
-                full_prompt + rejected,  
-                max_length=self.max_seq_length,  
-                padding="max_length",  
-                truncation=True,  
-                return_tensors="pt"  
-            )  
-            
-            batch["input_ids"].append(chosen_tokens["input_ids"][0])  
-            batch["attention_mask"].append(chosen_tokens["attention_mask"][0])  
-            batch["chosen_labels"].append(chosen_tokens["input_ids"][0])  
-            batch["rejected_labels"].append(rejected_tokens["input_ids"][0])  
-            
-        return batch  
-
-    def dpo_collator(self, features):  
-        """自定义数据整理函数"""  
-        batch = {  
-            "input_ids": torch.stack([f["input_ids"] for f in features]),  
-            "attention_mask": torch.stack([f["attention_mask"] for f in features]),  
-            "chosen_labels": torch.stack([f["chosen_labels"] for f in features]),  
-            "rejected_labels": torch.stack([f["rejected_labels"] for f in features])  
-        }  
-        return batch  
-
-    def _compute_metrics(self, eval_pred):  
-        """自定义评估指标"""  
-        logits_chosen, logits_rejected = eval_pred.predictions  
-        accuracy = (logits_chosen > logits_rejected).mean()  
-        return {"dpo_accuracy": accuracy}  
-
-    def train(self):  
-        """启动训练流程"""  
-        self.trainer.train()  
-
-    def save_model(self):  
-        """模型保存逻辑"""  
-        save_path = os.path.join(self.output_dir, "qwen2_cmed_dpo")  
-        self.trainer.save_model(save_path)  
-        self.tokenizer.save_pretrained(save_path)  
-
-class DPOCallback(TrainerCallback):  
-    def on_train_begin(self, args, state, control, **kwargs):  
-        """训练开始前的初始化"""  
-        self.model = kwargs.pop("model")  
-        if isinstance(self.model, DeepSpeedEngine):  
-            self.model = self.model.module  
-
-    def on_step_begin(self, args, state, control, **kwargs):  
-        """梯度累积期间冻结参考模型"""  
-        if state.global_step == 0:  
-            # 初始化参考模型参数  
-            self.ref_model = self._clone_model(self.model)  
-            self.ref_model.requires_grad_(False)  
-
-    def _clone_model(self, model):  
+class DPOTrainer(BaseTrainer):
+    """
+    DPO（直接偏好优化）训练器
+    
+    继承自 BaseTrainer，利用基础框架进行模型加载和训练管理，
+    专注于 DPO 特有的偏好学习逻辑。
+    
+    核心功能：
+    1. 加载基础模型和分词器（继承自 BaseTrainer）
+    2. 准备偏好数据集（prompt, chosen, rejected）
+    3. 计算 DPO 损失函数
+    4. 管理参考模型用于对比学习
+    
+    使用示例：
+        config = DPOTrainingConfig(
+            model_name_or_path="Qwen/Qwen2.5-7B-Instruct",
+            learning_rate=1e-5,
+            num_train_epochs=3
+        )
+        trainer = DPOTrainer(config)
+        trainer.start_training(dataset, output_dir)
+    """
+    
+    def __init__(
+        self,
+        config: DPOTrainingConfig,
+        finetuning_type: str = "lora",
+        beta: float = 0.1,
+        use_deepspeed: bool = False,
+        deepspeed_config: Optional[Union[str, Dict]] = None
+    ):
         """
-        创建参考模型的深拷贝
+        初始化 DPO 训练器
         
-        
-        type(model)：获取模型的类类型（如 Qwen2ForCausalLM）
-        **model.config.to_dict()：将模型的配置转换为字典并解包为关键字参数
-        type(model)(**model.config.to_dict())：使用原始模型的配置创建一个新的模型实例
-        """  
-        return type(model)(**model.config.to_dict()).load_state_dict(model.state_dict())  
-
-    def compute_loss(self, model, inputs, return_outputs=False):  
-        """核心DPO损失计算"""  
-        # 前向传播获取logits  
-        outputs = model(  
-            input_ids=inputs["input_ids"],  
-            attention_mask=inputs["attention_mask"]  
-        )  
-        
-        # 获取chosen和rejected的log概率  
-        chosen_log_probs = self._get_log_probs(outputs.logits, inputs["chosen_labels"])  
-        rejected_log_probs = self._get_log_probs(outputs.logits, inputs["rejected_labels"])  
-        
-        # 计算参考模型的log概率  
-        with torch.no_grad():  
-            ref_outputs = self.ref_model(  
-                input_ids=inputs["input_ids"],  
-                attention_mask=inputs["attention_mask"]  
-            )  
-            ref_chosen_log_probs = self._get_log_probs(ref_outputs.logits, inputs["chosen_labels"])  # 计算 log(π(y|x))
-            ref_rejected_log_probs = self._get_log_probs(ref_outputs.logits, inputs["rejected_labels"])  
-        
-        # 计算DPO损失  L = -log(σ(r(x,y_w) - r(x,y_l))) , where r(x,y) = β * log(π(y|x)/π_ref(y|x)) = β * [log(π(y|x)) - log(π_ref(y|x))]
-        losses = -F.logsigmoid(  
-            self.beta * (  
-                (chosen_log_probs - ref_chosen_log_probs) -     # log(π(y_win|x)/π_ref(y_win|x))
-                (rejected_log_probs - ref_rejected_log_probs)  
-            )  
-        )  
-        
-        return losses.mean()  
-
-    def _get_log_probs(self, logits, labels):  
+        Args:
+            config: DPO 训练配置
+            finetuning_type: 微调类型 ("lora" 或 "full")
+            beta: DPO 温度参数，控制偏好学习的强度
+                  - β 越大，对偏好差异越敏感，训练越保守
+                  - β 越小，模型更容易改变，训练更激进
+                  - 常用范围: 0.05 ~ 0.5
+            use_deepspeed: 是否使用 DeepSpeed 加速
+            deepspeed_config: DeepSpeed 配置文件路径或配置字典
         """
-        计算每个token的对数概率
+        super().__init__(config)
         
-        ##Args:
-        logits: x  shape = (batch_size, seq_len, vocab_size)
-        labels: y  shape = (batch_size, seq_len)
+        self.finetuning_type = finetuning_type
+        self.beta = beta
+        self.use_deepspeed = use_deepspeed
+        self.deepspeed_config = deepspeed_config
         
-        计算 log(π(y|x))
+        self.lora_config = None
+        self.ref_model = None
+        self.ref_model_idx = 0
         
-        为了以后计算 reward r(x,y) = β * log(π(y|x)/π_ref(y|x)) 
+        self._validate_config()
+        self.logger.info(f"DPO 训练器初始化完成: beta={beta}, finetuning_type={finetuning_type}")
+    
+    def _validate_config(self):
+        """验证配置有效性"""
+        if self.finetuning_type not in ["lora", "full"]:
+            raise ValueError(f"finetuning_type 必须是 'lora' 或 'full'，但得到了 '{self.finetuning_type}'")
         
+        if self.use_deepspeed and self.config.use_4bit:
+            self.logger.warning("DeepSpeed 与 4-bit 量化可能存在兼容性问题，请谨慎使用")
+    
+    def _get_default_target_modules(self, model_name: str) -> List[str]:
+        """获取模型默认的目标模块（用于 LoRA）"""
+        model_name_lower = model_name.lower()
         
-        ##Return
-        返回值：(batch_size, seq_len)
-            每个位置的值表示对应token的对数概率
+        if "qwen" in model_name_lower:
+            return ["q_proj", "k_proj", "v_proj", "o_proj"]
+        elif any(x in model_name_lower for x in ["llama", "mistral", "yi", "deepseek"]):
+            return ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+        elif "bloom" in model_name_lower:
+            return ["query_key_value", "dense", "dense_h_to_4h", "dense_4h_to_h"]
+        elif "gpt2" in model_name_lower:
+            return ["c_attn", "c_proj", "c_fc"]
+        else:
+            self.logger.warning(f"未识别模型类型 {model_name}，使用默认目标模块")
+            return ["q_proj", "k_proj", "v_proj", "o_proj"]
+    
+    def _setup_lora_config(self) -> LoraConfig:
+        """
+        配置 LoRA 参数高效微调
+        
+        LoRA 的核心思想：
+        - 在原始权重矩阵 W_0 旁添加低秩分解矩阵 AB
+        - 前向计算: h = W_0 x + BAx
+        - 训练时只更新 A 和 B，大幅减少参数量
+        """
+        target_modules = self._get_default_target_modules(self.config.model_name_or_path)
+        
+        self.lora_config = LoraConfig(
+            task_type=TaskType.CAUSAL_LM,
+            inference_mode=False,
+            r=64,
+            lora_alpha=16,
+            lora_dropout=0.05,
+            target_modules=target_modules,
+            bias="none",
+            modules_to_save=None,
+            fan_in_fan_out=False,
+            peft_type="LORA"
+        )
+        
+        self.logger.info(f"LoRA 配置: rank=64, alpha=16, target_modules={target_modules}")
+        return self.lora_config
+    
+    def load_model_and_tokenizer(self):
+        """
+        加载模型和分词器（重写 BaseTrainer 方法）
+        
+        DPO 特有步骤：
+        1. 加载基础模型
+        2. 如果使用 LoRA，附加 LoRA adapter
+        3. 创建参考模型的深拷贝（不参与梯度更新）
+        """
+        try:
+            self.logger.info(f"{self.__class__.__name__}: 加载模型: {self.config.model_name_or_path}")
+            
+            self._initialize_accelerator()
+            
+            self.tokenizer: AutoTokenizer = AutoTokenizer.from_pretrained(
+                self.config.model_name_or_path,
+                trust_remote_code=self.config.trust_remote_code,
+                padding_side="right"
+            )
+            
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.logger.info("已将 pad_token 设置为 eos_token")
+            
+            model_kwargs = {
+                "trust_remote_code": self.config.trust_remote_code,
+                "torch_dtype": self._get_dtype(),
+                "device_map": self.config.device_map if torch.cuda.is_available() else None,
+            }
+            
+            if self.config.use_4bit:
+                try:
+                    quantization_config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_compute_dtype=torch.bfloat16 if self.config.use_bf16 else torch.float16,
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_quant_type="nf4"
+                    )
+                    model_kwargs["quantization_config"] = quantization_config
+                    self.logger.info("启用 4-bit 量化")
+                except ImportError:
+                    self.logger.warning("未安装 bitsandbytes，禁用 4-bit 量化")
+                    self.config.use_4bit = False
+            
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.config.model_name_or_path,
+                **model_kwargs
+            )
+            
+            if self.finetuning_type == "lora":
+                self.logger.info("配置 LoRA 微调...")
                 
-        """  
-        log_probs = F.log_softmax(logits, dim=-1)  
-        # 在 log_probs 的最后一个维度（vocab_size维度）上，根据 labels 的索引收集对应的对数概率
-        return torch.gather(log_probs, -1, labels.unsqueeze(-1)).squeeze(-1)  
+                self.model.enable_input_require_grads()
+                
+                lora_config = self._setup_lora_config()
+                self.model = get_peft_model(self.model, lora_config)
+                self.model.print_trainable_parameters()
+                
+                for name, param in self.model.named_parameters():
+                    if "lora_" in name or param.requires_grad:
+                        param.requires_grad_(True)
+                
+                self.logger.info("已确保所有 LoRA 参数 requires_grad=True")
+            
+            if not torch.cuda.is_available():
+                self.model = self.model.to("cpu")
+            
+            self.model = self.accelerator.prepare(self.model)
+            
+            self.logger.info("模型和分词器加载完成")
+            
+        except Exception as e:
+            self.logger.error(f"模型加载失败: {e}")
+            raise
     
+    def _get_dtype(self) -> torch.dtype:
+        """获取最佳计算精度"""
+        if self.config.use_bf16 and torch.cuda.is_bf16_supported():
+            return torch.bfloat16
+        elif self.config.use_fp16 and torch.cuda.is_available():
+            return torch.float16
+        else:
+            return torch.float32
     
+    def _initialize_accelerator(self):
+        """初始化 Accelerator（用于分布式训练）"""
+        if self.accelerator is None:
+            kwargs = DistributedDataParallelKwargs(
+                find_unused_parameters=True,
+                broadcast_buffers=False
+            )
+            
+            deepspeed_plugin = None
+            if self.use_deepspeed and self.deepspeed_config:
+                if isinstance(self.deepspeed_config, str):
+                    import json
+                    with open(self.deepspeed_config, 'r') as f:
+                        deepspeed_plugin = json.load(f)
+                else:
+                    deepspeed_plugin = self.deepspeed_config
+            
+            self.accelerator = Accelerator(
+                kwargs_handlers=[kwargs],
+                deepspeed_plugin=deepspeed_plugin
+            )
+            
+            if self.accelerator.is_main_process:
+                self.logger.info(f"Accelerator 初始化完成，分布式类型: {self.accelerator.distributed_type}")
+                if torch.cuda.is_available():
+                    self.logger.info(f"可用 GPU 数量: {torch.cuda.device_count()}")
     
-        '''
-        log_probs = torch.tensor([
-            [[-0.5, -1.0, -2.0],  # 第一个样本，第一个token的对数概率
-            [-0.8, -1.2, -1.5]], # 第一个样本，第二个token的对数概率
-            [[-0.6, -1.1, -2.1],  # 第二个样本，第一个token的对数概率
-            [-0.9, -1.3, -1.6]]  # 第二个样本，第二个token的对数概率
-        ])  # shape: (2, 2, 3)  (batch_size=2, seq_len=2, vocab_size=3)
-
-        labels = torch.tensor([
-            [0, 2],  # 第一个样本的标签
-            [1, 0]   # 第二个样本的标签
-        ])  # shape: (2, 2)  (batch_size=2, seq_len=2)
+    def _create_ref_model(self) -> AutoModelForCausalLM:
+        """
+        创建参考模型（Reference Model）
         
+        参考模型的作用：
+        - 提供一个固定的基准，用于计算概率比
+        - 确保训练过程中模型不会偏离原始策略太远
+        - 不参与梯度计算（requires_grad=False）
         
-        执行过程：
-        labels.unsqueeze(-1)：
-
-        在 labels 的最后一个维度上增加一个维度
-        结果：
-
-        python
-        Apply
-        tensor([
-            [[0], [2]],  # 第一个样本
-            [[1], [0]]   # 第二个样本
-        ])  # shape: (2, 2, 1)
-        torch.gather(log_probs, -1, labels.unsqueeze(-1))：
-
-        在 log_probs 的最后一个维度（vocab_size维度）上，根据 labels 的索引收集对应的对数概率
-        结果：
-
-        python
-        Apply
-        tensor([
-            [[-0.5], [-1.5]],  # 第一个样本
-            [[-1.1], [-0.9]]   # 第二个样本
-        ])  # shape: (2, 2, 1)
-        .squeeze(-1)：
-
-        移除最后一个维度
-        最终结果：
-
-        python
-        Apply
-        tensor([
-            [-0.5, -1.5],  # 第一个样本
-            [-1.1, -0.9]   # 第二个样本
-        ])  # shape: (2, 2)
-        解释：
-        对于第一个样本的第一个token，labels[0,0]=0，所以收集 log_probs[0,0,0]=-0.5
-        对于第一个样本的第二个token，labels[0,1]=2，所以收集 log_probs[0,1,2]=-1.5
-        对于第二个样本的第一个token，labels[1,0]=1，所以收集 log_probs[1,0,1]=-1.1
-        对于第二个样本的第二个token，labels[1,1]=0，所以收集 log_probs[1,1,0]=-0.9
+        实现方式：
+        - 深拷贝当前模型参数
+        - 移动到相同设备
+        - 设置 eval 模式
+        """
+        ref_model = AutoModelForCausalLM.from_pretrained(
+            self.config.model_name_or_path,
+            trust_remote_code=self.config.trust_remote_code,
+            torch_dtype=self._get_dtype(),
+            device_map=self.config.device_map if torch.cuda.is_available() else None,
+        )
         
-        最终得到的矩阵表示每个样本中每个token对应的对数概率值。
-        '''
+        ref_model.load_state_dict(self.model.state_dict())
+        ref_model.requires_grad_(False)
+        ref_model.eval()
+        
+        if torch.cuda.is_available():
+            ref_model = ref_model.to("cuda")
+        
+        return ref_model
     
+    def prepare_dataset(
+        self,
+        dataset: Union[Dataset, List[Dict]],
+        prompt_field: str = "prompt",
+        chosen_field: str = "chosen",
+        rejected_field: str = "rejected",
+        max_prompt_length: Optional[int] = None,
+        max_response_length: Optional[int] = None
+    ) -> Dataset:
+        """
+        准备 DPO 偏好数据集
+        
+        处理偏好数据的三元组格式：
+        {
+            "prompt": "用户问题",
+            "chosen": "偏好的回答",
+            "rejected": "不偏好的回答"
+        }
+        
+        Args:
+            dataset: 输入数据集
+            prompt_field: prompt 字段名
+            chosen_field: 偏好答案字段名
+            rejected_field: 不偏好答案字段名
+            max_prompt_length: 最大 prompt 长度
+            max_response_length: 最大回答长度
+            
+        Returns:
+            处理后的数据集
+        """
+        if isinstance(dataset, list):
+            dataset = Dataset.from_list(dataset)
+        
+        max_prompt_length = max_prompt_length or 512
+        max_response_length = max_response_length or (self.config.max_seq_length - max_prompt_length - 2)
+        
+        def filter_and_format(examples):
+            """过滤无效样本并格式化"""
+            filtered = {
+                "prompt": [],
+                "chosen": [],
+                "rejected": []
+            }
+            
+            for i in range(len(examples.get(prompt_field, []))):
+                prompt = examples[prompt_field][i]
+                chosen = examples[chosen_field][i]
+                rejected = examples[rejected_field][i]
+                
+                if self._is_valid_preference_sample(prompt, chosen, rejected):
+                    filtered["prompt"].append(prompt)
+                    filtered["chosen"].append(chosen)
+                    filtered["rejected"].append(rejected)
+            
+            return filtered
+        
+        def tokenize_function(examples):
+            """
+            DPO 专用的 tokenize 处理
+            
+            数据流程：
+            1. 将 prompt + chosen 拼接并分词 → 用于计算 chosen 的对数概率
+            2. 将 prompt + rejected 拼接并分词 → 用于计算 rejected 的对数概率
+            3. 只保留 prompt 部分作为 input_ids（因为 prompt 不需要计算损失）
+            """
+            batch = {
+                "input_ids": [],
+                "attention_mask": [],
+                "chosen_labels": [],
+                "rejected_labels": []
+            }
+            
+            for prompt, chosen, rejected in zip(
+                examples["prompt"],
+                examples["chosen"],
+                examples["rejected"]
+            ):
+                full_prompt = f"User: {prompt}\nAssistant:"
+                
+                chosen_tokens = self.tokenizer(
+                    full_prompt + chosen,
+                    max_length=max_prompt_length + max_response_length,
+                    padding="max_length",
+                    truncation=True,
+                    return_tensors="pt"
+                )
+                
+                rejected_tokens = self.tokenizer(
+                    full_prompt + rejected,
+                    max_length=max_prompt_length + max_response_length,
+                    padding="max_length",
+                    truncation=True,
+                    return_tensors="pt"
+                )
+                
+                batch["input_ids"].append(chosen_tokens["input_ids"][0])
+                batch["attention_mask"].append(chosen_tokens["attention_mask"][0])
+                batch["chosen_labels"].append(chosen_tokens["input_ids"][0])
+                batch["rejected_labels"].append(rejected_tokens["input_ids"][0])
+            
+            return batch
+        
+        columns_to_remove = [col for col in dataset.column_names 
+                           if col not in [prompt_field, chosen_field, rejected_field]]
+        
+        dataset = dataset.map(
+            filter_and_format,
+            batched=True,
+            remove_columns=columns_to_remove,
+            desc="过滤无效偏好样本"
+        )
+        
+        dataset = dataset.map(
+            tokenize_function,
+            batched=True,
+            remove_columns=dataset.column_names,
+            desc="分词偏好数据"
+        )
+        
+        self.logger.info(f"偏好数据集准备完成，包含 {len(dataset)} 个有效样本")
+        return dataset
+    
+    def _is_valid_preference_sample(
+        self,
+        prompt: Any,
+        chosen: Any,
+        rejected: Any
+    ) -> bool:
+        """检查偏好样本的有效性"""
+        if not prompt or not chosen or not rejected:
+            return False
+        
+        if not isinstance(prompt, str) or not isinstance(chosen, str) or not isinstance(rejected, str):
+            return False
+        
+        if len(prompt) > 2048 or len(chosen) > 2048 or len(rejected) > 2048:
+            return False
+        
+        if chosen == rejected:
+            return False
+        
+        return True
+    
+    def tokenize_dataset(
+        self,
+        dataset: Dataset,
+        max_seq_length: Optional[int] = None
+    ) -> Dataset:
+        """
+        对数据集进行分词（继承方法，增加 DPO 特定处理）
+        
+        注意：DPO 数据的分词在 prepare_dataset 中已完成，
+        此方法主要用于保持接口一致性
+        """
+        self.logger.info("DPO 数据集已在前置处理中完成分词")
+        return dataset
+    
+    def _get_log_probs(
+        self,
+        logits: torch.Tensor,
+        labels: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        计算给定 logits 和标签的对数概率
+        
+        Args:
+            logits: 模型输出的 logits，shape = (batch_size, seq_len, vocab_size)
+            labels: 目标标签，shape = (batch_size, seq_len)
+            
+        Returns:
+            每个位置的对数概率，shape = (batch_size, seq_len)
+        
+        计算过程：
+        1. 对 logits 在 vocab 维度上计算 log_softmax
+        2. 使用 torch.gather 根据 labels 索引收集对应的对数概率
+        
+        示例：
+            logits = [
+                [[-0.5, -1.0, -2.0],  # position 0
+                 [-0.8, -1.2, -1.5]], # position 1
+                [[-0.6, -1.1, -2.1],  # batch 2
+                 [-0.9, -1.3, -1.6]]
+            ]  # shape: (2, 2, 3)
+            
+            labels = [[0, 2], [1, 0]]  # shape: (2, 2)
+            
+            结果 = [
+                [-0.5, -1.5],  # batch 0: log_probs[0,0,0], log_probs[0,1,2]
+                [-1.1, -0.9]   # batch 1: log_probs[1,0,1], log_probs[1,1,0]
+            ]
+        """
+        log_probs = F.log_softmax(logits, dim=-1)
+        log_probs = torch.gather(log_probs, -1, labels.unsqueeze(-1)).squeeze(-1)
+        return log_probs
+    
+    def _compute_dpo_loss(
+        self,
+        policy_logits: torch.Tensor,
+        ref_logits: torch.Tensor,
+        chosen_labels: torch.Tensor,
+        rejected_labels: torch.Tensor,
+        attention_mask: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        计算 DPO 损失函数
+        
+        DPO 损失的核心思想：
+        - 增大 chosen 回答相对于参考模型的对数概率比
+        - 减小 rejected 回答相对于参考模型的对数概率比
+        
+        数学公式：
+        L = -log(σ(β * (Δ_log_prob_chosen - Δ_log_prob_rejected)))
+        
+        其中：
+        - Δ_log_prob_chosen = log(π_policy(y_w|x)) - log(π_ref(y_w|x))
+        - Δ_log_prob_rejected = log(π_policy(y_l|x)) - log(π_ref(y_l|x))
+        - σ 是 sigmoid 函数
+        
+        直观理解：
+        - 当 policy 对 chosen 的偏好高于 ref 时，Δ_log_prob_chosen 增大
+        - 当 policy 对 rejected 的偏好低于 ref 时，Δ_log_prob_rejected 减小
+        - 两者差值越大，sigmoid 输出越接近 1，log(sigmoid) 越接近 0
+        - 损失最小化等价于最大化 chosen 被选中的概率
+        """
+        chosen_log_probs = self._get_log_probs(policy_logits, chosen_labels)
+        rejected_log_probs = self._get_log_probs(policy_logits, rejected_labels)
+        
+        with torch.no_grad():
+            ref_chosen_log_probs = self._get_log_probs(ref_logits, chosen_labels)
+            ref_rejected_log_probs = self._get_log_probs(ref_logits, rejected_labels)
+        
+        policy_chosen_reward = self.beta * (chosen_log_probs - ref_chosen_log_probs)
+        policy_rejected_reward = self.beta * (rejected_log_probs - ref_rejected_log_probs)
+        
+        logits = policy_chosen_reward - policy_rejected_reward
+        
+        loss = -F.logsigmoid(logits)
+        
+        if attention_mask is not None:
+            loss = (loss * attention_mask).sum() / attention_mask.sum()
+        
+        return loss
+    
+    def create_training_args(
+        self,
+        output_dir: str,
+        **training_kwargs
+    ) -> TrainingArguments:
+        """创建训练参数"""
+        training_args = TrainingArguments(
+            output_dir=output_dir,
+            num_train_epochs=self.config.num_train_epochs,
+            per_device_train_batch_size=self.config.per_device_train_batch_size,
+            per_device_eval_batch_size=self.config.per_device_eval_batch_size,
+            gradient_accumulation_steps=self.config.gradient_accumulation_steps,
+            learning_rate=self.config.learning_rate,
+            logging_steps=self.config.logging_steps,
+            save_steps=self.config.save_steps,
+            save_total_limit=self.config.save_total_limit,
+            warmup_ratio=self.config.warmup_ratio,
+            lr_scheduler_type=self.config.lr_scheduler_type,
+            report_to=self.config.report_to,
+            eval_strategy=self.config.eval_strategy,
+            eval_steps=self.config.eval_steps,
+            load_best_model_at_end=self.config.load_best_model_at_end,
+            metric_for_best_model=self.config.metric_for_best_model,
+            greater_is_better=self.config.greater_is_better,
+            max_grad_norm=self.config.max_grad_norm,
+            dataloader_pin_memory=self.config.dataloader_pin_memory,
+            remove_unused_columns=self.config.remove_unused_columns,
+            do_train=self.config.do_train,
+            do_eval=self.config.do_eval,
+            fp16=self.config.use_fp16 and torch.cuda.is_available() and not torch.cuda.is_bf16_supported(),
+            bf16=self.config.use_bf16 and torch.cuda.is_bf16_supported(),
+            dataloader_num_workers=self.config.dataloader_num_workers,
+            save_safetensors=True,
+            optim="adamw_torch" if self.finetuning_type == "full" else "paged_adamw_8bit",
+        )
+        
+        if self.use_deepspeed:
+            training_args.deepspeed = self.deepspeed_config
+        
+        self.logger.info(f"训练参数: {self.config.num_train_epochs} epochs, batch_size={self.config.per_device_train_batch_size * self.config.gradient_accumulation_steps}")
+        return training_args
+    
+    def dpo_collator(self, features: List[Dict]) -> Dict[str, torch.Tensor]:
+        """
+        DPO 数据整理器
+        
+        将多个样本整理成一个 batch：
+        - input_ids: prompt + chosen 的分词结果
+        - attention_mask: 注意力掩码
+        - chosen_labels: chosen 回答的分词结果
+        - rejected_labels: rejected 回答的分词结果
+        """
+        batch = {
+            "input_ids": torch.stack([f["input_ids"] for f in features]),
+            "attention_mask": torch.stack([f["attention_mask"] for f in features]),
+            "chosen_labels": torch.stack([f["chosen_labels"] for f in features]),
+            "rejected_labels": torch.stack([f["rejected_labels"] for f in features])
+        }
+        return batch
+    
+    def _compute_metrics(self, eval_pred) -> Dict[str, float]:
+        """
+        计算评估指标
+        
+        DPO 的核心指标：
+        - preference_accuracy: policy 对 chosen 的得分是否高于 rejected
+        """
+        logits_chosen, logits_rejected = eval_pred.predictions
+        
+        chosen_scores = logits_chosen.mean(axis=-1)
+        rejected_scores = logits_rejected.mean(axis=-1)
+        
+        accuracy = (chosen_scores > rejected_scores).mean()
+        return {"dpo_accuracy": float(accuracy)}
+    
+    def start_training(
+        self,
+        dataset: Union[Dataset, List[Dict]],
+        output_dir: str,
+        prompt_field: str = "prompt",
+        chosen_field: str = "chosen",
+        rejected_field: str = "rejected",
+        eval_dataset: Optional[Union[Dataset, List[Dict]]] = None,
+        **training_kwargs
+    ):
+        """
+        开始 DPO 训练
+        
+        Args:
+            dataset: 偏好训练数据集，包含 prompt, chosen, rejected 字段
+            output_dir: 模型输出目录
+            prompt_field: prompt 字段名
+            chosen_field: 偏好答案字段名
+            rejected_field: 不偏好答案字段名
+            eval_dataset: 评估数据集
+            **training_kwargs: 其他训练参数
+        """
+        if self.model is None or self.tokenizer is None:
+            self.load_model_and_tokenizer()
+        
+        os.makedirs(output_dir, exist_ok=True)
+        
+        prepared_dataset = self.prepare_dataset(
+            dataset,
+            prompt_field=prompt_field,
+            chosen_field=chosen_field,
+            rejected_field=rejected_field
+        )
+        
+        eval_tokenized_dataset = None
+        if eval_dataset is not None:
+            prepared_eval_dataset = self.prepare_dataset(
+                eval_dataset,
+                prompt_field=prompt_field,
+                chosen_field=chosen_field,
+                rejected_field=rejected_field
+            )
+            eval_tokenized_dataset = prepared_eval_dataset
+        
+        training_args = self.create_training_args(output_dir, **training_kwargs)
+        
+        if eval_tokenized_dataset is not None and training_kwargs.get("do_eval", True):
+            training_args.do_eval = True
+            training_args.evaluation_strategy = "steps"
+            training_args.eval_steps = training_kwargs.get("eval_steps", training_args.save_steps // 2)
+        
+        self.ref_model = self._create_ref_model()
+        
+        class CustomDPOTrainer(Trainer):
+            def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+                """
+                自定义 DPO 损失计算
+                
+                数据格式：
+                - input_ids: prompt + chosen 的分词结果
+                - attention_mask: 注意力掩码
+                - chosen_labels: chosen 回答的分词结果
+                - rejected_labels: rejected 回答的分词结果
+                
+                损失计算步骤：
+                1. 取出 input_ids 和 labels
+                2. 政策模型前向传播获取 logits
+                3. 参考模型前向传播获取 ref_logits（无梯度）
+                4. 计算 chosen 和 rejected 的对数概率差
+                5. 应用 DPO 损失函数
+                """
+                input_ids = inputs.pop("input_ids")
+                attention_mask = inputs.pop("attention_mask")
+                chosen_labels = inputs.pop("chosen_labels")
+                rejected_labels = inputs.pop("rejected_labels")
+                
+                policy_outputs = model(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask
+                )
+                policy_logits = policy_outputs.logits
+                
+                with torch.no_grad():
+                    ref_outputs = self.model.module(
+                        input_ids=input_ids,
+                        attention_mask=attention_mask
+                    )
+                    ref_logits = ref_outputs.logits
+                
+                loss = self.model.module._compute_dpo_loss(
+                    policy_logits=policy_logits,
+                    ref_logits=ref_logits,
+                    chosen_labels=chosen_labels,
+                    rejected_labels=rejected_labels,
+                    attention_mask=attention_mask
+                )
+                
+                if return_outputs:
+                    return loss, {"logits": policy_logits}
+                
+                return loss
+        
+        self.trainer = CustomDPOTrainer(
+            model=self.model,
+            args=training_args,
+            train_dataset=prepared_dataset,
+            eval_dataset=eval_tokenized_dataset,
+            data_collator=self.dpo_collator,
+            compute_metrics=self._compute_metrics,
+            callbacks=[DPOCallback(beta=self.beta)]
+        )
+        
+        self.trainer = self.accelerator.prepare(self.trainer)
+        
+        if self.accelerator.is_main_process:
+            self.logger.info("开始 DPO 训练...")
+        
+        train_result = self.trainer.train()
+        
+        self._save_model(output_dir)
+        
+        if self.accelerator.is_main_process:
+            self.logger.info(f"DPO 训练完成！损失: {train_result.training_loss:.4f}")
+            self.logger.info(f"模型保存到: {output_dir}")
+        
+        return train_result.metrics
+    
+    def _save_model(self, output_dir: str):
+        """保存模型"""
+        if self.accelerator.is_main_process:
+            os.makedirs(output_dir, exist_ok=True)
+            
+            if self.finetuning_type == "lora":
+                self.model.save_pretrained(
+                    output_dir,
+                    safe_serialization=True,
+                    save_adapter_config=True
+                )
+                self.logger.info(f"LoRA adapter 保存到: {output_dir}")
+            else:
+                self.trainer.save_model(output_dir)
+                self.logger.info(f"完整模型保存到: {output_dir}")
+            
+            self.tokenizer.save_pretrained(output_dir)
+            self.logger.info(f"分词器保存到: {output_dir}")
+
+
+class DPOCallback(TrainerCallback):
+    """
+    DPO 训练回调
+    
+    功能：
+    1. 初始化参考模型
+    2. 在每个 epoch 开始时同步参考模型参数
+    """
+    
+    def __init__(self, beta: float = 0.1):
+        self.beta = beta
+        self.ref_model = None
+    
+    def on_train_begin(self, args: TrainingArguments, state: TrainerControl, control: TrainerControl, **kwargs):
+        """训练开始时的初始化"""
+        model = kwargs.get("model")
+        if model is None:
+            return
+        
+        if isinstance(model, DeepSpeedEngine):
+            model = model.module
+        
+        self.ref_model = model
+        control.should_epoch_stop = False
+    
+    def on_epoch_begin(self, args: TrainingArguments, state: TrainerControl, control: TrainerControl, **kwargs):
+        """每个 epoch 开始时同步参考模型"""
+        if self.ref_model is None:
+            return
+        
+        model = kwargs.get("model")
+        if model is None:
+            return
+        
+        if isinstance(model, DeepSpeedEngine):
+            model = model.module
+        
+        self.ref_model.load_state_dict(model.state_dict())
+        self.ref_model.eval()
+    
+    def on_step_end(self, args: TrainingArguments, state: TrainerControl, control: TrainerControl, **kwargs):
+        """每个 step 结束时检查是否需要同步"""
+        if state.global_step % 100 == 0:
+            if self.ref_model is not None:
+                model = kwargs.get("model")
+                if model is not None and not isinstance(model, DeepSpeedEngine):
+                    self.ref_model.load_state_dict(model.state_dict())
+
+
+
+
+
+def run():
+    pass
+
+
+
+
+
+if __name__ == "__main__":
+    run()
