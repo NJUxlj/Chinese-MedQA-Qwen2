@@ -17,6 +17,7 @@ class BaseTrainingConfig(BaseConfig):
     device_map: Union[str, Dict[str, Any]] = Field(default = "auto", description="设备映射")
 
     use_4bit: bool = Field(default = False, description="是否使用 4bit 量化")
+    use_8bit: bool = Field(default = False, description="是否使用 8bit 量化")
     use_fp16: bool = Field(default = True, description="是否使用 FP16 精度")
     use_bf16: bool = Field(default = False, description="是否使用 BF16 精度")
     trust_remote_code: bool = Field(default = True, description="是否信任远程代码")
@@ -144,7 +145,15 @@ class GSPOTrainingConfig(BaseTrainingConfig):
 
 
 class TRPOTrainingConfig(BaseTrainingConfig):
-    pass
+    max_kl: float = Field(default=0.01, description="最大 KL 散度")
+    cg_damping: float = Field(default=0.1, description="共轭梯度阻尼系数")
+    cg_iterations: int = Field(default=10, description="共轭梯度迭代次数")
+    gamma: float = Field(default=0.99, description="折扣因子")
+    gae_lambda: float = Field(default=0.95, description="GAE lambda")
+    lora_r: int = Field(default=64, description="LoRA rank")
+    lora_alpha: int = Field(default=16, description="LoRA alpha")
+    lora_dropout: float = Field(default=0.05, description="LoRA dropout")
+    lora_target_modules: Optional[List[str]] = Field(default=None, description="LoRA 目标模块")
 
 
 
@@ -156,6 +165,21 @@ class SFTTrainingConfig(BaseTrainingConfig):
     lora_alpha: int = Field(default = 16, description="LoRA alpha")
     lora_dropout: float = Field(default = 0.05, description="LoRA dropout")
     target_modules: Optional[List[str]] = Field(default = None, description="目标模块")
+
+
+
+
+
+
+class RewardModelTrainingConfig(BaseTrainingConfig):
+    """奖励模型训练配置"""
+    lora_r: int = Field(default=8, description="LoRA rank")
+    lora_alpha: int = Field(default=16, description="LoRA alpha")
+    lora_dropout: float = Field(default=0.05, description="LoRA dropout")
+    lora_target_modules: Optional[List[str]] = Field(
+        default_factory=lambda: ["q_proj", "k_proj", "v_proj", "o_proj"],
+        description="LoRA 目标模块"
+    )
     
 
 

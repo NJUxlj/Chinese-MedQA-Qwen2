@@ -1,0 +1,96 @@
+2025-12-31 13:35:18,107 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,129 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,129 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,210 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,231 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,231 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,304 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,364 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,391 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,392 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,456 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,460 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,460 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,480 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,480 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,491 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,491 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,549 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,553 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,553 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,614 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,619 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,620 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,684 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,691 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,692 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,751 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:35:18,755 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:35:18,755 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:35:18,807 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:36:25,763 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:36:25,770 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:36:25,770 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:36:25,820 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:36:26,020 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:36:26,025 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:36:26,025 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:36:26,079 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:36:26,147 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:36:27,088 - TRPOTrainer - INFO - 参考模型加载完成
+2025-12-31 13:36:27,154 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:36:27,175 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:36:27,176 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:36:27,227 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:36:27,322 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:36:27,410 - TRPOTrainer - INFO - 参考模型加载完成
+2025-12-31 13:37:05,539 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:37:05,539 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:37:05,544 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:37:05,545 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:37:05,549 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:37:05,549 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:37:05,610 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:37:05,707 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:37:06,267 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:37:06,267 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:37:06,319 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:37:06,417 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:37:06,501 - TRPOTrainer - INFO - 参考模型加载完成
+2025-12-31 13:37:45,584 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:37:45,585 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:37:45,641 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:37:45,739 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:42:33,687 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:42:33,694 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:42:33,694 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:42:33,811 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:42:34,010 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:42:34,016 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:42:34,016 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:42:34,067 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:42:34,125 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:42:34,989 - TRPOTrainer - INFO - 参考模型加载完成
+2025-12-31 13:42:35,052 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:42:35,076 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:42:35,076 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:42:35,134 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:42:35,231 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:42:35,316 - TRPOTrainer - INFO - 参考模型加载完成
+2025-12-31 13:43:13,670 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:43:13,670 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:43:13,675 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:43:13,675 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:43:13,680 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:43:13,680 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:43:13,744 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:43:13,850 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:43:14,491 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:43:14,491 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:43:14,540 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:43:14,635 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora
+2025-12-31 13:43:14,729 - TRPOTrainer - INFO - 参考模型加载完成
+2025-12-31 13:43:54,971 - TRPOTrainer - INFO - Accelerator 设备: cpu
+2025-12-31 13:43:54,971 - TRPOTrainer - INFO - 分布式训练初始化完成
+2025-12-31 13:43:55,031 - TRPOTrainer - INFO - Tokenizer 加载完成，词汇表大小: 50257
+2025-12-31 13:43:55,136 - TRPOTrainer - INFO - 模型加载完成，微调类型: lora

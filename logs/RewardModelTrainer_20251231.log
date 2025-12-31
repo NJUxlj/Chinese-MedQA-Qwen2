@@ -1,0 +1,192 @@
+2025-12-31 16:00:07,429 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:07,433 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:07,536 - RewardModelTrainer - INFO - 准备数据集，包含 2 个样本
+2025-12-31 16:00:07,601 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:07,727 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:00:07,752 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:07,835 - RewardModelTrainer - INFO - 准备数据集，包含 10 个样本
+2025-12-31 16:00:07,882 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:07,960 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:00:07,960 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:00:07,961 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,045 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:00:08,045 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:00:08,046 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,127 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,204 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:00:08,204 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:00:08,231 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,249 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,349 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:00:08,349 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:00:08,350 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,351 - RewardModelTrainer - INFO - 准备数据集，包含 0 个样本
+2025-12-31 16:00:08,352 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,457 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:00:08,499 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:00:08,578 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:05:21,837 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:21,842 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:21,952 - RewardModelTrainer - INFO - 准备数据集，包含 2 个样本
+2025-12-31 16:05:21,993 - RewardModelTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-31 16:05:22,001 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,094 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:05:22,121 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,215 - RewardModelTrainer - INFO - 准备数据集，包含 10 个样本
+2025-12-31 16:05:22,241 - RewardModelTrainer - INFO - 数据集准备完成，包含 10 个样本
+2025-12-31 16:05:22,256 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,337 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:05:22,337 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:05:22,338 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,414 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:05:22,414 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:05:22,415 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,521 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,601 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:05:22,601 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:05:22,630 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,649 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,736 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:05:22,737 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:05:22,738 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,739 - RewardModelTrainer - INFO - 准备数据集，包含 0 个样本
+2025-12-31 16:05:22,740 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,852 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:05:22,878 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:05:22,886 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:22,970 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:05:22,992 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:05:59,813 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:59,823 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:05:59,946 - RewardModelTrainer - INFO - 准备数据集，包含 2 个样本
+2025-12-31 16:06:00,001 - RewardModelTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-31 16:06:00,013 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,104 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:06:00,131 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,219 - RewardModelTrainer - INFO - 准备数据集，包含 10 个样本
+2025-12-31 16:06:00,245 - RewardModelTrainer - INFO - 数据集准备完成，包含 10 个样本
+2025-12-31 16:06:00,260 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,343 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:06:00,343 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:06:00,344 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,429 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:06:00,429 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:06:00,430 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,519 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,602 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:06:00,603 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:06:00,632 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,649 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,736 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:06:00,736 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:06:00,737 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,738 - RewardModelTrainer - INFO - 准备数据集，包含 0 个样本
+2025-12-31 16:06:00,740 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,826 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:06:00,851 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:06:00,859 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:06:00,942 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:06:00,962 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:08:04,296 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,301 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,535 - RewardModelTrainer - INFO - 准备数据集，包含 2 个样本
+2025-12-31 16:08:04,574 - RewardModelTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-31 16:08:04,583 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,669 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:08:04,695 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,777 - RewardModelTrainer - INFO - 准备数据集，包含 10 个样本
+2025-12-31 16:08:04,797 - RewardModelTrainer - INFO - 数据集准备完成，包含 10 个样本
+2025-12-31 16:08:04,805 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,805 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:08:04,805 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:08:04,806 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,885 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:08:04,885 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:08:04,894 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:04,968 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:08:04,968 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:08:04,969 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,049 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,128 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:08:05,128 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:08:05,130 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,162 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,237 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:08:05,237 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:08:05,238 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,239 - RewardModelTrainer - INFO - 准备数据集，包含 0 个样本
+2025-12-31 16:08:05,240 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,317 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:08:05,344 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:08:05,352 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:08:05,430 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:08:05,451 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:13:03,001 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,006 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,104 - RewardModelTrainer - INFO - 准备数据集，包含 2 个样本
+2025-12-31 16:13:03,144 - RewardModelTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-31 16:13:03,155 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,256 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:13:03,291 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,385 - RewardModelTrainer - INFO - 准备数据集，包含 10 个样本
+2025-12-31 16:13:03,408 - RewardModelTrainer - INFO - 数据集准备完成，包含 10 个样本
+2025-12-31 16:13:03,416 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,417 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:03,417 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:03,418 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,510 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:03,510 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:03,519 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,600 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:03,600 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:03,601 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,679 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,759 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:03,759 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:03,760 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,893 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,972 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:03,972 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:03,973 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:03,974 - RewardModelTrainer - INFO - 准备数据集，包含 0 个样本
+2025-12-31 16:13:03,975 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:04,064 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:13:04,083 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:13:04,095 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:04,183 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:13:04,205 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:13:45,901 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:45,905 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,015 - RewardModelTrainer - INFO - 准备数据集，包含 2 个样本
+2025-12-31 16:13:46,059 - RewardModelTrainer - INFO - 数据集准备完成，包含 2 个样本
+2025-12-31 16:13:46,068 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,162 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:13:46,189 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,289 - RewardModelTrainer - INFO - 准备数据集，包含 10 个样本
+2025-12-31 16:13:46,312 - RewardModelTrainer - INFO - 数据集准备完成，包含 10 个样本
+2025-12-31 16:13:46,337 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,337 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:46,343 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:46,348 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,454 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:46,454 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:46,476 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,663 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:46,663 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:46,666 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,768 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,855 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:46,856 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:46,857 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,860 - RewardModelTrainer - INFO - 训练参数创建完成：1 epochs, batch_size=2
+2025-12-31 16:13:46,861 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,952 - RewardModelTrainer - INFO - 正在加载奖励模型：/Users/xiniuyiliao/Desktop/code/models/gpt2
+2025-12-31 16:13:46,952 - RewardModelTrainer - ERROR - 模型加载失败：Accelerator.__init__() got an unexpected keyword argument 'ddp_find_unused_parameters'
+2025-12-31 16:13:46,984 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:46,985 - RewardModelTrainer - INFO - 准备数据集，包含 0 个样本
+2025-12-31 16:13:46,986 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:47,072 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:13:47,092 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
+2025-12-31 16:13:47,100 - RewardModelTrainer - INFO - 配置验证通过
+2025-12-31 16:13:47,230 - RewardModelTrainer - INFO - 准备数据集，包含 1 个样本
+2025-12-31 16:13:47,253 - RewardModelTrainer - INFO - 数据集准备完成，包含 1 个样本
