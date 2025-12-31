@@ -85,7 +85,7 @@ class RecruiterAgent(BaseAgent):
             collaboration_plan = self._create_collaboration_plan(team_selection, context)
             
             result = {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "query": query,
                 "requirements_analysis": requirements,
@@ -105,7 +105,7 @@ class RecruiterAgent(BaseAgent):
             self.logger.error(f"招募过程出错: {e}")
             self.status = "error"
             return {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "query": query,
                 "error": str(e),

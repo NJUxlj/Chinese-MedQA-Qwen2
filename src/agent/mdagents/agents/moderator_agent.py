@@ -71,7 +71,7 @@ class ModeratorAgent(BaseAgent):
             risk_assessment = self._assess_risk_level(query, context)
             
             result = {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "query": query,
                 "complexity_analysis": complexity_analysis,
@@ -90,7 +90,7 @@ class ModeratorAgent(BaseAgent):
             self.logger.error(f"调节过程出错: {e}")
             self.status = "error"
             return {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "query": query,
                 "error": str(e),

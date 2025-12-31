@@ -74,7 +74,7 @@ class PrimaryCareClinician(BaseAgent):
             referral_needed = self._assess_referral_need(query, diagnosis_result)
             
             result = {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "query": query,
                 "diagnosis": diagnosis_result,
@@ -93,7 +93,7 @@ class PrimaryCareClinician(BaseAgent):
             self.logger.error(f"诊断过程出错: {e}")
             self.status = "error"
             return {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "query": query,
                 "error": str(e),

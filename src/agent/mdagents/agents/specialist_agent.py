@@ -104,7 +104,7 @@ class SpecialistAgent(BaseAgent):
             prognosis = self._assess_prognosis(specialty_result, query)
             
             result = {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "specialty": self.specialty,
                 "query": query,
@@ -123,7 +123,7 @@ class SpecialistAgent(BaseAgent):
             self.logger.error(f"专科评估过程出错: {e}")
             self.status = "error"
             return {
-                "agent_type": self.agent_type.value,
+                "agent_type": self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type,
                 "agent_name": self.name,
                 "specialty": self.specialty,
                 "query": query,

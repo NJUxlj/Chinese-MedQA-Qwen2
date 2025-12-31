@@ -46,9 +46,10 @@ class BaseAgent(ABC):
         
     def log_interaction(self, interaction_type: str, content: str, metadata: Dict[str, Any] = None):
         """记录交互日志"""
+        agent_type_value = self.agent_type.value if hasattr(self.agent_type, 'value') else self.agent_type
         log_entry = {
             "timestamp": datetime.now().isoformat(),
-            "agent_type": self.agent_type.value,
+            "agent_type": agent_type_value,
             "agent_name": self.name,
             "interaction_type": interaction_type,
             "content": content,
