@@ -1,12 +1,14 @@
 ## Chinese-MedQA-Qwen2
 - 本项目是一个基于Qwen2+Agent+RAG的医疗问答系统
-- 该项目的目的，是使用`SFT+DPO`来微调一个使用西医知识来进行疾病诊疗的垂直qwen2模型, 并将SFT+DPO微调后的模型(也可以用智谱api模型调用进行替换)的回答文本和本地知识库中的文本做匹配，然后使用RAG的方式(参考`Longchain-chatchat`项目)来将原始回答和匹配的top-k个文本段进行拼接，然后再进行回答。
+- 该项目的目的, 是为了打通从 `SFT/Embedding医疗训练数据生成`，到 `SFT微调`， 到`奖励模型微调`，到 `DPO/DAPO/GSPO/TRPO` 微调， 到使用 vllm 对最终模型进行部署与推理， 再到使用 AgentFactory 调用 医疗多 Agent 会诊系统 (mdagents) 进行问诊的整个流水线。
+
+- 最终本项目将会基于上述后训练方式，来微调出一个使用西医知识来进行疾病诊疗的垂直qwen2模型。
 
 
 ## 项目内容
 1. 手动构建 SFT+DPO 的Trainer.(SFT由huggingface的Trainer实现，DPO 是由 [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) 实现, 用户也可以选择我们手动编写的DPOTrainer【注意，这是我手写的！和trl库里的那个DPOTrainer不是同一个】)
-2. 推理实现：用户可以选择两种推理方式：1.使用 [fastllm](https://github.com/ztxz16/fastllm)（一个基于C++的推理库）加速推理。2.用户也可以切换成使用 VLLM 进行推理加速
-3. 本项目也参考了LongChain-Chatchat的项目框架：【1】包括Ollama，XInference的基本使用(主要是模型的加载与推理)。
+2. 推理实现：用户可以选择两种推理方式：1.使用 vllm。2.用户也可以切换成 xinference。
+3. 本项目也参考了LongChain-Chatchat的项目框架：【1】包括 XInference的基本使用(主要是模型的加载与推理)。
 4. 参考了LongChain-Chatchat的架构，在Chinese-MedQA的文档匹配算法中加入KNN（原本只有相似度、BM25、L2_distance）。【3】使用FAISS构建了本地医疗知识库。
 
 
@@ -38,63 +40,7 @@
 
 
 ## 项目设计图
-```mermaid
-
-flowchart TD
-    subgraph User["用户界面"]
-        UI["Web界面/API"]
-    end
-    
-    subgraph ModelTuning["模型微调模块"]
-        SFT["监督微调(SFT)"]
-        DPO["直接偏好优化(DPO)"]
-        Dataset["医疗数据集"]
-        SFT --> DPO
-        Dataset --> SFT
-    end
-    
-    subgraph KnowledgeBase["医疗知识库"]
-        Documents["医疗文档"]
-        Embedding["文档嵌入"]
-        FAISS["FAISS索引"]
-        Documents --> Embedding
-        Embedding --> FAISS
-    end
-    
-    subgraph Inference["推理模块"]
-        TunedModel["微调后的Qwen2模型"]
-        ApiModel["智谱API调用"]
-        FastLLM["FastLLM加速推理"]
-        VLLM["VLLM加速推理"]
-        TunedModel --> FastLLM
-        TunedModel --> VLLM
-        ApiModel --> Inference["推理结果"]
-        FastLLM --> Inference
-        VLLM --> Inference
-    end
-    
-    subgraph RAG["RAG模块"]
-        QueryEmbed["查询嵌入"]
-        Retrieval["文档检索"]
-        TopK["Top-K选择"]
-        RagPrompt["RAG提示构建"]
-        QueryEmbed --> Retrieval
-        Retrieval --> TopK
-        TopK --> RagPrompt
-    end
-    
-    subgraph AgentModule["Agent模块"]
-        AgentFramework["Agent框架"]
-        ToolCalling["工具调用"]
-        AgentFramework --> ToolCalling
-    end
-    
-    User --> RAG
-    RAG --> Inference
-    Inference --> AgentModule
-    KnowledgeBase --> RAG
-    ModelTuning --> Inference
-    AgentModule --> User
+```
 
 ```
 

@@ -25,9 +25,10 @@ from sentence_transformers import SentenceTransformer
 
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__)).parent.parent)
+sys.path.append(str(Path(__file__)).parent.parent.parent)
 
 from config.lda_config import LDAConfig
+from utils.logger import setup_logger
 
 # 导入本地PDF解析器（可选）
 PdfParser = None
@@ -36,8 +37,6 @@ try:
 except ImportError:
     try:
         # 如果相对导入失败，使用绝对路径导入
-        import sys
-        import os
         current_dir = os.path.dirname(os.path.abspath(__file__))
         pdf_parser_path = os.path.join(current_dir, "..", "pdf", "pdf_parser.py")
         
@@ -57,9 +56,6 @@ except ImportError:
 
 warnings.filterwarnings("ignore")
 
-# 配置日志
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # 设置中文字体（用于可视化）
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
@@ -82,6 +78,7 @@ class LDAPipeline:
             language: 处理语言，支持 'chinese' 和 'english'
             offline_mode: 是否使用离线模式（不使用在线模型）
         """
+        self.logger = setup_logger(self.__class__.__name__)
         self.config = config
         self.embedding_model_name = config.embedding_model_name
         self.language = config.language
@@ -106,36 +103,36 @@ class LDAPipeline:
     def _initialize_embedding_model(self):
         """初始化文档嵌入模型"""
         try:
-            logger.info(f"正在加载嵌入模型: {self.embedding_model_name}")
+            self.logger.info(f"正在加载嵌入模型: {self.embedding_model_name}")
             
             # 如果是本地路径，尝试从本地加载
             if Path(self.embedding_model_name).exists():
-                logger.info("检测到本地模型路径，尝试从本地加载...")
+                self.logger.info("检测到本地模型路径，尝试从本地加载...")
                 
                 # 尝试从本地路径加载SentenceTransformer模型
                 try:
                     self.embedding_model = SentenceTransformer(self.embedding_model_name)
                 except Exception as local_error:
-                    logger.warning(f"从本地路径加载失败: {local_error}")
+                    self.logger.warning(f"从本地路径加载失败: {local_error}")
                     # 尝试使用本地模型名称
                     model_name = Path(self.embedding_model_name).name
-                    logger.info(f"尝试使用模型名称: {model_name}")
+                    self.logger.info(f"尝试使用模型名称: {model_name}")
                     self.embedding_model = SentenceTransformer(model_name, cache_folder=str(Path(self.embedding_model_name).parent))
             else:
                 # 在线下载模型
-                logger.info("使用在线模型下载...")
+                self.logger.info("使用在线模型下载...")
                 self.embedding_model = SentenceTransformer(self.embedding_model_name)
             
-            logger.info("嵌入模型加载成功")
+            self.logger.info("嵌入模型加载成功")
         except Exception as e:
-            logger.error(f"加载嵌入模型失败: {e}")
+            self.logger.error(f"加载嵌入模型失败: {e}")
             # 如果本地模型加载失败，尝试使用一个默认的中文模型
-            logger.info("尝试使用默认的中文模型...")
+            self.logger.info("尝试使用默认的中文模型...")
             try:
                 self.embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
-                logger.info("默认模型加载成功")
+                self.logger.info("默认模型加载成功")
             except Exception as fallback_error:
-                logger.error(f"默认模型加载也失败: {fallback_error}")
+                self.logger.error(f"默认模型加载也失败: {fallback_error}")
                 raise
 
     def _preprocess_text(self, text: str) -> str:
@@ -224,10 +221,10 @@ class LDAPipeline:
         Returns:
             包含主题建模结果的字典
         """
-        logger.info(f"开始对PDF目录进行主题建模: {pdf_dir}")
+        self.logger.info(f"开始对PDF目录进行主题建模: {pdf_dir}")
         
         if not self.pdf_parser:
-            logger.error("PDF解析器不可用，请确保正确安装相关依赖")
+            self.logger.error("PDF解析器不可用，请确保正确安装相关依赖")
             return {"error": "PDF解析器不可用，请确保正确安装相关依赖"}
         
         try:
@@ -235,7 +232,7 @@ class LDAPipeline:
             documents = self.pdf_parser.batch_parse_pdfs(pdf_dir)
             
             if not documents:
-                logger.warning("没有找到可处理的PDF文档")
+                self.logger.warning("没有找到可处理的PDF文档")
                 return {"error": "没有找到可处理的PDF文档"}
             
             # 提取文本内容
@@ -246,10 +243,10 @@ class LDAPipeline:
                     texts.append(text)
             
             if not texts:
-                logger.warning("没有可用的文本内容进行建模")
+                self.logger.warning("没有可用的文本内容进行建模")
                 return {"error": "没有可用的文本内容进行建模"}
             
-            logger.info(f"成功提取 {len(texts)} 个文档的文本内容")
+            self.logger.info(f"成功提取 {len(texts)} 个文档的文本内容")
             
             # 调用文档主题建模方法
             return self.modeling_documents(
@@ -261,9 +258,9 @@ class LDAPipeline:
                 save_model_path=save_model_path,
                 source_type="pdf"
             )
-            
+                
         except Exception as e:
-            logger.error(f"PDF主题建模失败: {e}")
+            self.logger.error(f"PDF主题建模失败: {e}")
             return {"error": f"PDF主题建模失败: {str(e)}"}
 
     def modeling_documents(self, 
@@ -289,7 +286,7 @@ class LDAPipeline:
         Returns:
             包含主题建模结果的字典
         """
-        logger.info(f"开始对{len(documents)}个{source_type}文档进行主题建模")
+        self.logger.info(f"开始对{len(documents)}个{source_type}文档进行主题建模")
         
         try:
             # 预处理文档
@@ -300,22 +297,22 @@ class LDAPipeline:
                     processed_docs.append(processed_text)
             
             if not processed_docs:
-                logger.warning("预处理后没有可用文档")
+                self.logger.warning("预处理后没有可用文档")
                 return {"error": "预处理后没有可用文档"}
             
-            logger.info(f"预处理后剩余 {len(processed_docs)} 个有效文档")
+            self.logger.info(f"预处理后剩余 {len(processed_docs)} 个有效文档")
             
             # 准备BERTopic参数，根据文档数量动态调整
             n_docs = len(processed_docs)
             
             # 对于小数据集，使用更简单的配置
             if n_docs <= 10:
-                logger.info(f"小数据集模式: {n_docs} 个文档")
+                self.logger.info(f"小数据集模式: {n_docs} 个文档")
                 # 对于非常小的数据集，完全禁用UMAP，直接使用嵌入
                 umap_model = None
                 n_components = 2  # 最小维度
             else:
-                logger.info(f"标准模式: {n_docs} 个文档")
+                self.logger.info(f"标准模式: {n_docs} 个文档")
                 n_neighbors = min(15, max(2, n_docs - 1))
                 n_components = min(5, n_docs - 1)
                 umap_model = UMAP(
@@ -326,7 +323,7 @@ class LDAPipeline:
                     random_state=42
                 )
             
-            logger.info(f"文档数量: {n_docs}, UMAP模型: {umap_model is not None}")
+            self.logger.info(f"文档数量: {n_docs}, UMAP模型: {umap_model is not None}")
             
             # HDBSCAN参数调整
             adjusted_min_cluster_size = min(min_topic_size, max(2, n_docs // 2))  # 不超过文档数的一半
@@ -354,16 +351,16 @@ class LDAPipeline:
             
             # 拟合模型，对于小数据集使用备用方法
             if n_docs <= 5:
-                logger.info("使用简单LDA方法处理小数据集...")
+                self.logger.info("使用简单LDA方法处理小数据集...")
                 result = self._simple_topic_modeling(processed_docs, num_topics, top_n_words)
                 return result
             else:
-                logger.info("使用BERTopic模型...")
+                self.logger.info("使用BERTopic模型...")
                 topics, probabilities = self.topic_model.fit_transform(processed_docs)
             
             # 调整主题数量
             if num_topics is not None:
-                logger.info(f"将主题数量调整为 {num_topics}")
+                self.logger.info(f"将主题数量调整为 {num_topics}")
                 topics = self.topic_model.reduce_outliers(processed_docs, topics)
                 self.topic_model = self.topic_model.reduce_topics(processed_docs, topics, nr_topics=num_topics)
                 topics, probabilities = self.topic_model.transform(processed_docs)
@@ -396,12 +393,12 @@ class LDAPipeline:
                 self.save_model(save_model_path)
                 result["model_saved_path"] = save_model_path
             
-            logger.info(f"主题建模完成，发现 {result['num_topics']} 个主题")
+            self.logger.info(f"主题建模完成，发现 {result['num_topics']} 个主题")
             
             return result
             
         except Exception as e:
-            logger.error(f"文档主题建模失败: {e}")
+            self.logger.error(f"文档主题建模失败: {e}")
             return {"error": f"文档主题建模失败: {str(e)}"}
     
     def _simple_topic_modeling(self, 
@@ -419,7 +416,7 @@ class LDAPipeline:
         Returns:
             主题建模结果
         """
-        logger.info("开始简单LDA主题建模...")
+        self.logger.info("开始简单LDA主题建模...")
         
         try:
             n_docs = len(documents)
@@ -455,7 +452,7 @@ class LDAPipeline:
             
             # 检查是否有特征
             if doc_term_matrix.shape[1] == 0:
-                logger.warning("向量化后没有特征，尝试更宽松的参数...")
+                self.logger.warning("向量化后没有特征，尝试更宽松的参数...")
                 # 使用更宽松的参数重新向量化
                 vectorizer = TfidfVectorizer(
                     max_features=100,
@@ -525,11 +522,11 @@ class LDAPipeline:
                 "method": "simple_lda"
             }
             
-            logger.info(f"简单LDA主题建模完成，发现 {num_topics} 个主题")
+            self.logger.info(f"简单LDA主题建模完成，发现 {num_topics} 个主题")
             return result
             
         except Exception as e:
-            logger.error(f"简单LDA主题建模失败: {e}")
+            self.logger.error(f"简单LDA主题建模失败: {e}")
             return {"error": f"简单LDA主题建模失败: {str(e)}"}
 
     def visualize_topics(self, 
