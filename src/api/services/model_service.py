@@ -4,24 +4,29 @@
 """
 
 from typing import Dict, Any, List, Optional, Union
-import os
+import os,sys
 import threading
 import logging
 from contextlib import contextmanager
 
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
 # 导入模型
 from models.qwen_model import Qwen2Model
-from models.base_model import BaseModel
+from models.base_model import BaseGenerativeModel
 
 logger = logging.getLogger(__name__)
+from utils.logger import setup_logger
+
 
 class ModelService:
     """模型服务类"""
     
     def __init__(self):
         """初始化模型服务"""
-        self.models: Dict[str, BaseModel] = {}
+        self.models: Dict[str, BaseGenerativeModel] = {}
         self._models_lock = threading.RLock()  # 线程安全的读写锁
+        self.logger = setup_logger(self.__cls__.__name__)
         
         # 默认模型配置
         self.default_model_name = os.environ.get("DEFAULT_MODEL", "qwen2-7b-instruct")

@@ -17,12 +17,19 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 # 导入路由
-from routers import qa, admin, rag, embedding, health, evaluation
+from routers import qa, admin, rag, embedding, health, evaluation, mdagents
 
 # 导入模型服务
 from services.model_service import get_model_service, ModelService
 from services.rag_service import get_rag_service, RAGService
 from services.embedding_service import get_embedding_service, EmbeddingService
+from services.mdagents_service import get_mdagents_service, MDAgentsService
+
+# 导入Gradio UI
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from ui.medagents_ui import MDAgentsUI
 
 # 配置日志
 logging.basicConfig(
@@ -46,6 +53,7 @@ async def lifespan(app: FastAPI):
     model_service = get_model_service()
     rag_service = get_rag_service()
     embedding_service = get_embedding_service()
+    mdagents_service = get_mdagents_service()
     
     if os.environ.get("PRELOAD_MODELS", "true").lower() == "true":
         try:
@@ -90,6 +98,17 @@ app.include_router(rag.router, prefix="/api/rag", tags=["知识检索"])
 app.include_router(embedding.router, prefix="/api/embedding", tags=["嵌入服务"])
 app.include_router(evaluation.router, prefix="/api/evaluation", tags=["评估服务"])
 app.include_router(admin.router, prefix="/api/admin", tags=["管理接口"])
+app.include_router(mdagents.router, prefix="/api/mdagents", tags=["MDAgents医疗多智能体系统"])
+
+# 挂载Gradio UI
+try:
+    logger.info("正在初始化Gradio UI...")
+    ui = MDAgentsUI(api_base_url="http://localhost:8000/api/mdagents")
+    gradio_app = ui.create_interface()
+    app.mount("/ui", gradio_app)
+    logger.info("Gradio UI已挂载到 /ui 路径")
+except Exception as e:
+    logger.warning(f"Gradio UI挂载失败: {e}")
 
 # 请求计数中间件
 @app.middleware("http")
