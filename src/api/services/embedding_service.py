@@ -4,15 +4,18 @@
 """
 
 from typing import Dict, Any, List, Optional, Union
-import os
+import os, sys
 import threading
 import logging
 import numpy as np
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
 # 导入嵌入管理器
-from knowledge_base.embedding_manager import EmbeddingManager
+from knowledge_base.embedding.embedding_manager import EmbeddingManager
+from utils.logger import setup_logger
 
-logger = logging.getLogger(__name__)
 
 class EmbeddingService:
     """嵌入服务类"""
@@ -21,6 +24,7 @@ class EmbeddingService:
         """初始化嵌入服务"""
         self.embedding_managers: Dict[str, EmbeddingManager] = {}
         self._managers_lock = threading.RLock()
+        self.logger = setup_logger(self.__class__.__name__)
         
         # 默认嵌入模型配置
         self.default_model_name = os.environ.get(
@@ -54,11 +58,11 @@ class EmbeddingService:
             嵌入管理器实例
         """
         with self._managers_lock:
-            # 检查是否已加载
+            # 检查是否已加载该模型
             if model_name in self.embedding_managers:
                 return self.embedding_managers[model_name]
             
-            logger.info(f"加载嵌入模型: {model_name}")
+            self.logger.info(f"加载嵌入模型: {model_name}")
             
             try:
                 # 如果未指定维度，使用默认维度
@@ -78,7 +82,7 @@ class EmbeddingService:
                 return manager
                 
             except Exception as e:
-                logger.error(f"加载嵌入模型 {model_name} 失败: {e}")
+                self.logger.error(f"加载嵌入模型 {model_name} 失败: {e}")
                 raise
     
     def get_default_embedding_manager(self) -> EmbeddingManager:
@@ -189,10 +193,10 @@ class EmbeddingService:
         """
         with self._managers_lock:
             if model_name not in self.embedding_managers:
-                logger.warning(f"嵌入模型 {model_name} 未加载，无法卸载")
+                self.logger.warning(f"嵌入模型 {model_name} 未加载，无法卸载")
                 return False
             
-            logger.info(f"卸载嵌入模型: {model_name}")
+            self.logger.info(f"卸载嵌入模型: {model_name}")
             
             try:
                 # 从字典中移除
@@ -200,7 +204,7 @@ class EmbeddingService:
                 return True
             
             except Exception as e:
-                logger.error(f"卸载嵌入模型 {model_name} 失败: {e}")
+                self.logger.error(f"卸载嵌入模型 {model_name} 失败: {e}")
                 return False
 
 # 单例模式

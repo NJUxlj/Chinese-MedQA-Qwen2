@@ -1,9 +1,10 @@
 # knowledge_base/embedding_manager.py  
 from typing import List, Dict, Any, Optional, Union  
-import os  
+import os,sys
 import numpy as np  
 import logging  
 from pathlib import Path  
+sys.path.append(str(Path(__file__).parent.parent.parent))
 import torch  
 import json  
 import time  
@@ -15,7 +16,12 @@ from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.embeddings import ModelScopeEmbeddings  
 import pickle  
 
-logger = logging.getLogger(__name__)  
+from utils.logger import setup_logger
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class EmbeddingManager:  
     """  
@@ -41,6 +47,7 @@ class EmbeddingManager:
             normalize_embeddings: Whether to normalize embeddings  
             use_cache: Whether to use embedding caching  
         """  
+        self.logger = setup_logger(self.__class__.__name__)
         self.embedding_model_name = embedding_model_name  
         self.device = device  
         self.normalize_embeddings = normalize_embeddings  
@@ -66,12 +73,12 @@ class EmbeddingManager:
         Returns:  
             Embeddings model instance  
         """  
-        logger.info(f"Loading embedding model: {self.embedding_model_name}")  
+        self.logger.info(f"Loading embedding model: {self.embedding_model_name}")  
         
         # Handle different model types  
         if "openai" in self.embedding_model_name.lower():  
             # Load OpenAI embeddings if API key is set  
-            api_key = os.environ.get("OPENAI_API_KEY")  
+            api_key = os.getenv("OPENAI_API_KEY")  
             if not api_key:  
                 raise ValueError("OPENAI_API_KEY environment variable must be set for OpenAI embeddings")  
             return OpenAIEmbeddings(model=self.embedding_model_name)  
@@ -121,9 +128,9 @@ class EmbeddingManager:
             try:  
                 with open(cache_path, "rb") as f:  
                     self.embedding_cache = pickle.load(f)  
-                logger.info(f"Loaded {len(self.embedding_cache)} cached embeddings from {cache_path}")  
+                self.logger.info(f"Loaded {len(self.embedding_cache)} cached embeddings from {cache_path}")  
             except Exception as e:  
-                logger.warning(f"Failed to load embedding cache: {str(e)}")  
+                self.logger.warning(f"Failed to load embedding cache: {str(e)}")  
                 self.embedding_cache = {}  
     
     def _save_cache(self) -> None:  
@@ -135,9 +142,9 @@ class EmbeddingManager:
         try:  
             with open(cache_path, "wb") as f:  
                 pickle.dump(self.embedding_cache, f)  
-            logger.info(f"Saved {len(self.embedding_cache)} embeddings to cache at {cache_path}")  
+            self.logger.info(f"Saved {len(self.embedding_cache)} embeddings to cache at {cache_path}")  
         except Exception as e:  
-            logger.warning(f"Failed to save embedding cache: {str(e)}")  
+            self.logger.warning(f"Failed to save embedding cache: {str(e)}")  
     
     def _get_cache_key(self, text: str) -> str:  
         """  
@@ -181,7 +188,7 @@ class EmbeddingManager:
                 
             return embedding  
         except Exception as e:  
-            logger.error(f"Error embedding query: {str(e)}")  
+            self.logger.error(f"Error embedding query: {str(e)}")  
             raise  
     
     def embed_documents(self, documents: List[Document]) -> Dict[str, List[float]]:  
@@ -201,7 +208,7 @@ class EmbeddingManager:
         valid_docs = [(i, doc) for i, doc in enumerate(documents) if doc.page_content.strip()]  
         
         if not valid_docs:  
-            logger.warning("No valid documents to embed")  
+            self.logger.warning("No valid documents to embed")  
             return {}  
             
         indices, docs_to_embed = zip(*valid_docs)  
@@ -229,7 +236,7 @@ class EmbeddingManager:
             try:  
                 start_time = time.time()  
                 uncached_embeddings = self.embedding_model.embed_documents(texts_to_embed)  
-                logger.info(f"Embedded {len(texts_to_embed)} documents in {time.time()-start_time:.2f}s")  
+                self.logger.info(f"Embedded {len(texts_to_embed)} documents in {time.time()-start_time:.2f}s")  
                 
                 # Cache the results  
                 if self.use_cache:  
@@ -241,7 +248,7 @@ class EmbeddingManager:
                     embeddings.extend(zip(uncached_indices, uncached_embeddings))  
                     
             except Exception as e:  
-                logger.error(f"Error embedding documents: {str(e)}")  
+                self.logger.error(f"Error embedding documents: {str(e)}")  
                 raise  
         
         # Sort embeddings by original indices  
@@ -312,10 +319,10 @@ class EmbeddingManager:
                 batch_embeddings.sort(key=lambda x: x[0])  
                 result.extend([emb for _, emb in batch_embeddings])  
                 
-                logger.info(f"Embedded batch {i//batch_size + 1}/{(len(texts)-1)//batch_size + 1}")  
+                self.logger.info(f"Embedded batch {i//batch_size + 1}/{(len(texts)-1)//batch_size + 1}")  
                 
             except Exception as e:  
-                logger.error(f"Error embedding batch {i//batch_size + 1}: {str(e)}")  
+                self.logger.error(f"Error embedding batch {i//batch_size + 1}: {str(e)}")  
                 raise  
                 
         return result  
