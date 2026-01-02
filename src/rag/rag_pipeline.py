@@ -67,6 +67,9 @@ class RAGPipeline:
             temperature: 生成温度
             top_p: 生成top_p值
         """
+        self.config = config
+
+        
         self.retriever_type = retriever_type
         self.top_k = top_k
         self.model = model

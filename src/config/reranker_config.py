@@ -15,7 +15,7 @@ class RerankerConfig(BaseModel):
     """
     model_provider: str = Field(default="sentence_transformers", description="模型提供方：sentence_transformers, transformers")
     model_name: str = Field(default="Qwen3-Reranker-0.6B", description="模型名称")
-    model_path: str = Field(default="code/models/Qwen3-Reranker-0.6B", description="本地模型路径")
+    model_path: str = Field(default="/Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B", description="本地模型路径")
     device: str = Field(default="cpu", description="设备：cpu, cuda")
     batch_size: int = Field(default=32, description="批处理大小")
     normalize_scores: bool = Field(default=True, description="是否对分数进行归一化")

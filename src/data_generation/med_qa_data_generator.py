@@ -13,13 +13,32 @@ from knowledge_base.milvus.milvus_client import MilvusClient
 from knowledge_base.lda.lda_pipeline import LDAPipeline
 
 class MedQaDataGenerator:
-    """ 医疗问答数据生成器"""
+    """ 医疗问答数据生成器
+    
+    
+    流程:
+    1. 对 Milvus 中的若干个 collection:
+        - 对其中的每个 collection， 我们首先进行主题建模， 得到 num_topics 个主题 （父主题）
+        - 对每个父主题下面的所有文档，我们再逐一进行主题建模，得到子主题 （sub-topic）
+        - 对每个子主题，我们根据 MBTI 16 人格类型， 生成对应的医生和患者的背景资料 （每个子主题对应要生成 16 条样本）
+        - 对于每个子主题 + 人格 的组合， 我们需要单独为其生成医患对话 [但是，第一轮必须是患者问]。
+            - 生成的过程中使用到了 RAG 技术， 我们并不是一次生成所有对话，而是一轮一轮的生成。首先，在生成每一轮之前，我们使用 retrive_subtopic_documents 从 当前的 collection 中选出 top-k 个最相似片段。
+            - 我们一轮一轮进行生成， 每生成完一轮对话 (医生，或者患者)， 都要结合知识图谱、医学教科书、模型自身的医学常识。进行循证验证 （evidence-based verifier, 基于 ApiModel）。【验证的时候，输入当前生成的轮次，以及之前生成的所有轮次】
+            - 如果验证不通过， 历史生成的对话，当前的对话，反馈信息， 会被输入到一个 QACorrector 进行修复。修复完继续传给 evidence-based verifier 进行验证。
+            - 如果验证通过， 则继续生成下一轮对话。
+    2. 对剩余的 所有 collections 都执行上述步骤。
+    3. 合并所有 collection 对应的样本。
+    4. 将所有的样本格式都转换为 OpenAI 的 messages 格式 （role:..., content:...）
+    
+    
+    """
 
     def __init__(self, 
         milvus_config: MilvusConfig,
         llm_config: LLMConfig, 
         save_path: str, 
-        data_num: int = 1000):
+        data_num: int = 1000,
+        textbook_path:str = None):
         """
         初始化问答数据生成器
         
@@ -30,6 +49,8 @@ class MedQaDataGenerator:
         self.llm_config = llm_config
         self.api_model = ApiModel(llm_config)
         self.save_path = save_path
+
+        self.textbook_path = textbook_path
 
         self.mbti_personality_types = [
             "ISTJ", "ISFJ", "INFJ", "INTJ",
@@ -48,7 +69,7 @@ class MedQaDataGenerator:
 
     def generate_doctor(self, subtopic: str):
         '''
-        根据 MBTI 16 人格来生成医生的背景资料
+        生成医生的背景资料
 
         1. 使用 retriever 在 milvus 中搜索 top-k 与 subtopic 相关的文档
         2. 使用 reranker 重排序， 再取 top-kk 个最相关的文档 (top-kk < top-k)
@@ -60,7 +81,7 @@ class MedQaDataGenerator:
 
     def generate_patient(self, subtopic: str):
         '''
-        根据 MBTI 16 人格来生成患者的背景资料
+        同时结合相关文档片段和 MBTI 16 人格来生成患者的背景资料
 
         1. 使用 retriever 在 milvus 中搜索 top-k 与 subtopic 相关的文档
         2. 使用 reranker 重排序， 再取 top-kk 个最相关的文档 (top-kk < top-k)
@@ -74,7 +95,7 @@ class MedQaDataGenerator:
         pass
 
 
-    def modeling_topics_using_milvus(self):
+    def modeling_topics_using_lda(self):
         pass
 
     def generate_qa_topics(self, num_topics: int = 5):
@@ -87,13 +108,7 @@ class MedQaDataGenerator:
         Returns:
             List[Dict]: 包含主题ID和名称的列表
         """
-        topics = []
-        for i in range(num_topics):
-            topics.append({
-                "id": i,
-                "name": f"topic_{i}"
-            })
-        return topics
+        pass
 
 
     def generate_subtopics(self, num_subtopics: int = 3):
@@ -106,13 +121,7 @@ class MedQaDataGenerator:
         Returns:
             List[Dict]: 包含子主题ID和名称的列表
         """
-        subtopics = []
-        for i in range(num_subtopics):
-            subtopics.append({
-                "id": i,
-                "name": f"subtopic_{i}"
-            })
-        return subtopics
+        pass
 
 
 
@@ -126,10 +135,7 @@ class MedQaDataGenerator:
         Returns:
             Dict: 包含子主题ID和文档列表的字典
         """
-        subtopic_docs = {}
-        for subtopic in subtopics:
-            subtopic_docs[subtopic["id"]] = []
-        return subtopic_docs
+        pass
 
 
 
@@ -152,6 +158,12 @@ class MedQaDataGenerator:
 
 
     def generate_qa_data(self):
+        """
+        生成QA数据的主流程
+        
+        Returns:
+            List[Dict]: 包含问答数据的列表
+        """
         pass
 
 
