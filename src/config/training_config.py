@@ -47,6 +47,14 @@ class BaseTrainingConfig(BaseConfig):
     do_eval: bool = Field(default = False, description="是否进行评估")
 
     dataloader_num_workers: int = Field(default = 4, description="数据加载器工作线程数")
+    
+    distributed_strategy: str = Field(default = "auto", description="分布式训练策略: auto, ddpm, fsdp, deepspeed, single")
+    find_unused_parameters: bool = Field(default = False, description="是否查找未使用的参数（用于分布式训练）")
+    main_process_ip: str = Field(default = "localhost", description="主进程IP地址（多机训练时使用）")
+    main_process_port: int = Field(default = 29500, description="主进程端口（多机训练时使用）")
+    num_machines: int = Field(default = 1, description="机器数量")
+    machine_rank: int = Field(default = 0, description="当前机器编号")
+    
     @validator('device_map')
     def validate_device_map(cls, v):
         '''

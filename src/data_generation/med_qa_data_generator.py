@@ -11,6 +11,33 @@ from config.llm_config import LLMConfig
 from config.milvus_config import MilvusConfig
 from knowledge_base.milvus.milvus_client import MilvusClient
 from knowledge_base.lda.lda_pipeline import LDAPipeline
+from knowledge_base.milvus.milvus_client import MilvusClient
+from knowledge_base.lda.lda_pipeline import LDAPipeline
+from knowledge_base.kg.kg_client import KGClient
+from rag.rag_pipeline import RAGPipeline
+
+
+from config.milvus_config import MilvusConfig
+from config.kg_config import KGConfig
+from config.lda_config import LDAConfig
+
+
+
+
+
+
+class QACorrector:
+    def __init__(self):
+        pass
+
+
+
+class EvidenceBasedVerifier:
+    def __init__(self):
+        pass
+
+
+
 
 class MedQaDataGenerator:
     """ 医疗问答数据生成器
@@ -22,8 +49,8 @@ class MedQaDataGenerator:
         - 对每个父主题下面的所有文档，我们再逐一进行主题建模，得到子主题 （sub-topic）
         - 对每个子主题，我们根据 MBTI 16 人格类型， 生成对应的医生和患者的背景资料 （每个子主题对应要生成 16 条样本）
         - 对于每个子主题 + 人格 的组合， 我们需要单独为其生成医患对话 [但是，第一轮必须是患者问]。
-            - 生成的过程中使用到了 RAG 技术， 我们并不是一次生成所有对话，而是一轮一轮的生成。首先，在生成每一轮之前，我们使用 retrive_subtopic_documents 从 当前的 collection 中选出 top-k 个最相似片段。
-            - 我们一轮一轮进行生成， 每生成完一轮对话 (医生，或者患者)， 都要结合知识图谱、医学教科书、模型自身的医学常识。进行循证验证 （evidence-based verifier, 基于 ApiModel）。【验证的时候，输入当前生成的轮次，以及之前生成的所有轮次】
+            - 生成的过程中使用到了 RAG 技术， 我们并不是一次生成所有对话，而是一轮一轮的生成【一轮对话就相当于 messages 中的某个 role 发出的 content】。首先，在生成每一轮之前，我们使用 retrive_subtopic_documents 从 当前的 collection 中选出 top-k 个最相似片段。
+            - 我们一轮一轮进行生成， 每生成完一轮对话 (医生，或者患者)， 都要结合知识图谱中的子图搜索功能、milvus 中的医学教科书集合、模型自身的医学常识。进行循证验证 （evidence-based verifier, 基于 ApiModel）。【验证的时候，输入当前生成的轮次，以及之前生成的所有轮次】
             - 如果验证不通过， 历史生成的对话，当前的对话，反馈信息， 会被输入到一个 QACorrector 进行修复。修复完继续传给 evidence-based verifier 进行验证。
             - 如果验证通过， 则继续生成下一轮对话。
     2. 对剩余的 所有 collections 都执行上述步骤。
@@ -38,7 +65,7 @@ class MedQaDataGenerator:
         llm_config: LLMConfig, 
         save_path: str, 
         data_num: int = 1000,
-        textbook_path:str = None):
+        textbook_collection_name:str = None):
         """
         初始化问答数据生成器
         
@@ -50,7 +77,7 @@ class MedQaDataGenerator:
         self.api_model = ApiModel(llm_config)
         self.save_path = save_path
 
-        self.textbook_path = textbook_path
+        self.textbook_collection_name = textbook_collection_name
 
         self.mbti_personality_types = [
             "ISTJ", "ISFJ", "INFJ", "INTJ",
