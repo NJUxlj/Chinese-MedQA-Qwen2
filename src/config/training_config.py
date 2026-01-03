@@ -18,7 +18,7 @@ class BaseTrainingConfig(BaseConfig):
 
     use_4bit: bool = Field(default = False, description="是否使用 4bit 量化")
     use_8bit: bool = Field(default = False, description="是否使用 8bit 量化")
-    use_fp16: bool = Field(default = True, description="是否使用 FP16 精度")
+    use_fp16: bool = Field(default = False, description="是否使用 FP16 精度")
     use_bf16: bool = Field(default = False, description="是否使用 BF16 精度")
     trust_remote_code: bool = Field(default = True, description="是否信任远程代码")
 

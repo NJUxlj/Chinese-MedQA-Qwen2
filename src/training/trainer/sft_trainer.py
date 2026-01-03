@@ -410,7 +410,7 @@ class SFTTrainer:
             dataloader_num_workers=self.config.dataloader_num_workers,
             save_safetensors=True,
             resume_from_checkpoint=resume_from_checkpoint,
-            optim="adamw_torch" if self.finetuning_type == "full" else "paged_adamw_8bit",
+            optim="adamw_torch",   #  "paged_adamw_8bit",
             seed=self.config.seed if hasattr(self.config, 'seed') else 42,
             local_rank=self.accelerator.local_process_index if hasattr(self.accelerator, 'local_process_index') else -1,
         )
