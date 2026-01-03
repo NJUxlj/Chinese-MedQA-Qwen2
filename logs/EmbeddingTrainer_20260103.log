@@ -1,0 +1,64 @@
+2026-01-03 12:05:55,985 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: Qwen/Qwen3-14B
+2026-01-03 12:05:55,985 - EmbeddingTrainer - ERROR - 模型加载失败: 'EmbeddingTrainer' object has no attribute 'report_to'
+2026-01-03 12:07:38,072 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 12:07:38,074 - EmbeddingTrainer - INFO - Accelerator 初始化完成，分布式训练: False, 进程数: 1, 策略: single
+2026-01-03 12:07:41,415 - EmbeddingTrainer - INFO - 启用梯度检查点
+2026-01-03 12:07:41,420 - EmbeddingTrainer - INFO - Embedding 模型和分词器加载完成
+2026-01-03 12:07:41,507 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 10 个样本
+2026-01-03 12:07:44,622 - EmbeddingTrainer - INFO - 分词完成，数据集包含 10 个样本
+2026-01-03 12:07:44,628 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 5 个样本
+2026-01-03 12:07:46,167 - EmbeddingTrainer - INFO - 分词完成，数据集包含 5 个样本
+2026-01-03 12:08:52,955 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 12:08:52,958 - EmbeddingTrainer - INFO - Accelerator 初始化完成，分布式训练: False, 进程数: 1, 策略: single
+2026-01-03 12:08:54,073 - EmbeddingTrainer - INFO - 启用梯度检查点
+2026-01-03 12:08:54,076 - EmbeddingTrainer - INFO - Embedding 模型和分词器加载完成
+2026-01-03 12:08:54,095 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 10 个样本
+2026-01-03 12:08:57,429 - EmbeddingTrainer - INFO - 分词完成，数据集包含 10 个样本
+2026-01-03 12:08:57,434 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 5 个样本
+2026-01-03 12:08:59,808 - EmbeddingTrainer - INFO - 分词完成，数据集包含 5 个样本
+2026-01-03 12:08:59,810 - EmbeddingTrainer - INFO - 训练参数创建完成: 3 epochs, train_batch_size=8
+2026-01-03 12:08:59,828 - EmbeddingTrainer - INFO - 开始训练 Embedding 模型...
+2026-01-03 12:57:33,787 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 12:57:33,790 - EmbeddingTrainer - INFO - Accelerator 初始化完成，分布式训练: False, 进程数: 1, 策略: single
+2026-01-03 12:57:36,685 - EmbeddingTrainer - INFO - 启用梯度检查点
+2026-01-03 12:57:36,690 - EmbeddingTrainer - INFO - Embedding 模型和分词器加载完成
+2026-01-03 12:57:36,762 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 10 个样本
+2026-01-03 12:57:40,260 - EmbeddingTrainer - INFO - 分词完成，数据集包含 10 个样本
+2026-01-03 12:57:40,265 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 5 个样本
+2026-01-03 12:57:43,072 - EmbeddingTrainer - INFO - 分词完成，数据集包含 5 个样本
+2026-01-03 12:57:43,074 - EmbeddingTrainer - INFO - 训练参数创建完成: 3 epochs, train_batch_size=8
+2026-01-03 12:57:43,094 - EmbeddingTrainer - INFO - 开始训练 Embedding 模型...
+2026-01-03 12:58:23,882 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 12:58:23,885 - EmbeddingTrainer - INFO - Accelerator 初始化完成，分布式训练: False, 进程数: 1, 策略: single
+2026-01-03 12:58:26,134 - EmbeddingTrainer - INFO - 启用梯度检查点
+2026-01-03 12:58:26,139 - EmbeddingTrainer - INFO - Embedding 模型和分词器加载完成
+2026-01-03 12:58:26,172 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 10 个样本
+2026-01-03 12:58:29,677 - EmbeddingTrainer - INFO - 分词完成，数据集包含 10 个样本
+2026-01-03 12:58:29,683 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 5 个样本
+2026-01-03 12:58:32,165 - EmbeddingTrainer - INFO - 分词完成，数据集包含 5 个样本
+2026-01-03 12:58:32,168 - EmbeddingTrainer - INFO - 训练参数创建完成: 3 epochs, train_batch_size=8
+2026-01-03 12:58:32,188 - EmbeddingTrainer - INFO - 开始训练 Embedding 模型...
+2026-01-03 12:59:18,159 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 12:59:18,161 - EmbeddingTrainer - INFO - Accelerator 初始化完成，分布式训练: False, 进程数: 1, 策略: single
+2026-01-03 12:59:19,422 - EmbeddingTrainer - INFO - 启用梯度检查点
+2026-01-03 12:59:19,426 - EmbeddingTrainer - INFO - Embedding 模型和分词器加载完成
+2026-01-03 12:59:19,450 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 10 个样本
+2026-01-03 12:59:22,586 - EmbeddingTrainer - INFO - 分词完成，数据集包含 10 个样本
+2026-01-03 12:59:22,591 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 5 个样本
+2026-01-03 12:59:24,041 - EmbeddingTrainer - INFO - 分词完成，数据集包含 5 个样本
+2026-01-03 12:59:24,043 - EmbeddingTrainer - INFO - 训练参数创建完成: 3 epochs, train_batch_size=8
+2026-01-03 12:59:24,058 - EmbeddingTrainer - INFO - 开始训练 Embedding 模型...
+2026-01-03 13:04:55,220 - EmbeddingTrainer - INFO - 训练完成，保存模型到 ./outputs/embedding/qwen3-embedder
+2026-01-03 13:04:59,762 - EmbeddingTrainer - INFO - 训练指标: {'train_runtime': 331.0274, 'train_samples_per_second': 0.091, 'train_steps_per_second': 0.018, 'total_flos': 0.0, 'train_loss': 0.04162288783118129, 'epoch': 3.0}
+2026-01-03 13:09:22,204 - EmbeddingTrainer - INFO - EmbeddingTrainer: 加载 embedding 模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 13:09:22,206 - EmbeddingTrainer - INFO - Accelerator 初始化完成，分布式训练: False, 进程数: 1, 策略: single
+2026-01-03 13:09:25,080 - EmbeddingTrainer - INFO - 启用梯度检查点
+2026-01-03 13:09:25,092 - EmbeddingTrainer - INFO - Embedding 模型和分词器加载完成
+2026-01-03 13:09:25,175 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 10 个样本
+2026-01-03 13:09:29,023 - EmbeddingTrainer - INFO - 分词完成，数据集包含 10 个样本
+2026-01-03 13:09:29,029 - EmbeddingTrainer - INFO - 句子对数据集准备完成，包含 5 个样本
+2026-01-03 13:09:31,957 - EmbeddingTrainer - INFO - 分词完成，数据集包含 5 个样本
+2026-01-03 13:09:31,960 - EmbeddingTrainer - INFO - 训练参数创建完成: 3 epochs, train_batch_size=8
+2026-01-03 13:09:31,982 - EmbeddingTrainer - INFO - 开始训练 Embedding 模型...
+2026-01-03 13:15:09,099 - EmbeddingTrainer - INFO - 训练完成，保存模型到 ./outputs/embedding/qwen3-embedder
+2026-01-03 13:15:13,420 - EmbeddingTrainer - INFO - 训练指标: {'train_runtime': 336.9552, 'train_samples_per_second': 0.089, 'train_steps_per_second': 0.018, 'total_flos': 0.0, 'train_loss': 0.1908870736757914, 'epoch': 3.0}

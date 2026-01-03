@@ -13,19 +13,42 @@ from transformers import (
     Trainer,
     DataCollatorWithPadding,
 )
-from transformers import BitsAndBytesConfig
+from transformers import BitsAndBytesConfig, BatchEncoding
 from sentence_transformers import SentenceTransformer
 
 from accelerate import Accelerator, DistributedDataParallelKwargs
 from accelerate import FullyShardedDataParallelPlugin
 from accelerate import DeepSpeedPlugin
 from utils.logger import setup_logger
-from config.training_config import BaseTrainingConfig
+from config.training_config import BaseTrainingConfig, EmbeddingTrainingConfig
 from training.trainer.base_trainer import BaseTrainer
 
 
+class SentencePairDataCollator:
+    """自定义数据收集器，处理句子对格式的数据"""
+    
+    def __init__(self, tokenizer, padding=True, truncation=True, max_length=None):
+        self.tokenizer = tokenizer
+        self.padding = padding
+        self.truncation = truncation
+        self.max_length = max_length
+    
+    def __call__(self, features):
+        batch = {}
+        
+        batch["input_ids_1"] = torch.tensor([f["input_ids_1"] for f in features], dtype=torch.long)
+        batch["attention_mask_1"] = torch.tensor([f["attention_mask_1"] for f in features], dtype=torch.long)
+        batch["input_ids_2"] = torch.tensor([f["input_ids_2"] for f in features], dtype=torch.long)
+        batch["attention_mask_2"] = torch.tensor([f["attention_mask_2"] for f in features], dtype=torch.long)
+        
+        if "label" in features[0]:
+            batch["label"] = torch.tensor([f["label"] for f in features], dtype=torch.float)
+        
+        return batch
+
+
 class EmbeddingTrainer(BaseTrainer):
-    def __init__(self, config: BaseTrainingConfig):
+    def __init__(self, config: EmbeddingTrainingConfig):
         super().__init__(config)
         self.loss_type = getattr(config, 'loss_type', 'cosine')
         self.normalized = getattr(config, 'normalized', True)
@@ -45,11 +68,13 @@ class EmbeddingTrainer(BaseTrainer):
             self.logger.info(f"初始化 Softmax 分类头，类别数: {self.num_classes}")
 
     def _setup_accelerator(self):
+        report_to = getattr(self.config, 'report_to', 'none')
+        
         if self.distributed_strategy == "fsdp":
             fsdp_plugin = FullyShardedDataParallelPlugin()
             self.accelerator = Accelerator(
                 fsdp_plugin=fsdp_plugin,
-                log_with=self.report_to if self.report_to != "none" else None
+                log_with=report_to if report_to != "none" else None
             )
         elif self.distributed_strategy == "deepspeed":
             deepspeed_plugin = DeepSpeedPlugin(
@@ -58,7 +83,7 @@ class EmbeddingTrainer(BaseTrainer):
             )
             self.accelerator = Accelerator(
                 deepspeed_plugin=deepspeed_plugin,
-                log_with=self.report_to if self.report_to != "none" else None
+                log_with=report_to if report_to != "none" else None
             )
         elif self.distributed_strategy in ["ddp", "auto"]:
             ddp_kwargs = DistributedDataParallelKwargs(
@@ -66,11 +91,11 @@ class EmbeddingTrainer(BaseTrainer):
             )
             self.accelerator = Accelerator(
                 kwargs_handlers=[ddp_kwargs],
-                log_with=self.report_to if self.report_to != "none" else None
+                log_with=report_to if report_to != "none" else None
             )
         else:
             self.accelerator = Accelerator(
-                log_with=self.report_to if self.report_to != "none" else None
+                log_with=report_to if report_to != "none" else None
             )
         
         self.is_distributed = self.accelerator.num_processes > 1
@@ -321,7 +346,11 @@ class EmbeddingTrainer(BaseTrainer):
             def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
                 return embedding_trainer.compute_loss(model, inputs, return_outputs)
         
-        data_collator = DataCollatorWithPadding(tokenizer=self.tokenizer)
+        data_collator = SentencePairDataCollator(
+            tokenizer=self.tokenizer,
+            padding=True,
+            max_length=self.max_seq_length
+        )
         
         trainer = CustomEmbeddingTrainer(
             model=self.model,

@@ -118,6 +118,15 @@ class ActorRolloutRefConfig(BaseConfig):
 
 
 
+class EmbeddingTrainingConfig(BaseTrainingConfig):
+    """嵌入模型训练配置"""
+    loss_type: str = Field(default="softmax", description="损失类型: softmax, cosine, contrastive, info_nce, mnr")
+    normalized: bool = Field(default=True, description="是否对 embedding 进行 L2 归一化")
+    temperature: float = Field(default=0.02, description="损失函数温度参数（用于 softmax、contrastive、info_nce）")
+    num_classes: Optional[int] = Field(default=None, description="类别数（仅用于 softmax 损失）")
+    embedding_dim: int = Field(default=768, description="embedding 维度")
+    margin: float = Field(default=0.3, description="对比损失边界值（用于 contrastive 损失）")
+
 
 
 
