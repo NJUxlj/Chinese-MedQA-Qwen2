@@ -134,7 +134,10 @@ class EmbeddingTrainingConfig(BaseTrainingConfig):
 
 
 class DPOTrainingConfig(BaseTrainingConfig):
-    pass
+    lora_rank: int = Field(default=64, description="LoRA rank")
+    lora_alpha: int = Field(default=16, description="LoRA alpha")
+    lora_dropout: float = Field(default=0.05, description="LoRA dropout")
+    target_modules: Optional[List[str]] = Field(default=None, description="LoRA 目标模块")
 
 
 

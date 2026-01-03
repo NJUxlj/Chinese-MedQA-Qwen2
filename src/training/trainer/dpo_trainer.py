@@ -121,7 +121,12 @@ from transformers import (
 from transformers import TrainerControl
 from peft import LoraConfig, get_peft_model, TaskType
 from accelerate import Accelerator, DistributedDataParallelKwargs
-from deepspeed import DeepSpeedEngine
+try:
+    from deepspeed import DeepSpeedEngine
+    DEEPSPEED_AVAILABLE = True
+except ImportError:
+    DeepSpeedEngine = None
+    DEEPSPEED_AVAILABLE = False
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
@@ -234,6 +239,8 @@ class DPOTrainer(BaseTrainer):
             return ["query_key_value", "dense", "dense_h_to_4h", "dense_4h_to_h"]
         elif "gpt2" in model_name_lower:
             return ["c_attn", "c_proj", "c_fc"]
+        elif any(x in model_name_lower for x in ["gpt-neo", "gptneox", "gpt_j", "gptj"]):
+            return ["q_proj", "k_proj", "v_proj", "out_proj", "c_fc", "c_proj"]
         else:
             self.logger.warning(f"未识别模型类型 {model_name}，使用默认目标模块")
             return ["q_proj", "k_proj", "v_proj", "o_proj"]
@@ -247,14 +254,24 @@ class DPOTrainer(BaseTrainer):
         - 前向计算: h = W_0 x + BAx
         - 训练时只更新 A 和 B，大幅减少参数量
         """
-        target_modules = self._get_default_target_modules(self.config.model_name_or_path)
+        if self.config.target_modules is not None:
+            target_modules = self.config.target_modules
+            self.logger.info(f"使用指定的 target_modules: {target_modules}")
+        else:
+            model_name = os.path.basename(self.config.model_name_or_path) if os.path.exists(self.config.model_name_or_path) else self.config.model_name_or_path
+            target_modules = self._get_default_target_modules(model_name)
+            self.logger.info(f"自动检测到模型: {model_name}, target_modules: {target_modules}")
+        
+        lora_rank = getattr(self.config, 'lora_rank', 64)
+        lora_alpha = getattr(self.config, 'lora_alpha', 16)
+        lora_dropout = getattr(self.config, 'lora_dropout', 0.05)
         
         self.lora_config = LoraConfig(
             task_type=TaskType.CAUSAL_LM,
             inference_mode=False,
-            r=64,
-            lora_alpha=16,
-            lora_dropout=0.05,
+            r=lora_rank,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
             target_modules=target_modules,
             bias="none",
             modules_to_save=None,
@@ -262,7 +279,7 @@ class DPOTrainer(BaseTrainer):
             peft_type="LORA"
         )
         
-        self.logger.info(f"LoRA 配置: rank=64, alpha=16, target_modules={target_modules}")
+        self.logger.info(f"LoRA 配置: rank={lora_rank}, alpha={lora_alpha}, target_modules={target_modules}")
         return self.lora_config
     
     def load_model_and_tokenizer(self):
@@ -379,31 +396,34 @@ class DPOTrainer(BaseTrainer):
     def _create_ref_model(self) -> AutoModelForCausalLM:
         """
         创建参考模型（Reference Model）
-        
+
         参考模型的作用：
         - 提供一个固定的基准，用于计算概率比
         - 确保训练过程中模型不会偏离原始策略太远
         - 不参与梯度计算（requires_grad=False）
-        
+
         实现方式：
-        - 深拷贝当前模型参数
+        - 从原始模型路径加载模型
+        - 不需要从当前 LoRA 模型加载权重（参考模型应该是原始模型）
         - 移动到相同设备
         - 设置 eval 模式
         """
+        self.logger.info(f"创建参考模型: {self.config.model_name_or_path}")
+
         ref_model = AutoModelForCausalLM.from_pretrained(
             self.config.model_name_or_path,
             trust_remote_code=self.config.trust_remote_code,
             torch_dtype=self._get_dtype(),
             device_map=self.config.device_map if torch.cuda.is_available() else None,
         )
-        
-        ref_model.load_state_dict(self.model.state_dict())
+
         ref_model.requires_grad_(False)
         ref_model.eval()
-        
+
         if torch.cuda.is_available():
             ref_model = ref_model.to("cuda")
-        
+
+        self.logger.info("参考模型创建完成")
         return ref_model
     
     def prepare_dataset(
@@ -469,42 +489,36 @@ class DPOTrainer(BaseTrainer):
             数据流程：
             1. 将 prompt + chosen 拼接并分词 → 用于计算 chosen 的对数概率
             2. 将 prompt + rejected 拼接并分词 → 用于计算 rejected 的对数概率
-            3. 只保留 prompt 部分作为 input_ids（因为 prompt 不需要计算损失）
             """
-            batch = {
-                "input_ids": [],
-                "attention_mask": [],
-                "chosen_labels": [],
-                "rejected_labels": []
-            }
+            prompts = examples["prompt"]
+            chosen_texts = examples["chosen"]
+            rejected_texts = examples["rejected"]
             
-            for prompt, chosen, rejected in zip(
-                examples["prompt"],
-                examples["chosen"],
-                examples["rejected"]
-            ):
-                full_prompt = f"User: {prompt}\nAssistant:"
-                
-                chosen_tokens = self.tokenizer(
-                    full_prompt + chosen,
-                    max_length=max_prompt_length + max_response_length,
-                    padding="max_length",
-                    truncation=True,
-                    return_tensors="pt"
-                )
-                
-                rejected_tokens = self.tokenizer(
-                    full_prompt + rejected,
-                    max_length=max_prompt_length + max_response_length,
-                    padding="max_length",
-                    truncation=True,
-                    return_tensors="pt"
-                )
-                
-                batch["input_ids"].append(chosen_tokens["input_ids"][0])
-                batch["attention_mask"].append(chosen_tokens["attention_mask"][0])
-                batch["chosen_labels"].append(chosen_tokens["input_ids"][0])
-                batch["rejected_labels"].append(rejected_tokens["input_ids"][0])
+            chosen_texts = [f"User: {p}\nAssistant: {c}" for p, c in zip(prompts, chosen_texts)]
+            rejected_texts = [f"User: {p}\nAssistant: {r}" for p, r in zip(prompts, rejected_texts)]
+            
+            chosen_tokens = self.tokenizer(
+                chosen_texts,
+                max_length=max_prompt_length + max_response_length,
+                padding="max_length",
+                truncation=True,
+                return_tensors="pt"
+            )
+            
+            rejected_tokens = self.tokenizer(
+                rejected_texts,
+                max_length=max_prompt_length + max_response_length,
+                padding="max_length",
+                truncation=True,
+                return_tensors="pt"
+            )
+            
+            batch = {
+                "input_ids": chosen_tokens["input_ids"],
+                "attention_mask": chosen_tokens["attention_mask"],
+                "chosen_labels": chosen_tokens["input_ids"],
+                "rejected_labels": rejected_tokens["input_ids"]
+            }
             
             return batch
         
@@ -701,12 +715,13 @@ class DPOTrainer(BaseTrainer):
         - chosen_labels: chosen 回答的分词结果
         - rejected_labels: rejected 回答的分词结果
         """
-        batch = {
-            "input_ids": torch.stack([f["input_ids"] for f in features]),
-            "attention_mask": torch.stack([f["attention_mask"] for f in features]),
-            "chosen_labels": torch.stack([f["chosen_labels"] for f in features]),
-            "rejected_labels": torch.stack([f["rejected_labels"] for f in features])
-        }
+        batch = {}
+        for key in ["input_ids", "attention_mask", "chosen_labels", "rejected_labels"]:
+            values = [f[key] for f in features]
+            if isinstance(values[0], torch.Tensor):
+                batch[key] = torch.stack(values)
+            else:
+                batch[key] = torch.tensor(values)
         return batch
     
     def _compute_metrics(self, eval_pred) -> Dict[str, float]:
@@ -778,16 +793,16 @@ class DPOTrainer(BaseTrainer):
         self.ref_model = self._create_ref_model()
         
         class CustomDPOTrainer(Trainer):
-            def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
                 """
                 自定义 DPO 损失计算
-                
+
                 数据格式：
                 - input_ids: prompt + chosen 的分词结果
                 - attention_mask: 注意力掩码
                 - chosen_labels: chosen 回答的分词结果
                 - rejected_labels: rejected 回答的分词结果
-                
+
                 损失计算步骤：
                 1. 取出 input_ids 和 labels
                 2. 政策模型前向传播获取 logits
@@ -799,31 +814,47 @@ class DPOTrainer(BaseTrainer):
                 attention_mask = inputs.pop("attention_mask")
                 chosen_labels = inputs.pop("chosen_labels")
                 rejected_labels = inputs.pop("rejected_labels")
-                
+
                 policy_outputs = model(
                     input_ids=input_ids,
                     attention_mask=attention_mask
                 )
                 policy_logits = policy_outputs.logits
-                
+
                 with torch.no_grad():
-                    ref_outputs = self.model.module(
-                        input_ids=input_ids,
+                    if hasattr(model, 'base_model'):
+                        base_model = model.base_model
+                        ref_outputs = base_model(
+                            input_ids=input_ids,
+                            attention_mask=attention_mask
+                        )
+                    else:
+                        ref_outputs = model.module(
+                            input_ids=input_ids,
+                            attention_mask=attention_mask
+                        )
+                    ref_logits = ref_outputs.logits
+
+                if hasattr(base_model, '_compute_dpo_loss'):
+                    loss = base_model._compute_dpo_loss(
+                        policy_logits=policy_logits,
+                        ref_logits=ref_logits,
+                        chosen_labels=chosen_labels,
+                        rejected_labels=rejected_labels,
                         attention_mask=attention_mask
                     )
-                    ref_logits = ref_outputs.logits
-                
-                loss = self.model.module._compute_dpo_loss(
-                    policy_logits=policy_logits,
-                    ref_logits=ref_logits,
-                    chosen_labels=chosen_labels,
-                    rejected_labels=rejected_labels,
-                    attention_mask=attention_mask
-                )
-                
+                else:
+                    loss = self.model.module._compute_dpo_loss(
+                        policy_logits=policy_logits,
+                        ref_logits=ref_logits,
+                        chosen_labels=chosen_labels,
+                        rejected_labels=rejected_labels,
+                        attention_mask=attention_mask
+                    )
+
                 if return_outputs:
                     return loss, {"logits": policy_logits}
-                
+
                 return loss
         
         self.trainer = CustomDPOTrainer(
@@ -890,12 +921,12 @@ class DPOCallback(TrainerCallback):
         if model is None:
             return
         
-        if isinstance(model, DeepSpeedEngine):
+        if DEEPSPEED_AVAILABLE and isinstance(model, DeepSpeedEngine):
             model = model.module
         
         self.ref_model = model
         control.should_epoch_stop = False
-    
+
     def on_epoch_begin(self, args: TrainingArguments, state: TrainerControl, control: TrainerControl, **kwargs):
         """每个 epoch 开始时同步参考模型"""
         if self.ref_model is None:
@@ -905,7 +936,7 @@ class DPOCallback(TrainerCallback):
         if model is None:
             return
         
-        if isinstance(model, DeepSpeedEngine):
+        if DEEPSPEED_AVAILABLE and isinstance(model, DeepSpeedEngine):
             model = model.module
         
         self.ref_model.load_state_dict(model.state_dict())
@@ -916,7 +947,7 @@ class DPOCallback(TrainerCallback):
         if state.global_step % 100 == 0:
             if self.ref_model is not None:
                 model = kwargs.get("model")
-                if model is not None and not isinstance(model, DeepSpeedEngine):
+                if model is not None and (not DEEPSPEED_AVAILABLE or not isinstance(model, DeepSpeedEngine)):
                     self.ref_model.load_state_dict(model.state_dict())
 
 

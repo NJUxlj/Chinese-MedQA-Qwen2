@@ -17,6 +17,8 @@ def load_json_data(data_dir: str, split: str) -> List[Dict]:
     """加载 JSON 格式的数据集"""
     json_file = os.path.join(data_dir, f"{split}.json")
     jsonl_file = os.path.join(data_dir, f"{split}.jsonl")
+    dpo_json_file = os.path.join(data_dir, f"dpo_{split}.json")
+    dpo_jsonl_file = os.path.join(data_dir, f"dpo_{split}.jsonl")
 
     if os.path.exists(jsonl_file):
         with open(jsonl_file, 'r', encoding='utf-8') as f:
@@ -27,8 +29,17 @@ def load_json_data(data_dir: str, split: str) -> List[Dict]:
             if isinstance(data, dict) and 'data' in data:
                 return data['data']
             return data
+    elif os.path.exists(dpo_jsonl_file):
+        with open(dpo_jsonl_file, 'r', encoding='utf-8') as f:
+            return [json.loads(line) for line in f]
+    elif os.path.exists(dpo_json_file):
+        with open(dpo_json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if isinstance(data, dict) and 'data' in data:
+                return data['data']
+            return data
     else:
-        raise FileNotFoundError(f"数据文件不存在: {json_file} 或 {jsonl_file}")
+        raise FileNotFoundError(f"数据文件不存在: {json_file} 或 {jsonl_file} 或 {dpo_json_file} 或 {dpo_jsonl_file}")
 
 
 def parse_args():
@@ -61,9 +72,11 @@ def parse_args():
     parser.add_argument("--save_total_limit", type=int, default=2,
                         help="保存总限制")
     parser.add_argument("--warmup_ratio", type=float, default=0.03,
-                        help="预热比例")
+                        help="Warmup ratio")
+    parser.add_argument("--weight_decay", type=float, default=0.01,
+                        help="Weight decay")
     parser.add_argument("--lr_scheduler_type", type=str, default="cosine",
-                        help="学习率调度器类型")
+                        help="Learning rate scheduler type")
 
     parser.add_argument("--eval_strategy", type=str, default="steps",
                         help="评估策略")
@@ -168,6 +181,7 @@ def main():
         save_steps=args.save_steps,
         save_total_limit=args.save_total_limit,
         warmup_ratio=args.warmup_ratio,
+        weight_decay=args.weight_decay,
         lr_scheduler_type=args.lr_scheduler_type,
         report_to=args.report_to if args.report_to != "none" else "none",
         eval_strategy=args.eval_strategy,
@@ -205,8 +219,13 @@ def main():
 
     eval_data = None
     if args.do_eval:
-        eval_data = load_json_data(args.train_data_dir, "valid")
-        logger.info(f"加载 valid 数据: {len(eval_data)} 条样本")
+        try:
+            eval_data = load_json_data(args.train_data_dir, "valid")
+            logger.info(f"加载 valid 数据: {len(eval_data)} 条样本")
+        except FileNotFoundError:
+            logger.warning("未找到验证数据，禁用评估")
+            config.eval_strategy = "no"
+            config.do_eval = False
 
     trainer.start_training(
         dataset=train_data,

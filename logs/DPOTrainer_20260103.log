@@ -1,0 +1,181 @@
+2026-01-03 19:22:10,407 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:22:10,408 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:22:10,410 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:22:10,516 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:22:10,658 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:22:10,659 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj']
+2026-01-03 19:22:10,659 - DPOTrainer - ERROR - 模型加载失败: Target modules {'gate_proj', 'v_proj', 'up_proj', 'k_proj', 'q_proj', 'o_proj', 'down_proj'} not found in the base model. Please check the target modules and try again.
+2026-01-03 19:27:12,991 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:27:12,991 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:27:12,998 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:27:13,164 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:27:13,312 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:27:13,312 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj']
+2026-01-03 19:27:13,312 - DPOTrainer - ERROR - 模型加载失败: Target modules {'up_proj', 'v_proj', 'down_proj', 'k_proj', 'o_proj', 'q_proj', 'gate_proj'} not found in the base model. Please check the target modules and try again.
+2026-01-03 19:28:59,810 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:28:59,810 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:28:59,812 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:28:59,911 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:29:00,064 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:29:00,064 - DPOTrainer - ERROR - 模型加载失败: 'DPOTrainingConfig' object has no attribute 'target_modules'
+2026-01-03 19:29:40,161 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:29:40,161 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:29:40,163 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:29:40,262 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:29:40,402 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:29:40,402 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:29:40,402 - DPOTrainer - INFO - LoRA 配置: rank=16, alpha=8, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:29:40,461 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:29:40,467 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:30:26,095 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:30:26,095 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:30:26,098 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:30:26,240 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:30:26,414 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:30:26,414 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:30:26,414 - DPOTrainer - INFO - LoRA 配置: rank=16, alpha=8, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:30:26,510 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:30:26,518 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:30:29,517 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:30:29,518 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:34:04,957 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:34:04,957 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:34:04,960 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:34:05,066 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:34:05,245 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:34:05,245 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:34:05,245 - DPOTrainer - INFO - LoRA 配置: rank=16, alpha=8, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:34:05,312 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:34:05,318 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:34:08,192 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:34:08,193 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:34:08,193 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:34:08,241 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:35:58,532 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:35:58,533 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:35:58,535 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:35:58,763 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:35:58,996 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:35:58,996 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:35:58,997 - DPOTrainer - INFO - LoRA 配置: rank=16, alpha=8, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:35:59,157 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:35:59,167 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:36:02,154 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:36:02,155 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:36:02,155 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:36:02,203 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:36:02,216 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 19:39:47,462 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:39:47,462 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen2.5-7B-Instruct
+2026-01-03 19:39:47,464 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:39:47,464 - DPOTrainer - ERROR - 模型加载失败: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/Users/xiniuyiliao/Desktop/code/models/Qwen2.5-7B-Instruct'. Use `repo_type` argument if needed.
+2026-01-03 19:41:36,623 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:41:36,623 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:41:36,625 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:41:36,717 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:41:36,871 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:41:36,871 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:41:36,871 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:41:36,953 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:41:36,959 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:41:39,978 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:41:39,979 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:41:39,979 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:41:40,025 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:41:40,036 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 19:42:40,020 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:42:40,020 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:42:40,023 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:42:40,110 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:42:40,283 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:42:40,283 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:42:40,284 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:42:40,364 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:42:40,370 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:42:42,290 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:42:42,291 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:42:42,291 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:42:42,341 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:42:42,352 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 19:43:51,126 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:43:51,126 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:43:51,129 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:43:51,213 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:43:51,352 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:43:51,352 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:43:51,352 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:43:51,432 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:43:51,437 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:43:54,440 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:43:54,440 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:43:54,440 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:43:54,485 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:43:54,496 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 19:44:18,844 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:44:18,844 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:44:18,846 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:44:18,926 - DPOTrainer - INFO - 已将 pad_token 设置为 eos_token
+2026-01-03 19:44:19,008 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:44:19,008 - DPOTrainer - INFO - 自动检测到模型: gpt2, target_modules: ['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:44:19,008 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['c_attn', 'c_proj', 'c_fc']
+2026-01-03 19:44:19,082 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:44:19,088 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:44:20,789 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:44:20,790 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:44:20,791 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/gpt2
+2026-01-03 19:44:20,842 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:44:20,853 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 19:45:20,957 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:45:20,957 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen2.5-7B-Instruct
+2026-01-03 19:45:20,959 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:45:20,959 - DPOTrainer - ERROR - 模型加载失败: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/Users/xiniuyiliao/Desktop/code/models/Qwen2.5-7B-Instruct'. Use `repo_type` argument if needed.
+2026-01-03 19:51:09,438 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:51:09,439 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 19:51:09,441 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:51:14,321 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:51:14,322 - DPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 19:51:14,322 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 19:51:14,511 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:51:14,525 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:51:21,398 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:51:21,401 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:51:21,401 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 19:54:14,754 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:54:14,754 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 19:54:14,758 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:54:16,633 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:54:16,633 - DPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 19:54:16,634 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 19:54:16,921 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:54:16,936 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:54:23,708 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:54:23,710 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:54:23,710 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 19:54:24,657 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:54:24,674 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 19:57:33,617 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 19:57:33,617 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 19:57:33,620 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 19:57:36,333 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 19:57:36,334 - DPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 19:57:36,334 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 19:57:36,507 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 19:57:36,523 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 19:57:44,209 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 19:57:44,211 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 19:57:44,211 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 19:57:45,954 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 19:57:45,995 - DPOTrainer - INFO - 开始 DPO 训练...
+2026-01-03 20:04:13,314 - DPOTrainer - INFO - DPO 训练器初始化完成: beta=0.1, finetuning_type=lora
+2026-01-03 20:04:13,314 - DPOTrainer - INFO - DPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 20:04:13,317 - DPOTrainer - INFO - Accelerator 初始化完成，分布式类型: NO
+2026-01-03 20:04:15,104 - DPOTrainer - INFO - 配置 LoRA 微调...
+2026-01-03 20:04:15,104 - DPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 20:04:15,105 - DPOTrainer - INFO - LoRA 配置: rank=64, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-01-03 20:04:15,273 - DPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-01-03 20:04:15,288 - DPOTrainer - INFO - 模型和分词器加载完成
+2026-01-03 20:04:22,228 - DPOTrainer - INFO - 偏好数据集准备完成，包含 10 个有效样本
+2026-01-03 20:04:22,230 - DPOTrainer - INFO - 训练参数: 3 epochs, batch_size=4
+2026-01-03 20:04:22,230 - DPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-01-03 20:04:23,601 - DPOTrainer - INFO - 参考模型创建完成
+2026-01-03 20:04:23,616 - DPOTrainer - INFO - 开始 DPO 训练...

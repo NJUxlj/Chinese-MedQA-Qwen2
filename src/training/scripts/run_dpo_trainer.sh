@@ -5,9 +5,9 @@
 
 set -e
 
-MODEL_NAME_OR_PATH="/Users/xiniuyiliao/Desktop/code/models/Qwen2.5-7B-Instruct"
+MODEL_NAME_OR_PATH="/Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B"
 TRAIN_DATA_DIR="./src/training/data/dpo_data"
-OUTPUT_DIR="./outputs/dpo/qwen2.5-7B"
+OUTPUT_DIR="./outputs/dpo/qwen3-0.6B-test"
 MAX_SEQ_LENGTH=2048
 PER_DEVICE_TRAIN_BATCH_SIZE=4
 PER_DEVICE_EVAL_BATCH_SIZE=4
@@ -23,6 +23,7 @@ BETA=0.1
 LORA_RANK=64
 LORA_ALPHA=16
 LORA_DROPOUT=0.05
+DO_EVAL=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -98,6 +99,10 @@ while [[ $# -gt 0 ]]; do
             LORA_DROPOUT="$2"
             shift 2
             ;;
+        --do_eval)
+            DO_EVAL=true
+            shift
+            ;;
         --use_fp16)
             USE_FP16="--use_fp16"
             shift
@@ -139,6 +144,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --lora_rank <rank>                        LoRA rank"
             echo "  --lora_alpha <alpha>                      LoRA alpha"
             echo "  --lora_dropout <dropout>                  LoRA dropout"
+            echo "  --do_eval                                 启用评估模式"
             echo "  --use_fp16                                使用FP16精度"
             echo "  --use_bf16                                使用BF16精度"
             echo "  --use_4bit                                使用4-bit量化"
@@ -190,7 +196,8 @@ COMMON_ARGS="--model_name_or_path $MODEL_NAME_OR_PATH \
 --lora_alpha $LORA_ALPHA \
 --lora_dropout $LORA_DROPOUT \
 --distributed_strategy $STRATEGY \
---report_to tensorboard \
+--eval_strategy no \
+--report_to none \
 --warmup_ratio 0.03 \
 --weight_decay 0.01 \
 $USE_FP16 \
