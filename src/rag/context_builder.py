@@ -79,6 +79,8 @@ class ContextBuilder:
                     chunks.append(current_chunk)
                     current_chunk = ""
                 
+                # 匹配“中文/英文句号、感叹号、问号、分号”作为句子结束符；末尾的 ? 表示该结束符可出现 0 次或 1 次，
+                # 从而兼容没有标点结尾的剩余文本
                 sentence_pattern = r'[^.。!！?？;；]*[.。!！?？;；]?'
                 sentence_matches = re.findall(sentence_pattern, paragraph)
                 sentences = [s for s in sentence_matches if s.strip()]
