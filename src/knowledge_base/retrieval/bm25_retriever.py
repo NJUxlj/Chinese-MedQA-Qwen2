@@ -27,24 +27,21 @@ class BM25Retriever(BaseRetriever):
     
     def __init__(  
         self,  
-        name: str = "bm25_retriever",  
-        score_threshold: float = 0.1,  
-        use_jieba: bool = True,  
-        tokenizer: Optional[callable] = None  
+        config: Optional[BM25RetrieverConfig] = None,  
     ):  
         """  
         Initialize the BM25 retriever.  
         
         Args:  
-            name: Name of the retriever  
-            score_threshold: Minimum BM25 score threshold  
-            use_jieba: Whether to use jieba for Chinese tokenization  
-            tokenizer: Custom tokenizer function  
+            config: BM25RetrieverConfig with BM25 parameters  
         """  
-        super().__init__(name=name)  
-        self.score_threshold = score_threshold  
-        self.use_jieba = use_jieba  
-        self.tokenizer = tokenizer  
+        if config is None:
+            config = BM25RetrieverConfig()
+        super().__init__(config=config)
+        
+        self.score_threshold = config.score_threshold
+        self.use_jieba = config.use_jieba
+        self.tokenizer = config.tokenizer  
         
         # Storage for documents and BM25 model  
         self.documents: List[Document] = []  
@@ -208,7 +205,7 @@ class BM25Retriever(BaseRetriever):
             
         # Save config  
         config = {  
-            "name": self.name,  
+            "name": self.config.name,  
             "score_threshold": self.score_threshold,  
             "use_jieba": self.use_jieba  
         }  
@@ -246,10 +243,10 @@ class BM25Retriever(BaseRetriever):
         with open(load_dir / "bm25_model.pkl", "rb") as f:  
             self.bm25_model = pickle.load(f)  
             
-        # Load config  
+        # Load config
         with open(load_dir / "config.json", "r") as f:  
             config = json.load(f)  
-            self.name = config.get("name", self.name)  
+            self.config.name = config.get("name", self.config.name)  
             self.score_threshold = config.get("score_threshold", self.score_threshold)  
             self.use_jieba = config.get("use_jieba", self.use_jieba)  
             

@@ -1,10 +1,17 @@
 # src/rag/context_builder.py
-
-import os
+import os, sys
 import re
-from typing import Dict, List, Optional, Union, Any, Tuple
-import torch
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+import logging
+from typing import List, Optional, Tuple, Dict, Any
+from datetime import datetime
 from sentence_transformers import CrossEncoder
+from langchain_core.documents import Document
+from langchain_core.runnables import Runnable
+from langchain_core.callbacks import CallbackManagerForChainRun
+
+from knowledge_base.reranker.reranker_service import RerankerService, RerankerConfig
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -18,6 +25,8 @@ class ContextBuilder:
         self,
         chunk_size: int = 500,
         chunk_overlap: int = 100,
+        reranker_model_provider: str = "huggingface",
+        reranker_model_path: Optional[str] = None,
         reranker_model_name: Optional[str] = None,
         max_context_length: int = 4000,
         format_template: Optional[str] = None
@@ -49,7 +58,10 @@ class ContextBuilder:
         self.reranker = None
         if reranker_model_name:
             try:
-                self.reranker = CrossEncoder(reranker_model_name)
+                self.reranker_service = RerankerService(RerankerConfig(
+                    model_provider=reranker_model_provider,
+                    model_path=reranker_model_path,
+                    model_name=reranker_model_name))
                 logger.info(f"已加载重排序模型: {reranker_model_name}")
             except Exception as e:
                 logger.error(f"加载重排序模型失败: {e}")
@@ -132,24 +144,25 @@ class ContextBuilder:
             return documents
         
         document_texts = [doc["text"] for doc in documents]
+
+        # 将 document_texts 封装为 document 对象列表
+        original_metadata = [doc.get("metadata", {}) for doc in documents]
+        documents = [Document(page_content=text, metadata=meta) for text, meta in zip(document_texts, original_metadata)]
         
-        # 准备输入对
-        pairs = [(query, text) for text in document_texts]
+        # 重排序
+        reranked_documents = self.reranker_service.rerank(query = query, documents = documents, top_k = len(documents))
         
-        # 计算相关性分数
-        scores = self.reranker.predict(pairs)
+        # 将 Document 对象转换回字典格式
+        reranked_dicts = []
+        for doc in reranked_documents:
+            reranked_dicts.append({
+                "id": doc.metadata.get("doc_id", "unknown"),
+                "text": doc.page_content,
+                "metadata": doc.metadata,
+                "rerank_score": doc.metadata.get("rerank_score", 0.0)
+            })
         
-        # 更新文档分数和排序
-        scored_documents = []
-        for i, (doc, score) in enumerate(zip(documents, scores)):
-            doc_copy = doc.copy()
-            doc_copy["rerank_score"] = float(score)
-            scored_documents.append(doc_copy)
-        
-        # 根据分数排序
-        sorted_documents = sorted(scored_documents, key=lambda x: x["rerank_score"], reverse=True)
-        
-        return sorted_documents
+        return reranked_dicts
     
     def build_context(
         self,
@@ -182,7 +195,7 @@ class ContextBuilder:
         
         for i, doc in enumerate(documents):
             # 提取文档文本
-            text = doc["text"]
+            text = doc.get("text", "") if isinstance(doc, dict) else doc.page_content
             
             # 如果文档过长，分割成小块
             if len(text) > self.chunk_size:
@@ -288,19 +301,15 @@ class ContextBuilder:
             return context
         
         # 如果有重排序模型，使用它来选择最相关的段落
-        if self.reranker:
-            # 准备输入对
-            pairs = [(query, content) for content in doc_contents]
+        if self.reranker_service:
+            # 准备输入
+            documents = [Document(page_content = content) for content in doc_contents]
             
             # 计算相关性分数
-            scores = self.reranker.predict(pairs)
-            
-            # 对段落按相关性排序
-            sorted_contents = [content for _, content in sorted(
-                zip(scores, doc_contents), 
-                key=lambda x: x[0], 
-                reverse=True
-            )]
+            sorted_contents = self.reranker_service.rerank(query = query, documents = documents, top_k = len(documents))
+
+            sorted_contents = [doc.page_content for doc in sorted_contents]
+
             
             # 选择最相关的内容，控制总长度
             key_info = ""

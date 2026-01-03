@@ -187,9 +187,9 @@ class SimilarityRetriever(BaseRetriever):
         with open(save_dir / "document_embeddings.pkl", "wb") as f:  
             pickle.dump(self.document_embeddings, f)  
             
-        # Save config  
+        # Save config
         config = {  
-            "name": self.name,  
+            "name": self.config.name,  
             "score_threshold": self.score_threshold,  
             "embedding_model_name": self.embedding_manager.embedding_model_name,  
         }  
@@ -239,7 +239,7 @@ class SimilarityRetriever(BaseRetriever):
             Dictionary of retriever statistics  
         """  
         return {  
-            "name": self.name,  
+            "name": self.config.name,  
             "type": self.__class__.__name__,  
             "document_count": len(self.documents),  
             "embedding_model": self.embedding_manager.embedding_model_name,  

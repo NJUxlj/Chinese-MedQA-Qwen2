@@ -1,0 +1,92 @@
+2026-01-03 21:54:43,184 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:54:43,933 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:54:44,600 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:54:45,285 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:54:45,349 - rag.context_builder - WARNING - 没有文档用于构建上下文
+2026-01-03 21:57:15,662 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:57:16,356 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:57:17,102 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:57:17,773 - rag.context_builder - INFO - 已加载重排序模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B
+2026-01-03 21:57:17,842 - rag.context_builder - WARNING - 没有文档用于构建上下文
+2026-01-03 21:59:57,314 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 21:59:58,020 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 21:59:58,771 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 21:59:58,833 - rag.context_builder - ERROR - 加载重排序模型失败: 1 validation error for RerankerConfig
+model_path
+  Input should be a valid string [type=string_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2026-01-03 21:59:58,834 - rag.context_builder - WARNING - 没有文档用于构建上下文
+2026-01-03 22:00:44,954 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:00:45,837 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:00:46,518 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:00:47,195 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:00:47,278 - rag.context_builder - WARNING - 没有文档用于构建上下文
+2026-01-03 22:18:13,745 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:18:15,833 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:18:19,666 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:18:21,730 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:18:30,107 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:18:39,999 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:18:46,531 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:21:33,175 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:21:35,117 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:21:38,166 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:21:40,435 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:21:48,474 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:21:57,339 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:22:00,754 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:23:57,681 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:23:58,985 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:24:03,341 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:24:04,918 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:24:13,020 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:24:21,506 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:24:25,846 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:07,898 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:09,660 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:14,470 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:15,955 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:24,555 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:33,605 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:26:39,217 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:28:57,117 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:28:58,449 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:29:02,312 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:29:03,697 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:29:12,250 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:29:19,683 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:29:23,826 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:35:06,426 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:35:08,912 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:35:13,573 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:35:16,040 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:35:24,774 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:36:37,726 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:36:40,177 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:36:44,647 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:36:47,455 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:36:52,288 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:36:59,290 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:46:55,538 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:46:58,399 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:05,802 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:11,211 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:18,880 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:20,375 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:27,203 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:32,734 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:42,215 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:47:48,138 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:52:48,902 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:53:39,250 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:53:42,147 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:53:48,381 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:53:51,065 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:53:55,965 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:53:57,428 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:54:01,664 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:54:08,047 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:54:18,870 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 22:54:25,345 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 23:04:08,816 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B
+2026-01-03 23:06:25,990 - rag.context_builder - INFO - 已加载重排序模型: Qwen3-Reranker-0.6B

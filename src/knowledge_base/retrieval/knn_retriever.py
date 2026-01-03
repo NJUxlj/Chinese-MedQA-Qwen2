@@ -12,7 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 try:
     import faiss  
 except ImportError:
-    raise ImportError("FAISS not installed. Please install it with 'pip install faiss-cpu', if you are using macbook, please use 'brew install swig && pip install faiss-cpu -i https://pypi.tuna.tsinghua.edu.cn/simple' or 'conda install -c conda-forge faiss-cpu' instead.")
+    raise ImportError("FAISS not installed. Please install it with 'pip install faiss-cpu', if you are using macbook, please use 'brew install swig && pip install faiss-cpu -i https://pypi.tuna.tsinghua.edu.cn/simple' or 'conda install -c conda-forge faiss-cpu'  or  'conda install -c pytorch faiss-cpu' instead.")
 
 
 from langchain_core.documents import Document  
@@ -301,7 +301,7 @@ class KNNRetriever(BaseRetriever):
             
         # Save config  
         config = {  
-            "name": self.name,  
+            "name": self.config.name,  
             "score_threshold": self.score_threshold,  
             "embedding_model_name": self.embedding_manager.embedding_model_name,  
             "index_type": self.index_type,  

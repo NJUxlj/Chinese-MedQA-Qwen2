@@ -1,0 +1,262 @@
+2026-01-03 22:16:40,903 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:44,422 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:46,057 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:47,242 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:49,029 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:50,485 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:52,709 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:53,353 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:54,061 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:54,710 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:16:57,985 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:10,505 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:13,858 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:15,917 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:19,667 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:21,815 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:24,435 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:25,599 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:30,180 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:31,589 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:40,065 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:18:46,585 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:31,664 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:33,234 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:35,118 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:21:35,181 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:38,167 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:21:38,168 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:40,549 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:21:40,553 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:42,003 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:43,105 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:48,489 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:21:48,555 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:51,801 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:21:51,804 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:21:57,347 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:21:57,435 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:22:00,757 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:22:00,799 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:22:03,941 - EmbeddingManager - WARNING - No valid documents to embed
+2026-01-03 22:23:56,179 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:23:57,731 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:00,830 - EmbeddingManager - INFO - Embedded 10 documents in 1.84s
+2026-01-03 22:24:00,831 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:00,930 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:02,137 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:03,343 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:03,345 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:04,009 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:04,982 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:04,986 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:06,700 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:06,784 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:07,943 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:07,944 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:09,737 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:13,022 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:13,069 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:15,234 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:15,235 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:15,239 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:17,135 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:21,508 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:21,577 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:23,825 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:25,848 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:25,932 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:24:29,173 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:24:29,182 - EmbeddingManager - INFO - Saved 10 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:06,203 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:07,025 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:07,957 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:08,759 - EmbeddingManager - INFO - Loaded 10 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:11,598 - EmbeddingManager - INFO - Embedded 10 documents in 1.94s
+2026-01-03 22:26:11,599 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:11,700 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:13,224 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:14,471 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:14,473 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:15,127 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:16,015 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:16,017 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:17,820 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:17,910 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:18,954 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:18,955 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:20,965 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:24,556 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:24,624 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:27,112 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:27,115 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:27,129 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:28,912 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:33,607 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:33,728 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:35,768 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:39,218 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:39,936 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:26:44,694 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:26:44,695 - EmbeddingManager - INFO - Saved 20 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:28:55,278 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:28:56,008 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:28:57,174 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:28:57,820 - EmbeddingManager - INFO - Loaded 20 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:28:59,654 - EmbeddingManager - INFO - Embedded 10 documents in 1.20s
+2026-01-03 22:28:59,657 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:28:59,758 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:01,081 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:02,313 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:02,316 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:02,974 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:03,739 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:03,741 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:05,785 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:05,872 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:06,948 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:06,949 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:08,458 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:12,252 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:12,333 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:14,538 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:14,539 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:14,542 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:16,155 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:19,685 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:19,731 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:21,544 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:23,827 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:24,412 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:29:27,064 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:29:27,066 - EmbeddingManager - INFO - Saved 30 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:04,736 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:05,469 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:06,494 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:07,196 - EmbeddingManager - INFO - Loaded 30 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:10,284 - EmbeddingManager - INFO - Embedded 10 documents in 1.37s
+2026-01-03 22:35:10,286 - EmbeddingManager - INFO - Saved 40 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:10,590 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:12,110 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:13,574 - EmbeddingManager - INFO - Saved 40 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:13,886 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:14,565 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:16,110 - EmbeddingManager - INFO - Saved 40 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:16,112 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:18,824 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:18,935 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:19,630 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:19,631 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:21,516 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:24,775 - EmbeddingManager - INFO - Saved 40 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:25,422 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:35:27,542 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:35:27,544 - EmbeddingManager - INFO - Saved 40 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:35,828 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:36:36,504 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:37,849 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:36:38,515 - EmbeddingManager - INFO - Loaded 40 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:41,616 - EmbeddingManager - INFO - Embedded 10 documents in 1.44s
+2026-01-03 22:36:41,618 - EmbeddingManager - INFO - Saved 50 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:41,871 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:36:43,274 - EmbeddingManager - INFO - Loaded 50 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:44,649 - EmbeddingManager - INFO - Saved 50 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:44,893 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:36:45,568 - EmbeddingManager - INFO - Loaded 50 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:47,540 - EmbeddingManager - INFO - Saved 50 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:47,545 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:36:50,113 - EmbeddingManager - INFO - Loaded 50 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:52,832 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:36:56,101 - EmbeddingManager - INFO - Loaded 50 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:36:59,292 - EmbeddingManager - INFO - Saved 50 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:46:50,688 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:46:52,871 - EmbeddingManager - INFO - Loaded 50 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:46:55,647 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:46:56,738 - EmbeddingManager - INFO - Loaded 50 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:00,128 - EmbeddingManager - INFO - Embedded 10 documents in 1.73s
+2026-01-03 22:47:00,131 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:00,467 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:03,628 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:05,803 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:06,266 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:07,771 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:11,308 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:11,889 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:15,624 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:18,978 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:20,788 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:23,355 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:27,208 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:27,350 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:30,070 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:32,737 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:33,303 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:36,134 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:36,136 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:36,606 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:39,697 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:42,217 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:42,836 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:44,383 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:48,140 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:49,055 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:47:52,273 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:47:52,275 - EmbeddingManager - INFO - Saved 60 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:52:44,158 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:52:46,204 - EmbeddingManager - INFO - Loaded 60 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:52:50,487 - EmbeddingManager - INFO - Embedded 10 documents in 1.58s
+2026-01-03 22:52:50,489 - EmbeddingManager - INFO - Saved 70 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:36,984 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:53:37,921 - EmbeddingManager - INFO - Loaded 70 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:39,326 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:53:41,059 - EmbeddingManager - INFO - Loaded 70 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:43,545 - EmbeddingManager - INFO - Embedded 10 documents in 1.40s
+2026-01-03 22:53:43,547 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:43,829 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:53:45,116 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:48,384 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:48,861 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:53:50,319 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:51,139 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:51,375 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:53:52,543 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:56,055 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:53:57,800 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:54:00,201 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:01,666 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:02,271 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:54:05,443 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:08,049 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:08,578 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:54:10,838 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:10,840 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:11,224 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:54:14,058 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:18,881 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:19,726 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:54:22,812 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:25,347 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:26,284 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 22:54:28,988 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 22:54:29,027 - EmbeddingManager - INFO - Saved 80 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:04:02,145 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:04:05,755 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:04:11,616 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:04:14,090 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:04:18,790 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:04:22,422 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:04:25,887 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:04:30,165 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:06:20,267 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:06:23,089 - EmbeddingManager - INFO - Loaded 80 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:06:27,501 - EmbeddingManager - INFO - Embedded 10 documents in 1.51s
+2026-01-03 23:06:27,506 - EmbeddingManager - INFO - Saved 90 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:13:05,856 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:13:09,010 - EmbeddingManager - INFO - Loaded 90 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:13:09,013 - EmbeddingManager - INFO - Saved 90 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:14:27,121 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:14:30,740 - EmbeddingManager - INFO - Loaded 90 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:14:30,922 - EmbeddingManager - INFO - Saved 90 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:15:46,280 - EmbeddingManager - INFO - Loading embedding model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-01-03 23:15:50,014 - EmbeddingManager - INFO - Loaded 90 cached embeddings from /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl
+2026-01-03 23:15:50,177 - EmbeddingManager - INFO - Saved 90 embeddings to cache at /Users/xiniuyiliao/Desktop/code/models/_Users_xiniuyiliao_Desktop_code_models_Qwen3-Embedder-0.6B_embedding_cache.pkl

@@ -14,13 +14,18 @@ load_dotenv()
 
 class RAGConfig(BaseModel):
     """ RAG 配置"""
+    model_config = {"arbitrary_types_allowed": True}
+    
     retriever_type: str = Field(default="knn", description="检索类型：knn, similarity, bm25, l2")
     embedding_model_name: str = Field(default="paraphrase-multilingual-MiniLM-L12-v2", description="嵌入模型名称")
+    embedding_dimension: int = Field(default=384, description="嵌入维度")
     index_path: str = Field(default="data/indices/faiss_index.bin", description="索引路径")
     top_k: int = Field(default=5, description="默认检索数量")
 
     model: Optional[BaseGenerativeModel] = Field(default=None, description="生成模型")
     cache_dir: Optional[str] = Field(default=None, description="缓存目录")
+    reranker_model_provider: str = Field(default="huggingface", description="重排序模型提供方")
+    reranker_model_path: Optional[str] = Field(default=None, description="重排序模型路径")
     reranker_model_name: Optional[str] = Field(default=None, description="重排序模型名称")
     use_reranker: bool = Field(default=False, description="是否使用重排序模型")
     hybrid_weight: float = Field(default=0.5, description="混合检索时的权重(dense:sparse)")

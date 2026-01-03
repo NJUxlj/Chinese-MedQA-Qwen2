@@ -1,0 +1,28 @@
+2026-01-03 22:21:40,549 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 0
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 1
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 2
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 3
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 4
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 5
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 6
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 7
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 8
+2026-01-03 22:21:40,550 - SimilarityRetriever - WARNING - No embedding found for document 9
+2026-01-03 22:21:40,550 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:24:04,981 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:24:04,982 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:26:16,014 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:26:16,016 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:29:03,737 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:29:03,739 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:35:16,108 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:35:16,110 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:36:47,539 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:36:47,541 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:47:11,307 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:47:11,309 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:47:11,311 - SimilarityRetriever - INFO - Saved similarity retriever to /var/folders/km/v8sj_f2s4jv50nf0xtjhpd280000gn/T/tmp7_v_isl0/similarity_index.bin
+2026-01-03 22:53:51,135 - SimilarityRetriever - INFO - Embedding 10 documents for similarity retriever
+2026-01-03 22:53:51,139 - SimilarityRetriever - INFO - Added 10 documents to similarity retriever in 0.00s
+2026-01-03 22:53:51,140 - SimilarityRetriever - INFO - Saved similarity retriever to /var/folders/km/v8sj_f2s4jv50nf0xtjhpd280000gn/T/tmpli9c6dh6/similarity_index.bin

@@ -5,6 +5,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 
+from langchain_core.documents import Document
+
 from typing import Dict, List, Optional, Union, Any, Tuple
 from knowledge_base.retrieval.knn_retriever import KNNRetriever
 from knowledge_base.retrieval.similarity_retriever import SimilarityRetriever
@@ -29,22 +31,7 @@ class RAGPipeline:
     
     def __init__(
         self,
-        retriever_type: str = "knn",  # "knn", "similarity", "bm25", "l2", "hybrid"
-        embedding_model_name: str = "paraphrase-multilingual-MiniLM-L12-v2",
-        embedding_dimension: int = 384,
-        index_path: Optional[str] = None,
-        top_k: int = 5,
-        model: Optional[BaseGenerativeModel] = None,
-        cache_dir: Optional[str] = None,
-        reranker_model_name: Optional[str] = None,
-        use_reranker: bool = False,
-        hybrid_weight: float = 0.5,  # 混合检索时的权重(dense:sparse)
-        chunk_size: int = 500,  # 上下文构建时的块大小
-        chunk_overlap: int = 100,  # 上下文块重叠大小
-        response_template: Optional[str] = None,  # 响应模板
-        max_new_tokens: int = 1024,  # 生成的最大token数量
-        temperature: float = 0.7,  # 生成温度
-        top_p: float = 0.9,  # 生成top_p值
+        config: RAGConfig
     ):
         """
         初始化RAG流水线
@@ -69,76 +56,93 @@ class RAGPipeline:
         """
         self.config = config
 
-        
-        self.retriever_type = retriever_type
-        self.top_k = top_k
-        self.model = model
-        self.use_reranker = use_reranker
-        self.hybrid_weight = hybrid_weight
+
+        self.retriever_type: str = self.config.retriever_type
+        self.embedding_model_name: str = self.config.embedding_model_name
+        self.embedding_dimension: int = self.config.embedding_dimension
+        self.index_path: Optional[str] = self.config.index_path
+        self.top_k: int = self.config.top_k
+        self.model: Optional[BaseGenerativeModel] = self.config.model
+        self.cache_dir: Optional[str] = self.config.cache_dir
+        self.reranker_model_provider: str = self.config.reranker_model_provider
+        self.reranker_model_path: Optional[str] = self.config.reranker_model_path
+        self.reranker_model_name: Optional[str] = self.config.reranker_model_name
+        self.use_reranker: bool = self.config.use_reranker
+        self.hybrid_weight: float = self.config.hybrid_weight
+        self.chunk_size: int = self.config.chunk_size
+        self.chunk_overlap: int = self.config.chunk_overlap
+        self.response_template: Optional[str] = self.config.response_template
+        self.max_new_tokens: int = self.config.max_new_tokens
+        self.temperature: float = self.config.temperature
+        self.top_p: float = self.config.top_p
+
+    
         
         # 初始化查询处理器
         self.query_processor = QueryProcessor()
         
         # 初始化嵌入管理器 (对于某些检索器需要)
-        if retriever_type in ["knn", "similarity", "l2", "hybrid"]:
+        if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
             self.embedding_manager = EmbeddingManager(
-                embedding_model_name_or_path=embedding_model_name,
-                embedding_dimension=embedding_dimension,
-                cache_dir=cache_dir
+                embedding_model_name=self.embedding_model_name,
+                cache_dir=self.cache_dir
             )
         else:
             self.embedding_manager = None
         
         # 根据类型初始化检索器
-        if retriever_type == "knn":
+        if self.retriever_type == "knn":
+            from config.retriever_config import KNNRetrieverConfig
+            config = KNNRetrieverConfig()
             self.retriever = KNNRetriever(
-                embedding_manager=self.embedding_manager,
-                index_path=index_path
+                config=config,
+                embedding_manager=self.embedding_manager
             )
-        elif retriever_type == "similarity":
+        elif self.retriever_type == "similarity":
+            from config.retriever_config import SimilarityRetrieverConfig
+            config = SimilarityRetrieverConfig()
             self.retriever = SimilarityRetriever(
-                embedding_manager=self.embedding_manager,
-                index_path=index_path
+                config=config,
+                embedding_manager=self.embedding_manager
             )
-        elif retriever_type == "bm25":
-            self.retriever = BM25Retriever(
-                index_path=index_path
-            )
-        elif retriever_type == "l2":
+        elif self.retriever_type == "bm25":
+            self.retriever = BM25Retriever()
+        elif self.retriever_type == "l2":
+            from config.retriever_config import L2RetrieverConfig
+            config = L2RetrieverConfig()
             self.retriever = L2Retriever(
-                embedding_manager=self.embedding_manager,
-                index_path=index_path
+                config=config,
+                embedding_manager=self.embedding_manager
             )
-        elif retriever_type == "hybrid":
-            dense_index_path = self._get_variant_index_path(index_path, "dense") if index_path else None
-            sparse_index_path = self._get_variant_index_path(index_path, "sparse") if index_path else None
-            
+        elif self.retriever_type == "hybrid":
+            from config.retriever_config import KNNRetrieverConfig
+            dense_config = KNNRetrieverConfig()
             self.dense_retriever = KNNRetriever(
-                embedding_manager=self.embedding_manager,
-                index_path=dense_index_path
+                config=dense_config,
+                embedding_manager=self.embedding_manager
             )
-            self.sparse_retriever = BM25Retriever(
-                index_path=sparse_index_path
-            )
-            self.retriever = None  # 混合模式下不使用单一检索器
+            self.sparse_retriever = BM25Retriever()
+            self.retriever = None
         else:
-            raise ValueError(f"不支持的检索器类型: {retriever_type}")
+            raise ValueError(f"不支持的检索器类型: {self.retriever_type}")
         
         # 初始化上下文构建器
         self.context_builder = ContextBuilder(
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap,
-            reranker_model_name=reranker_model_name if use_reranker else None
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap,
+            reranker_model_provider=self.reranker_model_provider,
+            reranker_model_path=self.reranker_model_path if self.use_reranker else None,
+            reranker_model_name=self.reranker_model_name if self.use_reranker else None
         )
         
         # 如果提供了模型，初始化响应生成器
-        if model:
+        if self.model:
             self.response_generator = ResponseGenerator(
-                model=model,
-                max_new_tokens=max_new_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                template=response_template
+                model=self.model,
+                max_new_tokens=self.max_new_tokens,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                template=self.response_template
             )
         else:
             self.response_generator = None
@@ -194,54 +198,43 @@ class RAGPipeline:
         """
         k = top_k or self.top_k
         
-        # 获取密集(向量)检索结果
-        dense_docs = self.dense_retriever.retrieve(query_text, k=k*2)  # 检索更多文档以便后续合并
+        dense_results = self.dense_retriever.search(query_text, k*2)
+        sparse_results = self.sparse_retriever.search(query_text, k*2)
         
-        # 获取稀疏(BM25)检索结果
-        sparse_docs = self.sparse_retriever.retrieve(query_text, k=k*2)
+        dense_docs = [(doc.page_content, doc.metadata, score) for doc, score in dense_results]
+        sparse_docs = [(doc.page_content, doc.metadata, score) for doc, score in sparse_results]
         
-        # 合并结果
-        # 为每个文档分配一个组合得分
         combined_docs = {}
         
-        # 处理密集检索结果
-        for i, doc in enumerate(dense_docs):
-            doc_id = doc.get("id") or doc.get("metadata", {}).get("id") or hash(doc["text"])
-            
+        for i, (content, metadata, score) in enumerate(dense_docs):
+            doc_id = metadata.get("doc_id", f"dense_{i}")
             if doc_id not in combined_docs:
-                combined_docs[doc_id] = doc.copy()
-                # 初始化组合得分
-                combined_docs[doc_id]["combined_score"] = 0
-            
-            # 添加密集检索得分 (归一化到0-1)
-            # 使用排名倒数作为得分
-            dense_score = 1.0 / (i + 1) 
-            combined_docs[doc_id]["dense_score"] = dense_score
-            combined_docs[doc_id]["combined_score"] += self.hybrid_weight * dense_score
+                combined_docs[doc_id] = {
+                    "text": content,
+                    "metadata": metadata,
+                    "combined_score": 0
+                }
+            combined_docs[doc_id]["dense_score"] = score
+            combined_docs[doc_id]["combined_score"] += self.hybrid_weight * score
         
-        # 处理稀疏检索结果
-        for i, doc in enumerate(sparse_docs):
-            doc_id = doc.get("id") or doc.get("metadata", {}).get("id") or hash(doc["text"])
-            
+        for i, (content, metadata, score) in enumerate(sparse_docs):
+            doc_id = metadata.get("doc_id", f"sparse_{i}")
             if doc_id not in combined_docs:
-                combined_docs[doc_id] = doc.copy()
-                # 初始化组合得分
-                combined_docs[doc_id]["combined_score"] = 0
-                combined_docs[doc_id]["dense_score"] = 0
-            
-            # 添加稀疏检索得分 (归一化到0-1)
-            sparse_score = 1.0 / (i + 1)
-            combined_docs[doc_id]["sparse_score"] = sparse_score
-            combined_docs[doc_id]["combined_score"] += (1 - self.hybrid_weight) * sparse_score
+                combined_docs[doc_id] = {
+                    "text": content,
+                    "metadata": metadata,
+                    "combined_score": 0,
+                    "dense_score": 0
+                }
+            combined_docs[doc_id]["sparse_score"] = score
+            combined_docs[doc_id]["combined_score"] += (1 - self.hybrid_weight) * score
         
-        # 根据组合得分排序
         sorted_docs = sorted(
             combined_docs.values(), 
             key=lambda x: x["combined_score"], 
             reverse=True
         )
         
-        # 返回top-k结果
         return sorted_docs[:k]
     
     def query(self, query_text: str, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
@@ -255,18 +248,37 @@ class RAGPipeline:
         Returns:
             检索到的文档列表
         """
-        # 处理查询文本
+        if not query_text or not query_text.strip():
+            logger.warning("查询文本为空")
+            return []
+        
         processed_query = self.query_processor.process_query(query_text)
         
-        # 确定检索数量
+        if not processed_query or not processed_query.strip():
+            logger.warning(f"处理后的查询为空，使用原始查询: {query_text}")
+            processed_query = query_text
+        
+        if not processed_query or not processed_query.strip():
+            logger.warning("查询文本为空，无法执行检索")
+            return []
+        
         k = top_k or self.top_k
         
-        # 如果是混合检索
         if self.retriever_type == "hybrid":
             return self._query_hybrid(processed_query, k)
         
-        # 使用单一检索器
-        return self.retriever.retrieve(processed_query, k)
+        results = self.retriever.search(processed_query, k)
+        
+        docs = []
+        for doc, score in results:
+            docs.append({
+                "id": doc.metadata.get("doc_id", "unknown"),
+                "text": doc.page_content,
+                "metadata": doc.metadata,
+                "score": score
+            })
+        
+        return docs
     
     def build_context(self, query_text: str, top_k: Optional[int] = None, 
                      use_reranker: Optional[bool] = None) -> str:
@@ -361,14 +373,35 @@ class RAGPipeline:
             documents: 文档列表
             save_path: 保存路径
         """
+        
+        doc_objects = [
+            Document(page_content=doc.get("text", doc.get("content", "")), metadata=doc.get("metadata", {}))
+            for doc in documents
+        ]
+        
         if self.retriever_type == "hybrid":
-            dense_save_path = self._get_variant_index_path(save_path, "dense") if save_path else None
-            sparse_save_path = self._get_variant_index_path(save_path, "sparse") if save_path else None
+            self.dense_retriever.add_documents(doc_objects)
+            self.sparse_retriever.add_documents(doc_objects)
             
-            self.dense_retriever.build_index(documents, dense_save_path)
-            self.sparse_retriever.build_index(documents, sparse_save_path)
+            if save_path:
+                dense_save_path = self._get_variant_index_path(save_path, "dense")
+                sparse_save_path = self._get_variant_index_path(save_path, "sparse")
+                self.dense_retriever.save(dense_save_path)
+                self.sparse_retriever.save(sparse_save_path)
         else:
-            # 更新单一检索器
-            self.retriever.build_index(documents, save_path)
+            self.retriever.add_documents(doc_objects)
+            
+            if save_path:
+                self.retriever.save(save_path)
         
         logger.info(f"检索器索引已更新")
+
+    def build_index(self, documents: List[Dict[str, Any]], save_path: Optional[str] = None) -> None:
+        """
+        构建检索器索引
+
+        Args:
+            documents: 文档列表
+            save_path: 保存路径
+        """
+        self.update_retriever_index(documents, save_path)

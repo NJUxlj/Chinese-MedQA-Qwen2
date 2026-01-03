@@ -44,8 +44,6 @@ class L2Retriever(BaseRetriever):
         self.documents: List[Document] = []  
         self.document_ids: List[str] = []  
         self.document_embeddings: List[np.ndarray] = [] 
-
-        self.logger = setup_logger() 
     
     def add_documents(self, documents: List[Document]) -> None:  
         """  
@@ -188,9 +186,9 @@ class L2Retriever(BaseRetriever):
         with open(save_dir / "document_embeddings.pkl", "wb") as f:  
             pickle.dump(self.document_embeddings, f)  
             
-        # Save config  
+        # Save config
         config = {  
-            "name": self.name,  
+            "name": self.config.name,  
             "distance_threshold": self.distance_threshold,  
             "embedding_model_name": self.embedding_manager.embedding_model_name,  
         }  
@@ -224,10 +222,9 @@ class L2Retriever(BaseRetriever):
         with open(load_dir / "document_embeddings.pkl", "rb") as f:  
             self.document_embeddings = pickle.load(f)  
             
-        # Load config  
+        # Load config
         with open(load_dir / "config.json", "r") as f:  
             config = json.load(f)  
-            self.name = config.get("name", self.name)  
             self.distance_threshold = config.get("distance_threshold", self.distance_threshold)  
             
         logger.info(f"Loaded L2 retriever from {directory} with {len(self.documents)} documents")  

@@ -74,7 +74,7 @@ class RerankerService:
     def _setup_qwen3_reranker_tokens(self) -> None:
         """设置 Qwen3-Reranker 的 yes/no token ID"""
         try:
-            tokenizer = self.reranker_model.tokenizer
+            tokenizer = self.tokenizer
             
             yes_tokens = tokenizer.encode("yes", add_special_tokens=False)
             no_tokens = tokenizer.encode("no", add_special_tokens=False)
@@ -216,13 +216,20 @@ class RerankerService:
                     scores = scores - min_score
             
             doc_score_pairs = list(zip(documents, scores))
-            doc_score_pairs.sort(key=lambda x: x[1], reverse=True)
+            new_doc_score_pairs = []
+            for doc, score in doc_score_pairs:
+                new_meta_data = doc.metadata.copy() if doc.metadata else {}
+                new_meta_data["rerank_score"] = float(score)
+                doc.metadata = new_meta_data
+                new_doc_score_pairs.append((doc, float(score)))
             
-            reranked_documents = [doc for doc, _ in doc_score_pairs[:top_k]]
+            new_doc_score_pairs.sort(key=lambda x: x[1], reverse=True)
+            
+            reranked_documents = [doc for doc, _ in new_doc_score_pairs[:top_k]]
             
             logger.info(f"Reranking completed. Top {top_k} documents selected.")
             
-            self.print_reranked_documents_and_scores(doc_score_pairs[:top_k])
+            self.print_reranked_documents_and_scores(new_doc_score_pairs[:top_k])
             
             return reranked_documents
             
