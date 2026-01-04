@@ -380,7 +380,7 @@ class LDAPipeline:
             
             # 获取每个主题的关键词
             topic_words = {}
-            for topic_id in topic_info.Topic.unique():
+            for topic_id in topic_info.Topic.unique():  # 从 topic_info DataFrame 中提取所有唯一的主题ID（包括正常主题和异常主题）
                 if topic_id != -1:  # 排除异常主题
                     words = self.topic_model.get_topic(topic_id)
                     if words:
@@ -545,18 +545,18 @@ class LDAPipeline:
             保存的图像路径（如果指定了save_path）
         """
         if not self.topic_model:
-            logger.error("模型尚未拟合，请先运行主题建模")
+            self.logger.error("模型尚未拟合，请先运行主题建模")
             return None
         
         try:
-            logger.info("正在生成主题可视化...")
+            self.logger.info("正在生成主题可视化...")
             
             # 生成主题可视化
             fig = self.topic_model.visualize_topics(width=width, height=height)
             
             if save_path:
                 fig.write_html(save_path)
-                logger.info(f"主题可视化已保存到: {save_path}")
+                self.logger.info(f"主题可视化已保存到: {save_path}")
                 return save_path
             else:
                 # 显示图像
@@ -564,7 +564,7 @@ class LDAPipeline:
                 return None
                 
         except Exception as e:
-            logger.error(f"生成主题可视化失败: {e}")
+            self.logger.error(f"生成主题可视化失败: {e}")
             return None
 
     def visualize_topic_distribution(self, 
@@ -581,24 +581,24 @@ class LDAPipeline:
             保存的图像路径
         """
         if not self.topic_model:
-            logger.error("模型尚未拟合")
+            self.logger.error("模型尚未拟合")
             return None
         
         try:
-            logger.info("正在生成主题分布可视化...")
+            self.logger.info("正在生成主题分布可视化...")
             
             fig = self.topic_model.visualize_topic_distribution(topics)
             
             if save_path:
                 fig.write_html(save_path)
-                logger.info(f"主题分布可视化已保存到: {save_path}")
+                self.logger.info(f"主题分布可视化已保存到: {save_path}")
                 return save_path
             else:
                 fig.show()
                 return None
                 
         except Exception as e:
-            logger.error(f"生成主题分布可视化失败: {e}")
+            self.logger.error(f"生成主题分布可视化失败: {e}")
             return None
 
     def get_topic_keywords(self, topic_id: int, top_n: int = 10) -> List[Tuple[str, float]]:
@@ -613,13 +613,13 @@ class LDAPipeline:
             关键词及其权重列表
         """
         if not self.topic_model:
-            logger.error("模型尚未拟合")
+            self.logger.error("模型尚未拟合")
             return []
         
         try:
             return self.topic_model.get_topic(topic_id)[:top_n]
         except Exception as e:
-            logger.error(f"获取主题 {topic_id} 关键词失败: {e}")
+            self.logger.error(f"获取主题 {topic_id} 关键词失败: {e}")
             return []
 
     def save_model(self, save_path: str):
@@ -630,7 +630,7 @@ class LDAPipeline:
             save_path: 保存路径
         """
         if not self.topic_model:
-            logger.error("模型尚未拟合，无法保存")
+            self.logger.error("模型尚未拟合，无法保存")
             return
         
         try:
@@ -639,10 +639,10 @@ class LDAPipeline:
             
             # 保存BERTopic模型
             self.topic_model.save(save_path)
-            logger.info(f"模型已保存到: {save_path}")
+            self.logger.info(f"模型已保存到: {save_path}")
             
         except Exception as e:
-            logger.error(f"保存模型失败: {e}")
+            self.logger.error(f"保存模型失败: {e}")
 
     def load_model(self, load_path: str):
         """
@@ -653,10 +653,10 @@ class LDAPipeline:
         """
         try:
             self.topic_model = BERTopic.load(load_path)
-            logger.info(f"模型已从 {load_path} 加载")
+            self.logger.info(f"模型已从 {load_path} 加载")
             
         except Exception as e:
-            logger.error(f"加载模型失败: {e}")
+            self.logger.error(f"加载模型失败: {e}")
 
     def export_results(self, 
                       result: Dict[str, Any], 
@@ -689,10 +689,10 @@ class LDAPipeline:
             else:
                 raise ValueError(f"不支持的导出格式: {format}")
             
-            logger.info(f"结果已导出到: {export_path}")
+            self.logger.info(f"结果已导出到: {export_path}")
             
         except Exception as e:
-            logger.error(f"导出结果失败: {e}")
+            self.logger.error(f"导出结果失败: {e}")
 
     def analyze_topic_trends(self, 
                            documents: List[str], 
@@ -708,7 +708,7 @@ class LDAPipeline:
             主题趋势分析结果
         """
         if not self.topic_model:
-            logger.error("模型尚未拟合")
+            self.logger.error("模型尚未拟合")
             return {"error": "模型尚未拟合"}
         
         try:
@@ -725,7 +725,7 @@ class LDAPipeline:
             return result
             
         except Exception as e:
-            logger.error(f"分析主题趋势失败: {e}")
+            self.logger.error(f"分析主题趋势失败: {e}")
             return {"error": f"分析主题趋势失败: {str(e)}"}
 
 
