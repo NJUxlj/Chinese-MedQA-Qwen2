@@ -131,7 +131,7 @@ def get_model_path(model_name_or_path: str) -> str:
         return model_name_or_path  
     
     # 获取模型配置中的路径  
-    model_config = ModelConfig()  
+    model_config = LocalModelConfig()  
     model_dir = model_config.model_dir  
     
     # 检查是否在model_dir中  

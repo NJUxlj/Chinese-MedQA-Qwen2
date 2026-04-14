@@ -12,7 +12,7 @@ from threading import Lock
 # 确保可以导入项目其他模块  
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 
-from utils.logger import get_logger  
+from utils.logger import setup_logger  
 from config.model_config import ModelConfig  
 from inference.inference_utils import (  
     format_prompt,   
@@ -22,7 +22,7 @@ from inference.inference_utils import (
     get_inference_params  
 )  
 
-logger = get_logger("xinference_inference")  
+logger = setup_logger("xinference_inference")  
 
 # 尝试导入XInference  
 try:  

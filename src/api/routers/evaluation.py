@@ -9,8 +9,10 @@ from pydantic import BaseModel
 
 from services.model_service import get_model_service, ModelService
 from services.rag_service import get_rag_service, RAGService
+from utils.logger import setup_logger
 
 router = APIRouter()
+logger = setup_logger(__name__, level="INFO")
 
 class EvaluationRequest(BaseModel):
     """评估请求"""

@@ -16,7 +16,7 @@ from services.rag_service import get_rag_service, RAGService
 router = APIRouter()
 
 # API密钥认证
-API_KEY = os.environ.get("ADMIN_API_KEY", "change_me_in_production")
+API_KEY = os.environ.get("ADMIN_API_KEY")
 api_key_header = APIKeyHeader(name="X-API-Key")
 
 def get_api_key(api_key: str = Security(api_key_header)):

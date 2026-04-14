@@ -22,8 +22,7 @@ from inference.inference_utils import (
     get_inference_params  
 )  
 
-# 导入推理模块  
-from inference.fastllm_inference import FastLLMInference, FASTLLM_AVAILABLE  
+# 导入推理模块
 from inference.vllm_inference import VLLMInference, VLLM_AVAILABLE  
 from inference.api_inference import (  
     ZhipuAIInference,   

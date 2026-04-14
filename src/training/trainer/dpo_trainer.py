@@ -646,21 +646,32 @@ class DPOTrainer(BaseTrainer):
         """
         chosen_log_probs = self._get_log_probs(policy_logits, chosen_labels)
         rejected_log_probs = self._get_log_probs(policy_logits, rejected_labels)
-        
+
         with torch.no_grad():
             ref_chosen_log_probs = self._get_log_probs(ref_logits, chosen_labels)
             ref_rejected_log_probs = self._get_log_probs(ref_logits, rejected_labels)
-        
+
         policy_chosen_reward = self.beta * (chosen_log_probs - ref_chosen_log_probs)
         policy_rejected_reward = self.beta * (rejected_log_probs - ref_rejected_log_probs)
-        
+
         logits = policy_chosen_reward - policy_rejected_reward
-        
+
         loss = -F.logsigmoid(logits)
-        
+
         if attention_mask is not None:
-            loss = (loss * attention_mask).sum() / attention_mask.sum()
-        
+            # Only compute loss on response positions (where chosen_labels != rejected_labels)
+            # This excludes the prompt portion from the loss calculation
+            response_mask = (chosen_labels != rejected_labels).float()
+            # Also exclude padding positions
+            response_mask = response_mask * attention_mask
+
+            # Only compute mean over response positions
+            if response_mask.sum() > 0:
+                loss = (loss * response_mask).sum() / response_mask.sum()
+            else:
+                # Fallback to original behavior if no response positions found
+                loss = (loss * attention_mask).sum() / attention_mask.sum()
+
         return loss
     
     def create_training_args(

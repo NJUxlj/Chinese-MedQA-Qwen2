@@ -12,6 +12,49 @@
 4. 参考了LongChain-Chatchat的架构，在Chinese-MedQA的文档匹配算法中加入KNN（原本只有相似度、BM25、L2_distance）。【3】使用FAISS构建了本地医疗知识库。
 
 
+
+## 修复日志
+
+### 2026-04-14 代码审查与修复
+
+**审查结果：**
+- 严重问题：17项（已全部修复）
+- 中等问题：16项
+- 轻微问题：26项
+
+**主要修复内容：**
+
+1. **导入/逻辑修复 (9项)**
+   - `agent_factory.py`: 修正导入路径 `AgentBase` → `BaseAgent`
+   - `xinference_inference.py`: 修正 logger 导入 `get_logger` → `setup_logger`
+   - `inference_pipline.py`: 移除不存在的 `fastllm_inference` 模块导入
+   - `inference_utils.py`: 修正类名 `ModelConfig` → `LocalModelConfig`
+   - `api_model.py`: 修正变量名 `self.api_base` → `self.base_url`
+   - `medical_agent.py`: 修正 RAGPipeline 方法调用 `retrieve()` → `query()`
+   - `base_agent.py`: 修正工具执行循环变量覆盖问题
+   - `milvus_client.py`: 修正 logger 变量 `logger` → `self.logger`
+   - `evaluation.py`: 添加缺失的 logger 导入
+
+2. **配置安全修复 (3项)**
+   - `api/client.py`: 移除模块级 HTTP 请求，BASE_URL 改用环境变量
+   - `api/admin.py`: API_KEY 强制从环境变量读取
+   - `api/main.py`: CORS 配置改用环境变量
+
+3. **训练相关修复 (4项)**
+   - `base_trainer.py`: 修复频繁评估问题，添加评估间隔控制
+   - `dpo_trainer.py`: 修复 DPO 损失计算，使用 attention_mask 仅在响应位置计算
+   - `transformers_inference.py`: 移除 vLLM 特有参数，适配 AutoModelForCausalLM
+
+4. **配置重构**
+   - `milvus_config.py`: 改用环境变量 `MILVUS_URI`、`MILVUS_TOKEN` 等
+   - 日志统一使用 `LoggerManager`，输出目录改为 `/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/logs`
+   - 创建训练 YAML 配置文件：`examples/train/sft.yaml`、`dpo.yaml`、`grpo.yaml`、`reward_model.yaml`、`embedding.yaml`
+
+5. **遗留问题 (2项 - 均为测试代码)**
+   - `inference_pipline.py:412`: 测试代码占位符
+   - `milvus_client.py:602`: 测试代码 token
+
+
 ## 参考的项目
 - Agent部分 参考了：
   1.  [AgentGPT](https://github.com/reworkd/AgentGPT.git)

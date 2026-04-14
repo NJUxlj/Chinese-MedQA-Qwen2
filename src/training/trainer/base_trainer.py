@@ -510,26 +510,36 @@ class BaseTrainer:
             
             def training_step(self, model, inputs, num_items_in_batch=None):
                 """
-                重写training_step，在每个训练步骤后检查是否需要评估
+                重写training_step，使用独立的评估计数器避免频繁评估
                 """
                 # 执行训练步骤
                 step_output = super().training_step(model, inputs, num_items_in_batch)
-                
-                # 强制在第1步和最后一步进行评估
-                if self.state.global_step == 1 or self.state.global_step % self.args.eval_steps == 0:
-                    print(f"🔍 在训练步 {self.state.global_step} 后执行评估...")
-                    eval_result = self.evaluate()
-                    if hasattr(self, 'compute_metrics') and self.compute_metrics:
-                        try:
-                            # 获取最新的评估预测
-                            eval_preds = self.predict(self.eval_dataset)
-                            # 正确地传递预测结果和标签给compute_metrics
-                            metrics = self.compute_metrics((eval_preds.predictions, eval_preds.label_ids))
-                            self.log(metrics)
-                            print(f"🔍 自定义评估指标: {metrics}")
-                        except Exception as e:
-                            print(f"🔍 计算自定义指标时出错: {e}")
-                
+
+                # 使用独立的评估计数器，每隔eval_steps才评估一次
+                # 避免与logging_steps冲突导致过于频繁的评估
+                if not hasattr(self, '_last_eval_step'):
+                    self._last_eval_step = 0
+
+                current_step = self.state.global_step
+                eval_interval = getattr(self.args, 'eval_steps', None) or self.args.logging_steps
+
+                # 只在达到评估间隔且距离上次评估足够远时才评估
+                if (current_step - self._last_eval_step) >= eval_interval:
+                    if current_step == 1 or current_step % self.args.eval_steps == 0:
+                        print(f"🔍 在训练步 {current_step} 后执行评估...")
+                        eval_result = self.evaluate()
+                        if hasattr(self, 'compute_metrics') and self.compute_metrics:
+                            try:
+                                # 获取最新的评估预测
+                                eval_preds = self.predict(self.eval_dataset)
+                                # 正确地传递预测结果和标签给compute_metrics
+                                metrics = self.compute_metrics((eval_preds.predictions, eval_preds.label_ids))
+                                self.log(metrics)
+                                print(f"🔍 自定义评估指标: {metrics}")
+                            except Exception as e:
+                                print(f"🔍 计算自定义指标时出错: {e}")
+                        self._last_eval_step = current_step
+
                 return step_output
         
         math_evaluator = MathEvaluator()

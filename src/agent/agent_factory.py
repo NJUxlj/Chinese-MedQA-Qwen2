@@ -4,7 +4,7 @@ from pathlib import Path
 import sys, os
 sys.path.append(str(Path(__file__).parent.parent))
 
-from agent.agent_base import AgentBase
+from agent.base_agent import BaseAgent
 from agent.medical_agent import MedicalAgent
 from tools.tool_manager import ToolManager
 from tools.tool_base import ToolBase

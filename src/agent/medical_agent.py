@@ -227,7 +227,7 @@ class MedicalAgent(BaseAgent):
             return ""
         
         try:
-            retrieval_results = self.rag_pipeline.retrieve(query)
+            retrieval_results = self.rag_pipeline.query(query)
             if not retrieval_results:
                 return ""
             

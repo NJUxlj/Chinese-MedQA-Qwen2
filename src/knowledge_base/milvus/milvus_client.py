@@ -138,14 +138,14 @@ class MilvusClient:
             List[str]: 数据库名称列表
         """
         if not self._connected:
-            logger.error("请先连接到 Milvus 服务器")
+            self.logger.error("请先连接到 Milvus 服务器")
             return []
-        
+
         try:
             databases = utility.list_database()
             return [db for db in databases]
         except Exception as e:
-            logger.error(f"列出数据库失败: {e}")
+            self.logger.error(f"列出数据库失败: {e}")
             return []
     
     def database_exists(self, database_name: str) -> bool:

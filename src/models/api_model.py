@@ -427,7 +427,7 @@ class OpenAIApiModel(BaseGenerativeModel):
             import openai  
             self.client = openai.OpenAI(  
                 api_key=self.api_key,  
-                base_url=self.api_base  
+                base_url=self.base_url  
             )  
         except ImportError:  
             print("Warning: openai package not installed. Using requests instead.")  
@@ -494,7 +494,7 @@ class OpenAIApiModel(BaseGenerativeModel):
             
             try:  
                 response = requests.post(  
-                    f"{self.api_base}/chat/completions",  
+                    f"{self.base_url}/chat/completions",  
                     headers=headers,  
                     json=data,  
                     timeout=60  
@@ -563,7 +563,7 @@ class OpenAIApiModel(BaseGenerativeModel):
             
             try:  
                 response = requests.post(  
-                    f"{self.api_base}/embeddings",  
+                    f"{self.base_url}/embeddings",  
                     headers=headers,  
                     json=data,  
                     timeout=60  
@@ -724,7 +724,7 @@ class QwenApiModel(BaseGenerativeModel):
             
             try:  
                 response = requests.post(  
-                    f"{self.api_base}/chat/completions",  
+                    f"{self.base_url}/chat/completions",  
                     headers=headers,  
                     json=data,  
                     timeout=60  
@@ -793,7 +793,7 @@ class QwenApiModel(BaseGenerativeModel):
             
             try:  
                 response = requests.post(  
-                    f"{self.api_base}/embeddings",  
+                    f"{self.base_url}/embeddings",  
                     headers=headers,  
                     json=data,  
                     timeout=60  

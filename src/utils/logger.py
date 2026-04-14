@@ -26,10 +26,11 @@ DEFAULT_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 DETAILED_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
 
 # 默认日志配置
+DEFAULT_LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "logs")
 DEFAULT_LOG_CONFIG = {
     "level": "info",
     "format": DEFAULT_LOG_FORMAT,
-    "log_dir": "logs",
+    "log_dir": DEFAULT_LOG_DIR,
     "max_bytes": 10 * 1024 * 1024,  # 10 MB
     "backup_count": 5,
     "console_output": True,

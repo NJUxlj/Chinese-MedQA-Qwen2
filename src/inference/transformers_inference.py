@@ -51,12 +51,23 @@ class TransformersInference:
                 cls._instances[model_path] = instance     # 存入字典
             return cls._instances[model_path]  # 返回单例
     
-    def __init__(self,   
-                model_path: str,   
-                dtype: str = "auto",   
-                tensor_parallel_size: int = 1,  
-                gpu_memory_utilization: float = 0.8,  
-                max_model_len: int = 4096,  
+    @staticmethod
+    def _get_torch_dtype(dtype: str):
+        """将字符串dtype转换为torch dtype"""
+        dtype_map = {
+            "auto": None,
+            "float32": torch.float32,
+            "float16": torch.float16,
+            "bfloat16": torch.bfloat16,
+        }
+        return dtype_map.get(dtype, None)
+
+    def __init__(self,
+                model_path: str,
+                dtype: str = "auto",
+                tensor_parallel_size: int = 1,
+                gpu_memory_utilization: float = 0.8,
+                max_model_len: int = 4096,
                 quantization: Optional[str] = None):  
         """  
         初始化Transformers推理类  
@@ -94,15 +105,11 @@ class TransformersInference:
                 self.logger.warning(f"可用GPU数量({gpu_count})小于请求的张量并行大小({self.tensor_parallel_size})，将使用所有可用GPU")  
                 self.tensor_parallel_size = max(1, gpu_count)  
             
-            # 加载模型  
-            self.model = AutoModelForCausalLM(  
-                model=self.model_path,  
-                dtype=self.dtype,  
-                tensor_parallel_size=self.tensor_parallel_size,  
-                gpu_memory_utilization=self.gpu_memory_utilization,  
-                max_model_len=self.max_model_len,  
-                quantization=self.quantization,  
-                trust_remote_code=True  
+            # 加载模型 (使用 transformers 的 AutoModelForCausalLM，不支持 vLLM 特有参数)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.model_path,
+                torch_dtype=self._get_torch_dtype(self.dtype),
+                trust_remote_code=True
             )  
             
             # 获取分词器  

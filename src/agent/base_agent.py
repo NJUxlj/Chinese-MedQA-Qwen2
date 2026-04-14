@@ -233,7 +233,7 @@ class BaseAgent:
                 })
                 
                 # 更新用户查询为工具结果，让模型继续处理
-                user_query = tool_result_message
+                continue_query = tool_result_message
             
             iteration += 1
         

@@ -1,12 +1,8 @@
+import os
 import requests
 import uuid
 
-BASE_URL = "http://localhost:8000"
-
-# 创建新会话
-session_id = str(uuid.uuid4())
-response = requests.post(f"{BASE_URL}/create_session")
-session_id = response.json()["session_id"]
+BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 
 # 测试对话
 def stream_chat(query: str):

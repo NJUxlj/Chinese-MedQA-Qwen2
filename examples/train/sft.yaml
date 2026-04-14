@@ -1,0 +1,49 @@
+# SFTTrainingConfig - 监督微调训练配置
+model_name_or_path: "Qwen/Qwen3-14B"
+max_seq_length: 2048
+use_gradient_checkpointing: true
+device_map: "auto"
+
+use_4bit: false
+use_8bit: false
+use_fp16: false
+use_bf16: false
+trust_remote_code: true
+
+output_dir: "output/sft"
+num_train_epochs: 3
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 1
+learning_rate: 2e-5
+logging_steps: 10
+save_steps: 500
+save_total_limit: 2
+warmup_ratio: 0.03
+lr_scheduler_type: "cosine"
+report_to: "none"
+eval_strategy: "steps"
+eval_steps: 50
+load_best_model_at_end: false
+metric_for_best_model: "eval_loss"
+greater_is_better: false
+max_grad_norm: 1.0
+dataloader_pin_memory: false
+remove_unused_columns: false
+do_train: true
+do_eval: false
+dataloader_num_workers: 4
+
+# LoRA 配置
+lora_rank: 64
+lora_alpha: 16
+lora_dropout: 0.05
+target_modules: null
+
+# 分布式训练配置
+distributed_strategy: "auto"
+find_unused_parameters: false
+main_process_ip: "localhost"
+main_process_port: 29500
+num_machines: 1
+machine_rank: 0
