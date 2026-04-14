@@ -14,12 +14,24 @@ class Settings:
 
     def _load_config(self):
         config_path = Path(__file__).parent / "config.yaml"
-        self._config = OmegaConf.load(config_path)
-        # 环境变量覆盖
-        self._config = OmegaConf.merge(
-            self._config,
-            OmegaConf.from_dotlist([f"{k}={v}" for k, v in os.environ.items()])
-        )
+        # 读取 YAML 原始内容并替换环境变量占位符
+        with open(config_path, 'r') as f:
+            yaml_content = f.read()
+
+        # 替换 ${VAR} 或 ${VAR:default} 形式的占位符
+        import re
+        def replace_var(match):
+            var_expr = match.group(1)
+            # 支持 ${VAR:default} 语法
+            if ':' in var_expr:
+                var_name, default = var_expr.split(':', 1)
+                return os.environ.get(var_name.strip(), default.strip() if default.strip() else '')
+            else:
+                return os.environ.get(var_expr.strip(), '')
+
+        yaml_content = re.sub(r'\$\{([^}]+)\}', replace_var, yaml_content)
+
+        self._config = OmegaConf.create(yaml_content)
 
     @property
     def llm(self): return self._config.llm

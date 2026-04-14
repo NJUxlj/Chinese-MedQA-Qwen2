@@ -15,7 +15,17 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(src_path))
 
 from training.trainer.sft_trainer import SFTTrainer
-from config.training_config import SFTTrainingConfig
+from omegaconf import OmegaConf
+from types import SimpleNamespace
+
+
+def load_sft_config(config_path: str = None) -> SimpleNamespace:
+    """Load SFT config from YAML file and return as SimpleNamespace"""
+    if config_path is None:
+        config_path = project_root / "examples" / "train" / "sft.yaml"
+    cfg = OmegaConf.load(config_path)
+    # Convert OmegaConf to dict, then to SimpleNamespace for attribute access
+    return OmegaConf.to_container(cfg, resolve=True)
 
 
 def create_sample_dataset():
@@ -70,23 +80,23 @@ def test_lora_finetuning():
     print("=" * 60)
     print("测试 1: LoRA 微调")
     print("=" * 60)
-    
-    config = SFTTrainingConfig(
-        model_name_or_path="openai-community/gpt2",
-        num_train_epochs=1,
-        per_device_train_batch_size=2,
-        gradient_accumulation_steps=1,
-        learning_rate=3e-4,
-        logging_steps=10,
-        save_steps=100,
-        max_seq_length=128,
-        output_dir="./test_output/gpt2_lora",
-        use_fp16=False,
-        use_bf16=False,
-        lora_rank=16,
-        lora_alpha=32,
-        lora_dropout=0.1,
-    )
+
+    # Load base config from YAML and override for test
+    config = load_sft_config()
+    config.model_name_or_path = "openai-community/gpt2"
+    config.num_train_epochs = 1
+    config.per_device_train_batch_size = 2
+    config.gradient_accumulation_steps = 1
+    config.learning_rate = 3e-4
+    config.logging_steps = 10
+    config.save_steps = 100
+    config.max_seq_length = 128
+    config.output_dir = "./test_output/gpt2_lora"
+    config.use_fp16 = False
+    config.use_bf16 = False
+    config.lora_rank = 16
+    config.lora_alpha = 32
+    config.lora_dropout = 0.1
     
     trainer = SFTTrainer(
         config=config,
@@ -121,20 +131,20 @@ def test_full_finetuning():
     print("\n" + "=" * 60)
     print("测试 2: 全量微调")
     print("=" * 60)
-    
-    config = SFTTrainingConfig(
-        model_name_or_path="openai-community/gpt2",
-        num_train_epochs=1,
-        per_device_train_batch_size=2,
-        gradient_accumulation_steps=1,
-        learning_rate=5e-5,
-        logging_steps=10,
-        save_steps=100,
-        max_seq_length=128,
-        output_dir="./test_output/gpt2_full",
-        use_fp16=False,
-        use_bf16=False,
-    )
+
+    # Load base config from YAML and override for test
+    config = load_sft_config()
+    config.model_name_or_path = "openai-community/gpt2"
+    config.num_train_epochs = 1
+    config.per_device_train_batch_size = 2
+    config.gradient_accumulation_steps = 1
+    config.learning_rate = 5e-5
+    config.logging_steps = 10
+    config.save_steps = 100
+    config.max_seq_length = 128
+    config.output_dir = "./test_output/gpt2_full"
+    config.use_fp16 = False
+    config.use_bf16 = False
     
     trainer = SFTTrainer(
         config=config,
@@ -169,11 +179,11 @@ def test_lora_merge():
     print("\n" + "=" * 60)
     print("测试 3: LoRA Adapter 合并")
     print("=" * 60)
-    
-    config = SFTTrainingConfig(
-        model_name_or_path="openai-community/gpt2",
-        max_seq_length=128,
-    )
+
+    # Load base config from YAML and override for test
+    config = load_sft_config()
+    config.model_name_or_path = "openai-community/gpt2"
+    config.max_seq_length = 128
     
     trainer = SFTTrainer(config=config)
     
@@ -204,11 +214,11 @@ def test_inference():
     print("\n" + "=" * 60)
     print("测试 4: 推理测试")
     print("=" * 60)
-    
-    config = SFTTrainingConfig(
-        model_name_or_path="openai-community/gpt2",
-        max_seq_length=128,
-    )
+
+    # Load base config from YAML and override for test
+    config = load_sft_config()
+    config.model_name_or_path = "openai-community/gpt2"
+    config.max_seq_length = 128
     
     trainer = SFTTrainer(config=config)
     

@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 # 导入项目模块
 try:
-    from config.kg_config import KGConfig
     from knowledge_base.kg.kg_builder import KGBuilder, KGTriplet
     from knowledge_base.pdf.pdf_parser import PDFParser
     from langchain_community.graphs.neo4j_graph import Neo4jGraph
@@ -39,6 +38,16 @@ except ImportError as e:
     import traceback
     traceback.print_exc()
     sys.exit(1)
+
+
+# Simple KGConfig class for testing (replaces config.kg_config.KGConfig)
+class KGConfig:
+    """Knowledge Graph configuration for Neo4j connection"""
+    def __init__(self, uri: str, username: str, password: str, database: str = "neo4j"):
+        self.uri = uri
+        self.username = username
+        self.password = password
+        self.database = database
 
 
 class TestKGBuilder(unittest.TestCase):
