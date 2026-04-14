@@ -2,15 +2,15 @@ from pathlib import Path
 import os, sys
 sys.path.append(str(Path(__file__).parent.parent))
 import spacy
-from config.ner_config import NERConfig
+from config.settings import settings
 from typing import List, Dict, Any, Optional
 
 
 class NERService:
     """命名实体识别服务"""
-    def __init__(self, config: Optional[NERConfig] = None):
+    def __init__(self, config=None):
         """初始化命名实体识别服务"""
-        self.config = config or NERConfig()
+        self.config = config if config is not None else settings.ner
         self.model_provider = self.config.model_provider
 
         self.ner_model = None

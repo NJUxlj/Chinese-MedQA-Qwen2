@@ -14,34 +14,34 @@ from rank_bm25 import BM25Okapi
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from knowledge_base.retrieval.base_retriever import BaseRetriever  
-from config.retriever_config import BM25RetrieverConfig
+from config.settings import settings
 
-logger = logging.getLogger(__name__)  
+logger = logging.getLogger(__name__)
 
-class BM25Retriever(BaseRetriever):  
-    """  
-    Retriever that uses BM25 algorithm to find relevant documents.  
-    BM25 is a bag-of-words retrieval function that ranks documents based on   
-    the query terms appearing in each document.  
-    """  
-    
-    def __init__(  
-        self,  
-        config: Optional[BM25RetrieverConfig] = None,  
-    ):  
-        """  
-        Initialize the BM25 retriever.  
-        
-        Args:  
-            config: BM25RetrieverConfig with BM25 parameters  
-        """  
+class BM25Retriever(BaseRetriever):
+    """
+    Retriever that uses BM25 algorithm to find relevant documents.
+    BM25 is a bag-of-words retrieval function that ranks documents based on
+    the query terms appearing in each document.
+    """
+
+    def __init__(
+        self,
+        config=None,
+    ):
+        """
+        Initialize the BM25 retriever.
+
+        Args:
+            config: BM25RetrieverConfig with BM25 parameters
+        """
         if config is None:
-            config = BM25RetrieverConfig()
+            config = settings.retriever.bm25
         super().__init__(config=config)
-        
-        self.score_threshold = config.score_threshold
-        self.use_jieba = config.use_jieba
-        self.tokenizer = config.tokenizer  
+
+        self.score_threshold = config.score_threshold if hasattr(config, 'score_threshold') else 0.1
+        self.use_jieba = config.use_jieba if hasattr(config, 'use_jieba') else True
+        self.tokenizer = getattr(config, 'tokenizer', None)  
         
         # Storage for documents and BM25 model  
         self.documents: List[Document] = []  

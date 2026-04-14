@@ -2,7 +2,7 @@ from pathlib import Path
 import os, sys
 sys.path.append(str(Path(__file__).parent.parent))
 import spacy
-from config.kg_config import KGConfig
+from config.settings import settings
 from typing import List, Dict, Any, Optional
 from langchain_community.graphs.neo4j_graph import Neo4jGraph
 from langchain_community.graphs.graph_document import GraphDocument
@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 class KGClient:
     """知识图谱客户端"""
-    def __init__(self, config: Optional[KGConfig] = None, ner_service: Optional[NERService] = None):
+    def __init__(self, config=None, ner_service: Optional[NERService] = None):
         """初始化知识图谱客户端"""
-        self.config = config or KGConfig()
+        self.config = config if config is not None else settings.neo4j
         self.ner_service = ner_service or NERService()
         self.graph = None
         self._connect()

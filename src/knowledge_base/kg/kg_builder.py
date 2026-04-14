@@ -7,7 +7,7 @@ from typing import List, Dict, Union, Optional, Tuple
 import json
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from config.kg_config import KGConfig
+from config.settings import settings
 from langchain_community.graphs.neo4j_graph import Neo4jGraph
 
 # 配置日志
@@ -27,9 +27,9 @@ class KGBuilder:
     """知识图谱构建器，用于构建知识图谱"""
 
 
-    def __init__(self, config: KGConfig):
+    def __init__(self, config=None):
         """初始化构建器"""
-        self.config = config
+        self.config = config if config is not None else settings.neo4j
         self.neo4j_graph = None
         self._setup_neo4j_connection()
 
@@ -518,8 +518,7 @@ class KGBuilder:
 
 
 if __name__ == "__main__":
-    kg_config = KGConfig()
-    kg_builder = KGBuilder(kg_config)
+    kg_builder = KGBuilder()
     kg_builder.build_kg_from_pdfs("data/pdfs")
 
 

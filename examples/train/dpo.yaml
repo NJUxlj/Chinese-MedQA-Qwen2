@@ -1,15 +1,20 @@
-# DPOTrainingConfig - DPO训练配置
+# DPOTrainingConfig - DPO (Direct Preference Optimization) 训练配置
+# 参考: LLaMA-Factory DPO 训练模板
+
+### 基础模型配置
 model_name_or_path: "Qwen/Qwen3-14B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"
 
+### 量化配置
 use_4bit: false
 use_8bit: false
 use_fp16: false
 use_bf16: false
 trust_remote_code: true
 
+### 输出配置
 output_dir: "output/dpo"
 num_train_epochs: 3
 per_device_train_batch_size: 4
@@ -34,13 +39,45 @@ do_train: true
 do_eval: false
 dataloader_num_workers: 4
 
-# LoRA 配置
+### LoRA 配置
 lora_rank: 64
 lora_alpha: 16
 lora_dropout: 0.05
 target_modules: null
+lora_bias: "none"
+lora_task_type: "CAUSAL_LM"
 
-# 分布式训练配置
+### DPO 特定配置
+stage: "dpo"
+finetuning_type: "lora"
+
+# DPO 超参数
+beta: 0.1  # KL 散度的温度参数
+label_smoothing: 0.0
+loss_type: "sigmoid"  # sigmoid, hinge, kd_div, symmetric
+
+# 参考模型配置
+ref_model_name_or_path: null  # 如果为 null，使用相同的模型作为参考
+ref_adpter: null
+ref_peft_type: "lora"
+
+### 数据配置
+dataset: "your_dpo_dataset_name"
+dataset_dir: "data"
+template: "qwen2"
+cutoff_len: 2048
+overwrite_cache: true
+preprocessing_num_workers: 8
+positive_template: "positve"
+negative_template: "negative"
+
+### 验证配置
+val_size: 0.0
+precompute_ref_log_probs: false
+freeze_module: "ref_model"
+rl_dropout: 0.0
+
+### 分布式训练配置
 distributed_strategy: "auto"
 find_unused_parameters: false
 main_process_ip: "localhost"

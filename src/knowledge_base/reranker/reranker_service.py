@@ -6,7 +6,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from sentence_transformers import CrossEncoder
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from config.reranker_config import RerankerConfig
+from config.settings import settings
 from langchain_core.documents import Document
 from langchain_core.documents import Document
 
@@ -23,9 +23,9 @@ class RerankerService:
         - Qwen3-Reranker 使用特殊的输入格式和输出机制
         - 根据模型名称自动选择使用传统 CrossEncoder 方式或 Qwen3-Reranker 特殊方式
     """
-    def __init__(self, config: Optional[RerankerConfig] = None):
+    def __init__(self, config=None):
         """初始化 reranker 服务"""
-        self.config = config or RerankerConfig()
+        self.config = config if config is not None else settings.embedding
         self.model_provider = self.config.model_provider
         self.reranker_model = None
         self.tokenizer = None
@@ -454,8 +454,7 @@ class RerankerService:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    config = RerankerConfig()
-    reranker_service = RerankerService(config)
+    reranker_service = RerankerService()
     
     
     test_query = "什么是高血压？"

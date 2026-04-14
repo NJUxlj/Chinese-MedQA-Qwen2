@@ -1,0 +1,290 @@
+# =============================================================================
+# Chinese-MedQA-Qwen2 统一配置文件
+# =============================================================================
+
+# =============================================================================
+# LLM 配置
+# =============================================================================
+llm:
+  model_provider: ${GLOBAL_LLM_SERVICE}
+  model_name: ${MODEL_NAME}
+  api_key: ${API_KEY}
+  base_url: ${BASE_URL}
+  max_tokens: 2048
+  temperature: 0.7
+  top_p: 0.9
+  timeout: 60
+
+# =============================================================================
+# Milvus 配置
+# =============================================================================
+milvus:
+  uri: ${MILVUS_URI}
+  token: ${MILVUS_TOKEN}
+  db_name: ${MILVUS_DB_NAME}
+  index_type: ${MILVUS_INDEX_TYPE}
+  metric_type: ${MILVUS_METRIC_TYPE}
+  consistency_level: ${MILVUS_CONSISTENCY_LEVEL}
+
+# =============================================================================
+# Neo4j 配置
+# =============================================================================
+neo4j:
+  uri: bolt://localhost:7687
+  username: neo4j
+  password: ${NEO4J_PASSWORD}
+
+# =============================================================================
+# RAG 配置
+# =============================================================================
+rag:
+  retriever_type: hybrid
+  embedding_model_name: ${EMBEDDING_MODEL_NAME}
+  top_k: 5
+  similarity_threshold: 0.5
+  use_reranker: true
+  hybrid_weight: 0.7
+
+# =============================================================================
+# Agent 配置
+# =============================================================================
+agent:
+  max_iterations: 10
+  tool_timeout: 30
+  enable_auto_tool_choice: false
+
+# =============================================================================
+# 嵌入配置
+# =============================================================================
+embedding:
+  model_name: ${EMBEDDING_MODEL_NAME}
+  model_path: ${EMBEDDING_MODEL_PATH}
+  reranker_model_path: ${RERANKER_MODEL_PATH}
+  batch_size: 32
+  dimension: 768
+
+# =============================================================================
+# 推理配置
+# =============================================================================
+inference:
+  model_name_or_path: ${LOCAL_MODEL_PATH}
+  device: cuda:0
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  gpu_memory_utilization: 0.9
+  max_model_len: null
+  max_new_tokens: 2048
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 50
+  dtype: auto
+  trust_remote_code: true
+
+# =============================================================================
+# 评估器配置
+# =============================================================================
+evaluator:
+  model_name_or_path: ${LOCAL_MODEL_PATH}
+  test_dataset_path: null
+  batch_size: 4
+  max_new_tokens: 2048
+  temperature: 0.7
+  metrics: [bleu, rouge]
+
+# =============================================================================
+# 本地模型配置
+# =============================================================================
+local_model:
+  model_path: ${LOCAL_MODEL_PATH}
+  device: cuda:0
+  trust_remote_code: true
+
+# =============================================================================
+# VLLM 部署配置
+# =============================================================================
+vllm:
+  model_name_or_path: Qwen/Qwen3-14B
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  gpu_memory_utilization: 0.9
+  max_model_len: null
+  max_num_seqs: null
+  dtype: auto
+  quantization: null
+  enforce_eager: false
+  swap_space: 4
+  trust_remote_code: true
+  seed: 42
+
+# =============================================================================
+# API 配置
+# =============================================================================
+api:
+  base_url: ${API_BASE_URL}
+  admin_api_key: ${ADMIN_API_KEY}
+  cors_allowed_origins: ${CORS_ALLOWED_ORIGINS}
+
+# =============================================================================
+# Knowledge Base 配置
+# =============================================================================
+knowledge_base:
+  index_dir: knowledge_base/indices
+  default_retriever: hybrid
+
+# =============================================================================
+# Retriever 配置
+# =============================================================================
+retriever:
+  default_type: hybrid
+  default_weight: 0.7
+  bm25_score_threshold: 0.1
+  use_jieba: true
+  knn_index_type: Flat
+  knn_n_list: 100
+  knn_m: 16
+  l2_distance_threshold: 0.5
+
+# =============================================================================
+# NER 配置
+# =============================================================================
+ner:
+  model_provider: spacy
+  model_name: zh_core_web_sm
+  device: -1
+  batch_size: 32
+
+# =============================================================================
+# Azure AI 配置
+# =============================================================================
+azure_ai:
+  project_endpoint: ${PROJECT_ENDPOINT}
+  subscription_id: ${AZURE_SUBSCRIPTION_ID}
+  resource_group: ${AZURE_OPENAI_RESOURCE_GROUP}
+  service: ${AZURE_OPENAI_SERVICE}
+  agent_model_deployment_name: ${AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME}
+  project_name: ${AZURE_AI_PROJECT_NAME}
+
+# =============================================================================
+# 训练配置 (参考 LLaMA-Factory)
+# =============================================================================
+training:
+  output_dir: ./output
+  sft_model_name: qwen2_medical_sft
+  dpo_model_name: qwen2_medical_dpo
+  deepspeed_config_path: ./src/config/ds_config.json
+
+# Model
+model:
+  model_name_or_path: ${LOCAL_MODEL_PATH}
+  trust_remote_code: true
+
+# Method
+method:
+  stage: sft
+  do_train: true
+  finetuning_type: lora
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0
+  lora_target: all
+
+# Data
+data:
+  dataset: alpaca_en_demo
+  template: qwen
+  flash_attn: auto
+  cutoff_len: 1024
+  max_samples: 1000
+  preprocessing_num_workers: 16
+  dataloader_num_workers: 4
+  train_files: null
+  val_files: null
+  prompt_key: question
+  response_key: answer
+
+# Output
+output:
+  output_dir: ./output
+  logging_steps: 10
+  save_steps: 500
+  plot_loss: true
+  overwrite_output_dir: true
+  report_to: tensorboard
+
+# Train
+train:
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 1.0e-4
+  num_train_epochs: 3.0
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.1
+  bf16: true
+  ddp_timeout: 180000000
+  max_grad_norm: 1.0
+  optim: adamw_torch
+
+# Eval
+eval:
+  val_size: 0.1
+  per_device_eval_batch_size: 1
+  eval_strategy: steps
+  eval_steps: 500
+
+# =============================================================================
+# RL 训练配置 (参考 verl)
+# =============================================================================
+rl_data:
+  train_files: ~/data/rlhf/gsm8k/train.parquet
+  val_files: ~/data/rlhf/gsm8k/test.parquet
+  prompt_key: prompt
+  max_prompt_length: 512
+  max_response_length: 512
+  train_batch_size: 1024
+  shuffle: true
+  dataloader_num_workers: 8
+
+actor_rollout_ref:
+  hybrid_engine: true
+  model:
+    path: ${LOCAL_MODEL_PATH}
+    enable_gradient_checkpointing: true
+    lora_rank: 0
+    lora_alpha: 16
+  actor:
+    strategy: fsdp
+    ppo_mini_batch_size: 256
+    grad_clip: 1.0
+    clip_ratio: 0.2
+    lr: 1e-6
+    weight_decay: 0.01
+  rollout:
+    name: vllm
+    temperature: 1.0
+    top_k: -1
+    top_p: 1.0
+    dtype: bfloat16
+    gpu_memory_utilization: 0.5
+
+algorithm:
+  gamma: 1.0
+  lam: 1.0
+  adv_estimator: gae
+  kl_penalty: kl
+  kl_ctrl:
+    type: fixed
+    kl_coef: 0.001
+
+rl_trainer:
+  total_epochs: 30
+  project_name: verl_examples
+  experiment_name: gsm8k
+  logger: [console, wandb]
+  nnodes: 1
+  n_gpus_per_node: 8
+  save_freq: -1
+  test_freq: -1
+  device: cuda
+
+ray_init:
+  num_cpus: null

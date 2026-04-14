@@ -15,7 +15,7 @@ from tools.reaction_agent_tool import ReActAgentTool
 from tools.medical_assessment_tool import MedicalAssessmentTool
 
 from utils.logger import setup_logger
-from config.agent_config import AgentConfig
+from config.settings import settings
 from models.base_model import BaseGenerativeModel
 from rag.rag_pipeline import RAGPipeline
 
@@ -31,7 +31,7 @@ class AgentFactory:
         agent_type: str,
         model: BaseGenerativeModel,
         rag_pipeline: Optional[RAGPipeline] = None,
-        config: Optional[AgentConfig] = None,
+        config: Optional = None,
         **kwargs
     ) -> AgentBase:
         """
@@ -69,7 +69,7 @@ class AgentFactory:
     def load_default_tools(
         agent: AgentBase,
         model: BaseGenerativeModel,
-        config: AgentConfig
+        config=None
     ) -> None:
         """
         加载默认工具到Agent

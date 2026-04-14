@@ -19,8 +19,7 @@ from rag.response_generator import ResponseGenerator
 from models.base_model import BaseGenerativeModel
 from utils.logger import setup_logger
 
-from config.rag_config import RAGConfig
-from config.embedding_config import EmbeddingConfig
+from config.settings import settings
 
 logger = setup_logger(__name__)
 
@@ -28,14 +27,14 @@ class RAGPipeline:
     """
     RAG流水线，整合查询处理、文档检索、上下文构建和响应生成
     """
-    
+
     def __init__(
         self,
-        config: RAGConfig
+        config=None
     ):
         """
         初始化RAG流水线
-        
+
         Args:
             retriever_type: 检索器类型
             embedding_model_name: 嵌入模型名称
@@ -54,33 +53,55 @@ class RAGPipeline:
             temperature: 生成温度
             top_p: 生成top_p值
         """
+        if config is None:
+            from omegaconf import OmegaConf
+            config = OmegaConf.create({
+                'retriever_type': settings.retriever.default_type if hasattr(settings, 'retriever') else 'hybrid',
+                'embedding_model_name': settings.embedding.model_name if hasattr(settings, 'embedding') else 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+                'embedding_dimension': settings.embedding.dimension if hasattr(settings, 'embedding') else 768,
+                'index_path': None,
+                'top_k': 3,
+                'model': None,
+                'cache_dir': None,
+                'reranker_model_provider': 'transformers',
+                'reranker_model_path': settings.embedding.reranker_model_path if hasattr(settings.embedding, 'reranker_model_path') else None,
+                'reranker_model_name': None,
+                'use_reranker': False,
+                'hybrid_weight': settings.retriever.default_weight if hasattr(settings, 'retriever') else 0.7,
+                'chunk_size': 500,
+                'chunk_overlap': 50,
+                'response_template': None,
+                'max_new_tokens': 512,
+                'temperature': 0.7,
+                'top_p': 0.9,
+            })
         self.config = config
 
 
         self.retriever_type: str = self.config.retriever_type
         self.embedding_model_name: str = self.config.embedding_model_name
-        self.embedding_dimension: int = self.config.embedding_dimension
-        self.index_path: Optional[str] = self.config.index_path
-        self.top_k: int = self.config.top_k
-        self.model: Optional[BaseGenerativeModel] = self.config.model
-        self.cache_dir: Optional[str] = self.config.cache_dir
-        self.reranker_model_provider: str = self.config.reranker_model_provider
-        self.reranker_model_path: Optional[str] = self.config.reranker_model_path
-        self.reranker_model_name: Optional[str] = self.config.reranker_model_name
-        self.use_reranker: bool = self.config.use_reranker
-        self.hybrid_weight: float = self.config.hybrid_weight
-        self.chunk_size: int = self.config.chunk_size
-        self.chunk_overlap: int = self.config.chunk_overlap
-        self.response_template: Optional[str] = self.config.response_template
-        self.max_new_tokens: int = self.config.max_new_tokens
-        self.temperature: float = self.config.temperature
-        self.top_p: float = self.config.top_p
+        self.embedding_dimension: int = self.config.embedding_dimension if hasattr(self.config, 'embedding_dimension') else 768
+        self.index_path: Optional[str] = self.config.index_path if hasattr(self.config, 'index_path') else None
+        self.top_k: int = self.config.top_k if hasattr(self.config, 'top_k') else 3
+        self.model: Optional[BaseGenerativeModel] = self.config.model if hasattr(self.config, 'model') else None
+        self.cache_dir: Optional[str] = self.config.cache_dir if hasattr(self.config, 'cache_dir') else None
+        self.reranker_model_provider: str = self.config.reranker_model_provider if hasattr(self.config, 'reranker_model_provider') else 'transformers'
+        self.reranker_model_path: Optional[str] = self.config.reranker_model_path if hasattr(self.config, 'reranker_model_path') else None
+        self.reranker_model_name: Optional[str] = self.config.reranker_model_name if hasattr(self.config, 'reranker_model_name') else None
+        self.use_reranker: bool = self.config.use_reranker if hasattr(self.config, 'use_reranker') else False
+        self.hybrid_weight: float = self.config.hybrid_weight if hasattr(self.config, 'hybrid_weight') else 0.7
+        self.chunk_size: int = self.config.chunk_size if hasattr(self.config, 'chunk_size') else 500
+        self.chunk_overlap: int = self.config.chunk_overlap if hasattr(self.config, 'chunk_overlap') else 50
+        self.response_template: Optional[str] = self.config.response_template if hasattr(self.config, 'response_template') else None
+        self.max_new_tokens: int = self.config.max_new_tokens if hasattr(self.config, 'max_new_tokens') else 512
+        self.temperature: float = self.config.temperature if hasattr(self.config, 'temperature') else 0.7
+        self.top_p: float = self.config.top_p if hasattr(self.config, 'top_p') else 0.9
 
-    
-        
+
+
         # 初始化查询处理器
         self.query_processor = QueryProcessor()
-        
+
         # 初始化嵌入管理器 (对于某些检索器需要)
         if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
             self.embedding_manager = EmbeddingManager(
@@ -89,36 +110,24 @@ class RAGPipeline:
             )
         else:
             self.embedding_manager = None
-        
+
         # 根据类型初始化检索器
         if self.retriever_type == "knn":
-            from config.retriever_config import KNNRetrieverConfig
-            config = KNNRetrieverConfig()
             self.retriever = KNNRetriever(
-                config=config,
                 embedding_manager=self.embedding_manager
             )
         elif self.retriever_type == "similarity":
-            from config.retriever_config import SimilarityRetrieverConfig
-            config = SimilarityRetrieverConfig()
             self.retriever = SimilarityRetriever(
-                config=config,
                 embedding_manager=self.embedding_manager
             )
         elif self.retriever_type == "bm25":
             self.retriever = BM25Retriever()
         elif self.retriever_type == "l2":
-            from config.retriever_config import L2RetrieverConfig
-            config = L2RetrieverConfig()
             self.retriever = L2Retriever(
-                config=config,
                 embedding_manager=self.embedding_manager
             )
         elif self.retriever_type == "hybrid":
-            from config.retriever_config import KNNRetrieverConfig
-            dense_config = KNNRetrieverConfig()
             self.dense_retriever = KNNRetriever(
-                config=dense_config,
                 embedding_manager=self.embedding_manager
             )
             self.sparse_retriever = BM25Retriever()

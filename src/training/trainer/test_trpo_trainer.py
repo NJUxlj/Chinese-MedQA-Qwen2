@@ -16,7 +16,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from training.trainer.trpo_trainer import TRPOTrainer
-from config.training_config import TRPOTrainingConfig
+from config.settings import settings
 
 
 from dotenv import load_dotenv

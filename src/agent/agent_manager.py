@@ -4,7 +4,7 @@ import uuid
 from agent.base_agent import BaseAgent
 from agent.agent_factory import AgentFactory
 from utils.logger import setup_logger
-from config.agent_config import AgentConfig
+from config.settings import settings
 from models.api_model import ApiModel
 from rag.rag_pipeline import RAGPipeline
 
@@ -24,7 +24,7 @@ class AgentManager:
         agent_type: str,
         model: ApiModel,
         rag_pipeline: Optional[RAGPipeline] = None,
-        config: Optional[AgentConfig] = None,
+        config: Optional = None,
         agent_id: Optional[str] = None,
         **kwargs
     ) -> str:

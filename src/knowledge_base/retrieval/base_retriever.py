@@ -7,15 +7,15 @@ from utils.logger import setup_logger
 from abc import ABC, abstractmethod  
 from typing import List, Dict, Any, Optional, Tuple  
 from langchain_core.documents import Document  
-from config.retriever_config import RetrieverConfig
+from config.settings import settings
 
-class BaseRetriever(ABC):  
-    """  
-    Base class for all retrievers in the medical knowledge base.  
-    All retrieval methods should inherit from this class.  
-    """  
-    
-    def __init__(self, config: RetrieverConfig):  
+class BaseRetriever(ABC):
+    """
+    Base class for all retrievers in the medical knowledge base.
+    All retrieval methods should inherit from this class.
+    """
+
+    def __init__(self, config=None):  
         """  
         Initialize the base retriever.  
         

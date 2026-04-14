@@ -16,7 +16,7 @@ from transformers import BitsAndBytesConfig
 from peft import LoraConfig, get_peft_model, TaskType
 from accelerate import Accelerator, DistributedDataParallelKwargs
 from utils.logger import setup_logger
-from config.training_config import BaseTrainingConfig
+from config.settings import settings
 from utils.metrics import MathEvaluator
 
 
@@ -31,11 +31,11 @@ class BaseTrainer:
 
     def __init__(
         self,
-        config: BaseTrainingConfig
+        config=None
     ):
         '''
         初始化 SFT 训练器
-        
+
         Args:
             model_name: 模型名称或路径
             max_seq_length: 最大序列长度
@@ -43,14 +43,16 @@ class BaseTrainer:
             use_gradient_checkpointing: 是否使用梯度检查点
             device_map: 设备映射策略
         '''
-        self.config:BaseTrainingConfig = config
-        self.model_name = config.model_name_or_path
-        self.max_seq_length = config.max_seq_length
-        self.use_4bit = config.use_4bit
-        self.use_gradient_checkpointing = config.use_gradient_checkpointing
-        self.device_map = config.device_map
-        self.use_fp16 = config.use_fp16
-        self.trust_remote_code = config.trust_remote_code
+        if config is None:
+            config = settings.training if hasattr(settings, 'training') else {}
+        self.config = config
+        self.model_name = config.model_name_or_path if hasattr(config, 'model_name_or_path') else 'Qwen/Qwen2.5-7B'
+        self.max_seq_length = config.max_seq_length if hasattr(config, 'max_seq_length') else 2048
+        self.use_4bit = config.use_4bit if hasattr(config, 'use_4bit') else False
+        self.use_gradient_checkpointing = config.use_gradient_checkpointing if hasattr(config, 'use_gradient_checkpointing') else True
+        self.device_map = config.device_map if hasattr(config, 'device_map') else 'auto'
+        self.use_fp16 = config.use_fp16 if hasattr(config, 'use_fp16') else True
+        self.trust_remote_code = config.trust_remote_code if hasattr(config, 'trust_remote_code') else True
         
         self.model = None
         self.tokenizer = None

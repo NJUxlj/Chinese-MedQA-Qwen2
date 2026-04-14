@@ -19,7 +19,7 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 from models.base_model import BaseGenerativeModel  
-from config.local_model_config import LocalModelConfig
+from config.settings import settings
 
 
 # from models.qwen2.modeling_qwen2 import Qwen2ForCausalLM

@@ -1,15 +1,21 @@
 # SFTTrainingConfig - 监督微调训练配置
+# 使用 LLaMA-Factory 风格的 SFT 配置
+# 参考: https://github.com/hiyouga/LLaMA-Factory
+
+### 基础模型配置
 model_name_or_path: "Qwen/Qwen3-14B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"
 
+### 量化配置
 use_4bit: false
 use_8bit: false
 use_fp16: false
 use_bf16: false
 trust_remote_code: true
 
+### 输出配置
 output_dir: "output/sft"
 num_train_epochs: 3
 per_device_train_batch_size: 4
@@ -34,13 +40,31 @@ do_train: true
 do_eval: false
 dataloader_num_workers: 4
 
-# LoRA 配置
+### LoRA 配置
 lora_rank: 64
 lora_alpha: 16
 lora_dropout: 0.05
 target_modules: null
+lora_bias: "none"
+lora_task_type: "CAUSAL_LM"
 
-# 分布式训练配置
+### 训练方法配置
+stage: "sft"
+finetuning_type: "lora"
+
+### 数据配置
+dataset: "your_dataset_name"
+dataset_dir: "data"
+template: "qwen2"
+cutoff_len: 2048
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### 验证配置
+val_size: 0.0
+neat_packing: false
+
+### 分布式训练配置
 distributed_strategy: "auto"
 find_unused_parameters: false
 main_process_ip: "localhost"

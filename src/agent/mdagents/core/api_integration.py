@@ -8,21 +8,21 @@ import json
 from datetime import datetime
 
 from models.api_model import ApiModel, ZhipuApiModel, OpenAIApiModel
-from config.llm_config import LLMConfig
+from config.settings import settings
 from ..tools.logger import setup_logger
 
 
 class ApiIntegrationManager:
     """API集成管理器"""
     
-    def __init__(self, llm_config: LLMConfig):
+    def __init__(self, llm_config=None):
         """
         初始化API集成管理器
-        
+
         Args:
             llm_config: LLM配置对象
         """
-        self.llm_config = llm_config
+        self.llm_config = llm_config if llm_config is not None else settings.llm
         self.logger = setup_logger(self.__class__.__name__)
         
         # 初始化API模型

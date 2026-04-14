@@ -3,7 +3,7 @@ from pathlib import Path
 import sys, os
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from trainer.base_trainer import BaseTrainer
-from config.training_config import GSPOTrainingConfig
+from config.settings import settings
 from utils.logger import setup_logger
 
 

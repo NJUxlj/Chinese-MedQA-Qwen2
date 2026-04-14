@@ -17,7 +17,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from abc import ABC, abstractmethod
 
 from models.base_model import BaseGenerativeModel  
-from config.llm_config import LLMConfig
+from config.settings import settings
 from zhipuai import ZhipuAI  
 import openai  
 

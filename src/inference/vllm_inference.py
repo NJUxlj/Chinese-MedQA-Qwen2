@@ -13,7 +13,7 @@ from threading import Lock
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 
 from utils.logger import setup_logger  
-from config.local_model_config import LocalModelConfig  
+from config.settings import settings  
 from inference.inference_utils import (  
     format_prompt,   
     format_rag_prompt,   

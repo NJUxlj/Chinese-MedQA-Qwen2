@@ -20,7 +20,7 @@ from accelerate import Accelerator, DistributedDataParallelKwargs
 from accelerate import FullyShardedDataParallelPlugin
 from accelerate import DeepSpeedPlugin
 from utils.logger import setup_logger
-from config.training_config import BaseTrainingConfig, EmbeddingTrainingConfig
+from config.settings import settings
 from training.trainer.base_trainer import BaseTrainer
 
 

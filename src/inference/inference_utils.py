@@ -14,8 +14,7 @@ from pathlib import Path
 # 确保可以导入项目其他模块  
 sys.path.append(str(Path(__file__).parent.parent))  
 
-from config.local_model_config import LocalModelConfig  
-from config.rag_config import RAGConfig  
+from config.settings import settings  
 from utils.logger import setup_logger
 
 logger = setup_logger(name=__class__.__name__, level="INFO")
@@ -130,9 +129,9 @@ def get_model_path(model_name_or_path: str) -> str:
     if os.path.exists(model_name_or_path):  
         return model_name_or_path  
     
-    # 获取模型配置中的路径  
-    model_config = LocalModelConfig()  
-    model_dir = model_config.model_dir  
+    # 获取模型配置中的路径
+    model_config = settings.local_model
+    model_dir = model_config.model_path if hasattr(model_config, 'model_path') else './models'  
     
     # 检查是否在model_dir中  
     local_path = os.path.join(model_dir, model_name_or_path)  

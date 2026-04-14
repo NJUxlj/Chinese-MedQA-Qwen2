@@ -15,14 +15,14 @@ from knowledge_base.retrieval.knn_retriever import KNNRetriever
 from rag.rag_pipeline import RAGPipeline
 from rag.response_generator import ResponseGenerator
 from agent.medical_agent import MedicalAgent
-from config.model_config import ModelConfig
+from config.settings import settings
 from utils.logger import setup_logger
 
 # 创建logger
 logger = setup_logger(__name__)
 
 # 加载配置
-model_config = ModelConfig()
+model_config = settings
 
 # 创建FastAPI应用
 app = FastAPI(

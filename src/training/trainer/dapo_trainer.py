@@ -20,7 +20,7 @@ from accelerate import Accelerator, DistributedDataParallelKwargs
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from trainer.base_trainer import BaseTrainer
-from config.training_config import DAPOTrainingConfig
+from config.settings import settings
 from utils.logger import setup_logger
 from utils.dataproto import DataProto
 

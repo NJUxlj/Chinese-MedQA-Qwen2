@@ -13,21 +13,26 @@ from langchain_core.documents import Document
 from knowledge_base.retrieval.base_retriever import BaseRetriever  
 from knowledge_base.embedding.embedding_manager import EmbeddingManager  
 from utils.logger import setup_logger
-from config.retriever_config import L2RetrieverConfig
+from config.settings import settings
 
-logger = logging.getLogger(__name__)  
+logger = logging.getLogger(__name__)
 
-class L2Retriever(BaseRetriever):  
-    """  
-    Retriever that uses L2 Euclidean distance to find most similar documents.  
-    Lower distances indicate higher similarity.  
-    """  
-    
-    def __init__(  
-        self,  
-        config: L2RetrieverConfig,
-        embedding_manager: EmbeddingManager,  
-    ):  
+class L2Retriever(BaseRetriever):
+    """
+    Retriever that uses L2 Euclidean distance to find most similar documents.
+    Lower distances indicate higher similarity.
+    """
+
+    def __init__(
+        self,
+        config=None,
+        embedding_manager: EmbeddingManager=None,
+    ):
+        if config is None:
+            config = settings.retriever.l2
+        if embedding_manager is None:
+            from knowledge_base.embedding.embedding_manager import EmbeddingManager
+            embedding_manager = EmbeddingManager()  
         """  
         Initialize the L2 retriever.  
         

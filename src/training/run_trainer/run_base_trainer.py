@@ -9,7 +9,7 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 
-from config.training_config import BaseTrainingConfig
+from config.settings import settings
 from training.trainer.base_trainer import BaseTrainer
 
 
@@ -24,7 +24,7 @@ def main():
     )
     
     print(f"Loading config from: {base_trainer_yaml_path}")
-    base_trainer_config = BaseTrainingConfig.from_yaml(base_trainer_yaml_path)
+    base_trainer_config = OmegaConf.load(base_trainer_yaml_path)
     
     # 设置训练和验证数据路径
     train_data_path = os.path.join(
@@ -62,13 +62,13 @@ def main():
 
 
 
-def run_base_trainer(base_trainer_config: BaseTrainingConfig, train_data, valid_data):
+def run_base_trainer(base_trainer_config, train_data, valid_data):
     trainer = BaseTrainer(base_trainer_config)
-    
+
     # 启动训练
     trainer.start_training(
         dataset=train_data,
-        output_dir=base_trainer_config.output_dir,
+        output_dir=base_trainer_config.output_dir if hasattr(base_trainer_config, 'output_dir') else './output',
         messages_field="messages",
         eval_dataset=valid_data
     )

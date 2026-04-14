@@ -1,15 +1,21 @@
-# GSPOTrainingConfig - GRPO训练配置 (使用 GSPOTrainingConfig)
+# GSPOTrainingConfig - GRPO (Group Relative Policy Optimization) 训练配置
+# 基于 verl 框架的 GRPO 配置
+# 参考: https://github.com/verl/verl
+
+### 基础模型配置
 model_name_or_path: "Qwen/Qwen3-14B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"
 
+### 量化配置
 use_4bit: false
 use_8bit: false
 use_fp16: false
 use_bf16: false
 trust_remote_code: true
 
+### 输出配置
 output_dir: "output/grpo"
 num_train_epochs: 3
 per_device_train_batch_size: 4
@@ -34,7 +40,113 @@ do_train: true
 do_eval: false
 dataloader_num_workers: 4
 
-# 分布式训练配置
+### GRPO/verl 配置
+stage: "grpo"
+
+### 数据配置
+train_files: "data/rlhf/train.parquet"
+val_files: "data/rlhf/val.parquet"
+prompt_key: "prompt"
+max_prompt_length: 512
+max_response_length: 512
+train_batch_size: 1024
+shuffle: true
+filter_overlong_prompts: false
+
+### Actor 配置
+actor:
+  strategy: "fsdp"
+  ppo_mini_batch_size: 256
+  ppo_micro_batch_size_per_gpu: null
+  use_dynamic_bsz: false
+  ppo_max_token_len_per_gpu: 16384
+  grad_clip: 1.0
+  clip_ratio: 0.2
+  entropy_coeff: 0.0
+  use_kl_loss: true  # GRPO 使用 KL loss
+  kl_loss_coef: 0.001
+  kl_loss_type: "low_var_kl"
+  ppo_epochs: 1
+  shuffle: false
+  ulysses_sequence_parallel_size: 1
+  optim:
+    lr: 1e-6
+    lr_warmup_steps: -1
+    lr_warmup_steps_ratio: 0.0
+    warmup_style: "constant"
+    total_training_steps: -1
+    weight_decay: 0.01
+  fsdp_config:
+    wrap_policy:
+      min_num_params: 0
+    param_offload: false
+    optimizer_offload: false
+    fsdp_size: -1
+
+### Rollout 配置
+rollout:
+  name: "vllm"
+  temperature: 1.0
+  top_k: -1
+  top_p: 1.0
+  prompt_length: 512
+  response_length: 512
+  dtype: "bfloat16"
+  gpu_memory_utilization: 0.5
+  ignore_eos: false
+  enforce_eager: true
+  free_cache_engine: true
+  load_format: "dummy_dtensor"
+  tensor_model_parallel_size: 2
+  max_num_batched_tokens: 8192
+  max_num_seqs: 1024
+  disable_log_stats: true
+  enable_chunked_prefill: true
+  do_sample: true
+  n: 1  # > 1 for GRPO
+
+### Reference 模型配置
+ref:
+  strategy: "fsdp"
+  fsdp_config:
+    param_offload: false
+    reshard_after_forward: true
+    wrap_policy:
+      min_num_params: 0
+  log_prob_micro_batch_size_per_gpu: null
+  log_prob_use_dynamic_bsz: false
+  log_prob_max_token_len_per_gpu: 16384
+
+### 算法配置
+algorithm:
+  gamma: 1.0
+  lam: 1.0
+  adv_estimator: "gae"
+  use_kl_in_reward: false
+  kl_penalty: "kl"
+  kl_ctrl:
+    type: "fixed"
+    kl_coef: 0.001
+  norm_adv_by_std_in_grpo: true
+
+### Trainer 配置
+trainer:
+  total_epochs: 30
+  total_training_steps: null
+  project_name: "verl_grpo"
+  experiment_name: "grpo_experiment"
+  logger: ["console"]
+  log_val_generations: 0
+  nnodes: 1
+  n_gpus_per_node: 8
+  save_freq: -1
+  resume_mode: "auto"
+  resume_from_path: null
+  test_freq: -1
+  critic_warmup: 0
+  val_before_train: true
+
+### 分布式训练配置
 distributed_strategy: "auto"
 find_unused_parameters: false
 main_process_ip: "localhost"

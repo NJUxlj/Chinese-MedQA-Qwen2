@@ -26,26 +26,25 @@ import os, sys
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from utils.logger import setup_logger
 from embedding.embedder import TextEmbedder
-from config.embedding_config import EmbeddingConfig
-from config.milvus_config import MilvusConfig
+from config.settings import settings
 
 
 class MilvusClient:
     """
     基于 LangChain 的 Milvus 客户端类
-    
+
     提供 Milvus 向量数据库的基础操作功能，包括数据库管理、
     Collection 管理、文档操作和搜索功能。
     """
-    
+
     def __init__(
         self,
-        milvus_config:MilvusConfig,
-        embedding_config:EmbeddingConfig
+        milvus_config=None,
+        embedding_config=None
     ):
         """
         初始化 Milvus 客户端
-        
+
         Args:
             uri: Milvus 服务器 URI
             token: Milvus 认证令牌
@@ -56,8 +55,8 @@ class MilvusClient:
             metric_type: 距离度量类型 (L2, IP, COSINE)
             consistency_level: 一致性级别
         """
-        self.milvus_config = milvus_config
-        self.embedding_config = embedding_config
+        self.milvus_config = milvus_config if milvus_config is not None else settings.milvus
+        self.embedding_config = embedding_config if embedding_config is not None else settings.embedding
 
         self.uri = self.milvus_config.uri
         self.token = self.milvus_config.token

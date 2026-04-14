@@ -11,20 +11,25 @@ from langchain_core.documents import Document
 
 from knowledge_base.retrieval.base_retriever import BaseRetriever  
 from knowledge_base.embedding.embedding_manager import EmbeddingManager  
-from config.retriever_config import SimilarityRetrieverConfig
+from config.settings import settings
 
 
-class SimilarityRetriever(BaseRetriever):  
-    """  
-    Retriever that uses cosine similarity to find most similar documents.  
-    Implements a simple but effective vector similarity search.  
-    """  
-    
-    def __init__(  
-        self,  
-        config: SimilarityRetrieverConfig,
-        embedding_manager: EmbeddingManager,  
-    ):  
+class SimilarityRetriever(BaseRetriever):
+    """
+    Retriever that uses cosine similarity to find most similar documents.
+    Implements a simple but effective vector similarity search.
+    """
+
+    def __init__(
+        self,
+        config=None,
+        embedding_manager: EmbeddingManager=None,
+    ):
+        if config is None:
+            config = settings.retriever
+        if embedding_manager is None:
+            from knowledge_base.embedding.embedding_manager import EmbeddingManager
+            embedding_manager = EmbeddingManager()  
         """  
         Initialize the similarity retriever.  
         

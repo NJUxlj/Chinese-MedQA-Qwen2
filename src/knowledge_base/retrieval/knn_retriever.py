@@ -19,7 +19,7 @@ from langchain_core.documents import Document
 
 from knowledge_base.retrieval.base_retriever import BaseRetriever  
 from knowledge_base.embedding.embedding_manager import EmbeddingManager  
-from config.retriever_config import KNNRetrieverConfig
+from config.settings import settings
 
 logger = logging.getLogger(__name__)  
 
@@ -35,25 +35,29 @@ class KNNRetriever(BaseRetriever):
     - Inner Product with normalized vectors = Cosine Similarity  
     """  
     
-    def __init__(  
-        self,  
-        config: KNNRetrieverConfig,  
-        embedding_manager: EmbeddingManager,  
-    ):  
-        """  
-        Initialize the KNN retriever.  
-        
-        Args:  
-            config: KNNRetrieverConfig with index parameters  
-            embedding_manager: Embedding manager for document and query embedding  
-        """  
-        super().__init__(config=config)  
-        
-        self.embedding_manager = embedding_manager  
-        self.score_threshold = self.config.score_threshold  
-        self.index_type = self.config.index_type.upper()  
-        self.n_list = self.config.n_list  
-        self.m = self.config.m  
+    def __init__(
+        self,
+        config=None,
+        embedding_manager=None,
+    ):
+        """
+        Initialize the KNN retriever.
+
+        Args:
+            config: KNNRetrieverConfig with index parameters
+            embedding_manager: Embedding manager for document and query embedding
+        """
+        if config is None:
+            config = settings.retriever.knn
+        if embedding_manager is None:
+            embedding_manager = EmbeddingManager()
+        super().__init__(config=config)
+
+        self.embedding_manager = embedding_manager
+        self.score_threshold = self.config.score_threshold if hasattr(self.config, 'score_threshold') else 0.1
+        self.index_type = self.config.index_type.upper() if hasattr(self.config, 'index_type') else 'FLAT'
+        self.n_list = self.config.n_list if hasattr(self.config, 'n_list') else 100
+        self.m = self.config.m if hasattr(self.config, 'm') else 16  
         
         self.documents: List[Document] = []  
         self.document_ids: List[str] = []  
@@ -384,7 +388,7 @@ def run():
     print("=" * 60)
     
     from langchain_core.documents import Document
-    from config.retriever_config import KNNRetrieverConfig
+    from config.settings import settings
     from knowledge_base.embedding.embedding_manager import EmbeddingManager
     
     class MockEmbeddings:
@@ -467,7 +471,8 @@ def run():
         print(f"{'='*50}")
         
         print(f"\n2. 初始化 KNNRetriever ({index_type})...")
-        config = KNNRetrieverConfig(
+        from omegaconf import OmegaConf
+        config = OmegaConf.create(
             name=f"test_{index_type.lower()}_retriever",
             score_threshold=0.1,
             index_type=index_type,
@@ -513,7 +518,8 @@ def run():
     print("测试 FLAT 索引的删除功能")
     print(f"{'='*50}")
     
-    config = KNNRetrieverConfig(name="delete_test", score_threshold=0.0, index_type="FLAT")
+    from omegaconf import OmegaConf
+    config = OmegaConf.create(name="delete_test", score_threshold=0.0, index_type="FLAT")
     retriever = KNNRetriever(config=config, embedding_manager=mock_embedding_manager)
     retriever.add_documents(sample_documents)
     
@@ -531,8 +537,9 @@ def run():
     retriever.save(save_dir)
     print(f"   已保存到: {save_dir}")
     
+    from omegaconf import OmegaConf
     new_retriever = KNNRetriever(
-        config=KNNRetrieverConfig(name="loaded"),
+        config=OmegaConf.create(name="loaded"),
         embedding_manager=mock_embedding_manager
     )
     new_retriever.load(save_dir)

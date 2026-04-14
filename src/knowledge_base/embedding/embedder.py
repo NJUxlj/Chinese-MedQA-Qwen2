@@ -4,14 +4,14 @@ from pathlib import Path
 import os, sys
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from config.embedding_config import EmbeddingConfig
+from config.settings import settings
 
 class TextEmbedder:
     """文本嵌入器"""
 
-    def __init__(self, config:EmbeddingConfig):
+    def __init__(self, config=None):
         """初始化嵌入器"""
-        self.config = config
+        self.config = config if config is not None else settings.embedding
         self.embedder = HuggingFaceEmbeddings(model_name=self.config.model_name)
 
 

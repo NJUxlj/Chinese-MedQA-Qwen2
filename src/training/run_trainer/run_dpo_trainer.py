@@ -8,7 +8,7 @@ from datasets import Dataset
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from config.training_config import DPOTrainingConfig
+from config.settings import settings
 from training.trainer.dpo_trainer import DPOTrainer
 from utils.logger import setup_logger
 
@@ -168,7 +168,8 @@ def main():
     if args.target_modules:
         target_modules = [m.strip() for m in args.target_modules.split(",")]
 
-    config = DPOTrainingConfig(
+    from omegaconf import OmegaConf
+    config = OmegaConf.create(
         model_name_or_path=args.model_name_or_path,
         output_dir=args.output_dir,
         max_seq_length=args.max_seq_length,

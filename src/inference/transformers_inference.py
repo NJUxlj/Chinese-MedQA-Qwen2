@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__)).parent.parent)  
 
 from utils.logger import setup_logger  
-from config.local_model_config import LocalModelConfig  
+from config.settings import settings  
 from inference.inference_utils import (  
     format_prompt,   
     format_rag_prompt,   

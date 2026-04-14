@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 import json
 import argparse
 from datasets import Dataset
-from config.training_config import EmbeddingTrainingConfig
+from config.settings import settings
 from training.trainer.embedding_trainer import EmbeddingTrainer
 
 
@@ -72,7 +72,8 @@ def main():
     print(f"训练轮数: {args.num_train_epochs}")
     print("=" * 60)
     
-    config = EmbeddingTrainingConfig(
+    from omegaconf import OmegaConf
+    config = OmegaConf.create(
         model_name_or_path=args.model_name_or_path,
         output_dir=args.output_dir,
         max_seq_length=args.max_seq_length,

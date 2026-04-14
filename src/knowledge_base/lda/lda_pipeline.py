@@ -27,7 +27,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__)).parent.parent.parent)
 
-from config.lda_config import LDAConfig
+from config.settings import settings
 from utils.logger import setup_logger
 
 # 导入本地PDF解析器（可选）
@@ -68,24 +68,32 @@ class LDAPipeline:
     支持中文文本的主题建模，提供PDF文档处理和结果可视化功能
     """
 
-    def __init__(self, 
-                 config: LDAConfig):
+    def __init__(self,
+                 config=None):
         """
         初始化主题建模管道
-        
+
         Args:
             embedding_model: 用于生成文档嵌入的模型路径或名称
             language: 处理语言，支持 'chinese' 和 'english'
             offline_mode: 是否使用离线模式（不使用在线模型）
         """
         self.logger = setup_logger(self.__class__.__name__)
+        if config is None:
+            # Create a simple config object with default values
+            from omegaconf import OmegaConf
+            config = OmegaConf.create({
+                'embedding_model_name': settings.embedding.model_name if hasattr(settings, 'embedding') else 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+                'language': 'chinese',
+                'offline_mode': False
+            })
         self.config = config
-        self.embedding_model_name = config.embedding_model_name
-        self.language = config.language
+        self.embedding_model_name = config.embedding_model_name if hasattr(config, 'embedding_model_name') else settings.embedding.model_name
+        self.language = config.language if hasattr(config, 'language') else 'chinese'
         self.pdf_parser = PdfParser() if PdfParser else None
         self.embedding_model = None
         self.topic_model = None
-        self.offline_mode = config.offline_mode
+        self.offline_mode = config.offline_mode if hasattr(config, 'offline_mode') else False
         
         # 中文停用词列表
         self.chinese_stopwords = {

@@ -25,7 +25,7 @@ import sys
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from utils.logger import setup_logger
-from config.training_config import TRPOTrainingConfig
+from config.settings import settings
 
 
 
