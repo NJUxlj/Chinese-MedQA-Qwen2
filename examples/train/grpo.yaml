@@ -3,7 +3,7 @@
 # 参考: https://github.com/verl/verl
 
 ### 基础模型配置
-model_name_or_path: "Qwen/Qwen3-14B"
+model_name_or_path: "Qwen/Qwen3-4B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"

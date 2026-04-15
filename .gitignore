@@ -6,3 +6,5 @@ data/
 **/output/*
 **/yamls/base_trainer_config.yaml
 src/training/yamls/base_trainer_config.yaml
+
+volumes/*

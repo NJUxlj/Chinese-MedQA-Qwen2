@@ -1,4 +1,0 @@
-2025-12-21 13:27:03,148 - test_logger - INFO - This is an info message
-2025-12-21 13:27:03,148 - test_logger - WARNING - This is a warning message
-2025-12-21 13:27:03,148 - test_logger - ERROR - This is an error message
-2025-12-21 13:27:03,148 - test_logger - CRITICAL - This is a critical message

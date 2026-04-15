@@ -404,7 +404,7 @@ class DPOQualityEvaluator(BaseEvaluator):
 
 def run():
     config = DPOQualityEvaluatorConfig(
-        model_name_or_path="Qwen/Qwen3-14B",
+        model_name_or_path="Qwen/Qwen3-4B",
         device="cuda:0",
         test_dataset_path="data/dpo/test.json",
         query_key="query",

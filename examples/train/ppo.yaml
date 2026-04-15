@@ -3,7 +3,7 @@
 # 参考: https://github.com/verl/verl
 
 ### 基础模型配置
-model_name_or_path: "Qwen/Qwen3-14B"
+model_name_or_path: "Qwen/Qwen3-4B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"
@@ -66,7 +66,7 @@ data:
 actor_rollout_ref:
   hybrid_engine: true
   model:
-    path: "Qwen/Qwen3-14B"
+    path: "Qwen/Qwen3-4B"
     custom_chat_template: null
     use_shm: false
     external_lib: null
@@ -198,8 +198,8 @@ critic:
     total_training_steps: -1
     weight_decay: 0.01
   model:
-    path: "Qwen/Qwen3-14B"
-    tokenizer_path: "Qwen/Qwen3-14B"
+    path: "Qwen/Qwen3-4B"
+    tokenizer_path: "Qwen/Qwen3-4B"
     use_shm: false
     override_config: {}
     external_lib: null
@@ -237,7 +237,7 @@ reward_model:
   enable: false
   strategy: "fsdp"
   model:
-    input_tokenizer: "Qwen/Qwen3-14B"
+    input_tokenizer: "Qwen/Qwen3-4B"
     path: "your_reward_model_path"
     use_shm: false
     external_lib: null

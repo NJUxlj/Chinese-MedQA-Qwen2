@@ -103,7 +103,7 @@ local_model:
 # VLLM 部署配置
 # =============================================================================
 vllm:
-  model_name_or_path: Qwen/Qwen3-14B
+  model_name_or_path: Qwen/Qwen3-4B
   tensor_parallel_size: 1
   pipeline_parallel_size: 1
   gpu_memory_utilization: 0.9

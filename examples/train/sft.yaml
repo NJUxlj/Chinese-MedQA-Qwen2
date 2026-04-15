@@ -3,7 +3,7 @@
 # 参考: https://github.com/hiyouga/LLaMA-Factory
 
 ### 基础模型配置
-model_name_or_path: "Qwen/Qwen3-14B"
+model_name_or_path: "Qwen/Qwen3-4B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"
@@ -41,7 +41,7 @@ do_eval: false
 dataloader_num_workers: 4
 
 ### LoRA 配置
-lora_rank: 64
+lora_rank: 16
 lora_alpha: 16
 lora_dropout: 0.05
 target_modules: null

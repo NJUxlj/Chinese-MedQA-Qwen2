@@ -42,7 +42,7 @@ from training.trainer.base_trainer import BaseTrainer
 @dataclass
 class RewardModelTrainingConfig:
     """奖励模型训练配置"""
-    model_name_or_path: str = "Qwen/Qwen3-14B"
+    model_name_or_path: str = "Qwen/Qwen3-4B"
     output_dir: str = "output"
     num_train_epochs: int = 3
     per_device_train_batch_size: int = 4

@@ -117,7 +117,7 @@ def parse_args():
                         help="微调类型")
     parser.add_argument("--beta", type=float, default=0.1,
                         help="DPO 温度参数")
-    parser.add_argument("--lora_rank", type=int, default=64,
+    parser.add_argument("--lora_rank", type=int, default=16,
                         help="LoRA rank")
     parser.add_argument("--lora_alpha", type=int, default=16,
                         help="LoRA alpha")

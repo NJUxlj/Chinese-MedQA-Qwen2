@@ -120,7 +120,7 @@ def parse_args():
     parser.add_argument("--finetuning_type", type=str, default="lora",
                         choices=["lora", "full"],
                         help="微调类型")
-    parser.add_argument("--lora_rank", type=int, default=64,
+    parser.add_argument("--lora_rank", type=int, default=16,
                         help="LoRA rank")
     parser.add_argument("--lora_alpha", type=int, default=16,
                         help="LoRA alpha")

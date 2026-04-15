@@ -405,7 +405,7 @@ class CodeEvaluator(BaseEvaluator):
     使用方法:
     ```python
     config = CodeEvaluatorConfig(
-        model_name_or_path="Qwen/Qwen3-14B",
+        model_name_or_path="Qwen/Qwen3-4B",
         test_dataset_path="data/test.json",
         execution_timeout=10,
         max_memory_mb=256,
@@ -662,7 +662,7 @@ class CodeEvaluator(BaseEvaluator):
 def run_evaluation():
     '''运行评估的入口函数'''
     config = CodeEvaluatorConfig(
-        model_name_or_path="Qwen/Qwen3-14B",
+        model_name_or_path="Qwen/Qwen3-4B",
         test_dataset_path="data/test.json",
         execution_timeout=10,
         max_memory_mb=256,

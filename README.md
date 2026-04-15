@@ -1,264 +1,252 @@
-## Chinese-MedQA-Qwen2
-- 本项目是一个基于Qwen2+Agent+RAG的医疗问答系统
-- 该项目的目的, 是为了打通从 `SFT/Embedding医疗训练数据生成`，到 `SFT微调`， 到`奖励模型微调`，到 `DPO/DAPO/GSPO/TRPO` 微调， 到使用 vllm 对最终模型进行部署与推理， 再到使用 AgentFactory 调用 医疗多 Agent 会诊系统 (mdagents) 进行问诊的整个流水线。
+# Chinese-MedQA-Qwen2
 
-- 最终本项目将会基于上述后训练方式，来微调出一个使用西医知识来进行疾病诊疗的垂直qwen2模型。
+<!-- Badges -->
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Project](https://img.shields.io/badge/Project-MedQA-orange.svg)]()
 
+## 项目简介
 
-## 项目内容
-1. 手动构建 SFT+DPO 的Trainer.(SFT由huggingface的Trainer实现，DPO 是由 [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) 实现, 用户也可以选择我们手动编写的DPOTrainer【注意，这是我手写的！和trl库里的那个DPOTrainer不是同一个】)
-2. 推理实现：用户可以选择两种推理方式：1.使用 vllm。2.用户也可以切换成 xinference。
-3. 本项目也参考了LongChain-Chatchat的项目框架：【1】包括 XInference的基本使用(主要是模型的加载与推理)。
-4. 参考了LongChain-Chatchat的架构，在Chinese-MedQA的文档匹配算法中加入KNN（原本只有相似度、BM25、L2_distance）。【3】使用FAISS构建了本地医疗知识库。
+本项目是一个基于 **Qwen2 + Agent + RAG** 的医疗问答系统，旨在打通从 SFT/Embedding 训练数据生成，到 SFT 微调、奖励模型微调，再到 DPO/DAPO/GSPO/TRPO 强化学习微调，最终使用 vLLM 部署推理，并通过 AgentFactory 调用医疗多 Agent 会诊系统（MDAgents）进行问诊的完整流水线。
 
+最终目标：基于上述后训练方式，微调出一个使用西医知识进行疾病诊疗的垂直 Qwen2 模型。
 
+## 项目特性
 
-## 修复日志
-
-- **2026-04-14**: 修复17项严重问题（P0），包括导入路径修正、配置安全加固、训练逻辑修复、LoggerManager统一、训练YAML配置创建。详见 [docs/修复文档/FIX_1.md](docs/修复文档/FIX_1.md)
-
-
-## 参考的项目
-- Agent部分 参考了：
-  1.  [AgentGPT](https://github.com/reworkd/AgentGPT.git)
-  2.  [Camel](https://github.com/camel-ai/camel.git)
-- 医疗RAG实现+工具调用+数据库部分参考了 [Medical-Graph-RAG](https://github.com/SuperMedIntel/Medical-Graph-RAG.git)
-- RAG检索算法+项目结构参考了 [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat.git)
-
-
+- 🏋️ **多种训练框架**：支持 SFT、DPO、DAPO、GSPO、TRPO、PPO、GRPO 等多种微调算法
+- 🔧 **手写 DPOTrainer**：完全自主实现的 DPO 训练器，非第三方库直接调用
+- ⚡ **多种推理后端**：支持 vLLM、XInference、Ollama、Transformers 多种推理方式
+- 🔍 **混合检索系统**：集成相似度、BM25、L2距离、KNN 等多种检索算法
+- 🤖 **Multi-Agent 会诊**：基于 MDAgents 的多专科医疗会诊系统
+- 📚 **知识库增强**：支持 FAISS 向量库 + Milvus + Neo4j 知识图谱
 
 ## 技术栈总结
-1. 基础模型: Qwen2（同时支持本地部署和智谱API调用）
-2. 微调框架:
-  - SFT: 基于Hugging Face Trainer实现
-  - DPO: 手动构建的DPOTrainer，参考LLaMA-Factory
-3. 推理加速:
-  - FastLLM（基于C++的推理库）
-  - VLLM（大规模部署时的推理加速）
-4. 知识库与检索:
-  - FAISS向量数据库（高效相似性搜索）
-  - 多种检索算法：相似度、BM25、L2距离、KNN
-5. Agent实现:
-  - 参考AgentGPT和Camel项目
-6. 项目框架:
-  - 参考Langchain-Chatchat和Medical-Graph-RAG的项目结构
 
+| 层次 | 技术 |
+|------|------|
+| **基础模型** | Qwen2 / Qwen3（支持本地部署和 API 调用） |
+| **SFT 微调** | HuggingFace Trainer + Accelerate |
+| **DPO 微调** | 手写 DPOTrainer（参考 LLaMA-Factory） |
+| **强化学习** | VeRL 框架（支持 PPO/GRPO/DAPO/SPPO/SPiNO/TRPO） |
+| **推理加速** | vLLM、XInference、Ollama、Transformers |
+| **向量数据库** | Milvus + FAISS |
+| **图数据库** | Neo4j |
+| **RAG 框架** | LangChain (langchain-core, langchain-community) |
+| **Agent 框架** | LangChain + 自定义 Multi-Agent (MDAgents) |
+| **配置管理** | Hydra + OmegaConf |
+| **Web 框架** | FastAPI + Gradio |
+| **评估指标** | BLEU、ROUGE、Math（自定义） |
 
-
-## 项目设计图
-```
+## 项目架构图
 
 ```
-
-
-## 项目文件架构
+Chinese-MedQA-Qwen2
+├── src/                          # 核心源码
+│   ├── agent/                    # Agent 模块
+│   │   ├── base_agent.py         # 基础 Agent 类
+│   │   ├── medical_agent.py      # 医疗 Agent
+│   │   ├── agent_factory.py      # Agent 工厂
+│   │   ├── mdagents/             # 多专科会诊系统
+│   │   │   ├── core/             # 核心控制器
+│   │   │   └── agents/           # 各专科 Agent
+│   │   └── tools/                # Agent 工具集
+│   │
+│   ├── rag/                      # RAG 流水线
+│   │   ├── rag_pipeline.py       # RAG 主流程
+│   │   ├── query_processor.py   # 查询处理
+│   │   ├── context_builder.py    # 上下文构建
+│   │   └── response_generator.py # 响应生成
+│   │
+│   ├── knowledge_base/            # 知识库
+│   │   ├── retrieval/            # 检索器实现
+│   │   │   ├── similarity_retriever.py  # 相似度检索
+│   │   │   ├── bm25_retriever.py        # BM25 检索
+│   │   │   ├── l2_retriever.py          # L2 距离检索
+│   │   │   └── knn_retriever.py         # KNN 检索
+│   │   ├── embedding/            # 嵌入管理
+│   │   ├── kg/                    # 知识图谱
+│   │   └── milvus/                # Milvus 接口
+│   │
+│   ├── training/                  # 训练模块
+│   │   ├── trainer/               # 多种训练器
+│   │   │   ├── sft_trainer.py     # SFT 训练器
+│   │   │   ├── dpo_trainer.py     # DPO 训练器（手写）
+│   │   │   ├── dapo_trainer.py     # DAPO 训练器
+│   │   │   ├── trpo_trainer.py     # TRPO 训练器
+│   │   │   └── reward_model_trainer.py  # 奖励模型
+│   │   ├── dataset/               # 数据集处理
+│   │   │   └── medical_dataset.py # 医疗数据集类
+│   │   └── run_trainer/           # 训练启动脚本
+│   │       ├── run_sft_trainer.py
+│   │       └── run_dpo_trainer.py
+│   │
+│   ├── inference/                  # 推理模块
+│   │   ├── vllm_inference.py       # vLLM 推理
+│   │   ├── xinference_inference.py # XInference 推理
+│   │   ├── ollama_inference.py     # Ollama 推理
+│   │   └── transformers_inference.py # Transformers 推理
+│   │
+│   ├── evaluation/                 # 评估模块
+│   │   ├── base_evaluator.py       # 评估器基类
+│   │   ├── bleu_rouge_evaluator.py # BLEU/ROUGE 评估
+│   │   ├── medqa_llm_evaluator.py   # MedQA LLM 评估
+│   │   └── math_evaluator.py        # 数学题评估
+│   │
+│   ├── models/                     # 模型封装
+│   │   ├── base_model.py           # 基础模型类
+│   │   ├── qwen_model.py           # Qwen 模型封装
+│   │   └── api_model.py            # API 模型封装
+│   │
+│   ├── api/                        # FastAPI 服务
+│   │   ├── main.py                 # API 主入口
+│   │   └── routers/                # API 路由
+│   │
+│   ├── config/                     # 配置模块
+│   │   ├── config.yaml             # 统一配置文件
+│   │   ├── settings.py             # 配置加载器
+│   │   └── deepspeed_config/       # DeepSpeed 配置
+│   │
+│   └── utils/                      # 工具模块
+│       ├── logger.py               # 日志管理
+│       ├── metrics.py              # 评估指标
+│       └── text_utils.py           # 文本处理
+│
+├── examples/                       # 示例代码
+│   ├── train/                      # 训练 YAML 配置
+│   │   ├── sft.yaml
+│   │   ├── dpo.yaml
+│   │   ├── grpo.yaml
+│   │   ├── ppo.yaml
+│   │   └── reward_model.yaml
+│   └── mdagents_usage_examples.py  # MDAgents 使用示例
+│
+├── data/                           # 数据目录
+│   ├── raw/                        # 原始数据
+│   ├── processed/                  # 处理后数据
+│   └── indices/                    # FAISS 索引
+│
+├── requirements.txt                # 项目依赖
+└── README.md
 ```
-chinese-medqa-qwen2/
-├── README.md                          # 项目介绍和使用说明
-├── requirements.txt                   # 项目依赖
-├── config/                            # 配置文件目录
-│   ├── model_config.py                # 模型配置
-│   ├── rag_config.py                  # RAG配置
-│   └── agent_config.py                # Agent配置
-├── data/                              # 数据目录
-│   ├── raw/                           # 原始医疗数据
-│   ├── processed/                     # 处理后的数据
-│   ├── embeddings/                    # 文档嵌入
-│   └── indices/                       # FAISS索引文件
-├── models/                            # 模型相关代码
-│   ├── base_model.py                  # 基础模型类
-│   ├── qwen_model.py                  # Qwen2模型封装
-│   ├── api_model.py                   # 智谱API模型封装
-│   └── model_utils.py                 # 模型工具函数
-├── training/                          # 训练相关代码
-│   ├── trainer/                       # 训练器实现
-│   │   ├── sft_trainer.py             # SFT训练器
-│   │   └── dpo_trainer.py             # DPO训练器(手写)
-│   ├── dataset/                       # 数据集处理
-│   │   ├── medical_dataset.py         # 医疗数据集类
-│   │   └── data_processor.py          # 数据处理工具
-│   └── scripts/                       # 训练脚本
-│       ├── run_sft.py                 # 运行SFT训练
-│       └── run_dpo.py                 # 运行DPO训练
-├── inference/                         # 推理相关代码
-│   ├── fastllm_inference.py           # FastLLM推理
-│   ├── vllm_inference.py              # VLLM推理
-│   ├── api_inference.py               # API推理
-│   └── inference_utils.py             # 推理工具函数
-├── knowledge_base/                    # 知识库相关代码
-│   ├── document_loader.py             # 文档加载器
-│   ├── document_processor.py          # 文档处理
-│   ├── embedding_manager.py           # 嵌入管理
-│   └── retrieval/                     # 检索相关代码
-│       ├── retriever_base.py          # 基础检索器
-│       ├── similarity_retriever.py    # 相似度检索
-│       ├── bm25_retriever.py          # BM25检索
-│       ├── l2_retriever.py            # L2距离检索
-│       └── knn_retriever.py           # KNN检索
-├── rag/                               # RAG相关代码
-│   ├── rag_pipeline.py                # RAG流水线
-│   ├── query_processor.py             # 查询处理
-│   ├── context_builder.py             # 上下文构建
-│   └── response_generator.py          # 响应生成
-├── agent/                             # Agent相关代码
-│   ├── agent_base.py                  # 基础Agent类
-│   ├── medical_agent.py               # 医疗Agent实现
-│   ├── tool_manager.py                # 工具管理
-│   └── tools/                         # 工具实现
-│       ├── tool_base.py               # 基础工具类
-│       ├── search_tool.py             # 搜索工具
-│       ├── calculator_tool.py         # 计算工具
-│       └── medical_reference_tool.py  # 医疗参考工具
-├── web/                               # Web界面
-│   ├── app.py                         # Web应用
-│   ├── static/                        # 静态资源
-│   └── templates/                     # 模板文件
-├── api/                               # API服务
-│   ├── main.py                        # API主入口
-│   ├── routers/                       # API路由
-│   └── schemas/                       # API模式定义
-├── utils/                             # 通用工具
-│   ├── logger.py                      # 日志工具
-│   ├── metrics.py                     # 评估指标
-│   ├── file_utils.py                  # 文件工具
-│   └── text_utils.py                  # 文本处理工具
-└── tests/                             # 测试代码
-    ├── test_models.py                 # 模型测试
-    ├── test_rag.py                    # RAG测试
-    ├── test_agent.py                  # Agent测试
-    └── test_integration.py            # 集成测试
-```
-
-
-
-## 模型介绍
-Qwen2 is based on the Transformer architecture with SwiGLU activation, attention QKV bias, group query attention, etc. 
-
-Qwen2-7B-Instruct supports a context length of up to 131,072 tokens.
-
 
 ## 数据集
 
-#### SFT数据集
-- 字段格式：{"instruction"..., "input":..., "output":...}
-```python
-from datasets import load_dataset
+### SFT 数据集
+- 来源: [`ticoAg/Chinese-medical-dialogue`](https://huggingface.co/datasets/ticoAg/Chinese-medical-dialogue)
+- 字段格式: `{"instruction", "input", "output"}`
 
-ds = load_dataset("ticoAg/Chinese-medical-dialogue")
-```
+### DPO 数据集
+- 来源: [`Morefreedai/medical-dpo-v1`](https://huggingface.co/datasets/Morefreedai/medical-dpo-v1)
+- 字段格式: `{"prompt", "chosen", "rejected"}`
 
-#### DPO数据集
-- 字段格式：{"prompt"..., "chosen":..., "rejected":...}
-```python
-from datasets import load_dataset
+### RL 训练数据
+- GSM8K 数学题: `~/data/rlhf/gsm8k/`
 
-ds = load_dataset("Morefreedai/medical-dpo-v1")
+## 模型权重
 
-```
+主要基座模型: **`Qwen/Qwen3-4B`** (HuggingFace)
 
-
-## 权重下载
-
-
-## SFT
-一轮LoRA/SFT + 一轮DPO，其余步骤根据后续效果再加
-
-
-
-
-## Evaluation
-微调结束后，我们会使用evaluate_model.py来让llama3.1给GPT4o和和Qwen2生成的答案打分。
-
-
-## Environment Config
-- AutoDL Cloud Platform
-  
-![env](image/env.png)
-
-- then, make sure to pre-download the model weight (e.g. Qwen2.5-1.5B on the huggingface) to the local storage (e.g., `/root/autodl-tmp/models/Qwen2.5-1.5B`).
-
-
-
+模型路径通过环境变量配置:
+- `LOCAL_MODEL_PATH` - 本地模型路径
+- `EMBEDDING_MODEL_PATH` - Embedding 模型路径
+- `RERANKER_MODEL_PATH` - Reranker 模型路径
 
 ## 如何运行本项目
-#### 1. 先把项目拉到本地，比如 /你的本地目录/Chinese-MedQA-Qwen2
 
-#### 2. 配置LLaMA-Factory
-1. 拉取LLaMA-Factory到本地，并确保LLaMA-Factory目录和Chinese-MedQA-Qwen2目录处于同一层级，例如：
- ```python  
-     -----你的本地目录
-                |------Chinese-MedQA-Qwen2
-                |------LLaMA-Factory
-```
+### 1. 安装依赖
 
-
-2. 安装依赖
- ```python  
-    cd LLaMA-Factory
-    pip install -r requirements.txt
-    pip install -e ".[torch,metrics]"
-```
-
-
-#### 3. 配置fastllm
-```python
-git clone https://github.com/ztxz16/fastllm.git
-
-cd ./fastllm    
-```
-
-```python
+```bash
 pip install -r requirements.txt
 ```
 
-```python  
------你的本地目录
-          |------Chinese-MedQA-Qwen2
-          |------LLaMA-Factory
-          |------fastllm
-```
-1. 安装gcc
-```python
-# 确认是否已经安装
-gcc --version
+### 2. 配置环境变量
 
-# 安装
-# For Debian based distributions like Ubuntu
-sudo apt-get install gcc
-
-# For RPM-based distributions like CentOS
-sudo yum install gcc
+```bash
+export LOCAL_MODEL_PATH="/path/to/Qwen3-4B"
+export EMBEDDING_MODEL_PATH="/path/to/embedding/model"
+export RERANKER_MODEL_PATH="/path/to/reranker/model"
 ```
 
-3. 安装cmake
-```python
-sudo apt install cmake -y
-cmake  --version
+### 3. 启动 API 服务
+
+```bash
+docker compose up
+cd src/api
+python main.py
+# 或
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-4. 编译
- ```python
-bash install.sh -DUSE_CUDA=ON # 编译GPU版本
-# bash install.sh -DUSE_CUDA=ON -DCUDA_ARCH=89 # 可以指定CUDA架构，如4090使用89架构, A100使用80架构
-```
-4. 跑起来
-```python
-# openai api server
-# 需要安装依赖: pip install -r requirements-server.txt
-# 这里在8080端口打开了一个模型名为qwen的server
-python3 -m ftllm.server -t 16 -p ~/Qwen2-7B-Instruct/ --port 8080 --model_name qwen
+### 4. 运行 SFT 训练
 
-# 使用float16精度的模型对话
-python3 -m ftllm.chat -t 16 -p ~/Qwen2-7B-Instruct/ 
-
-# 在线量化为int8模型对话
-python3 -m ftllm.chat -t 16 -p ~/Qwen2-7B-Instruct/ --dtype int8
-
-# webui
-# 需要安装依赖: pip install streamlit-chat
-python3 -m ftllm.webui -t 16 -p ~/Qwen2-7B-Instruct/ --port 8080
+```bash
+python src/training/run_trainer/run_sft_trainer.py \
+    --model_name_or_path Qwen/Qwen3-4B \
+    --train_data_dir ./data \
+    --output_dir ./output/sft \
+    --per_device_train_batch_size 4 \
+    --learning_rate 2e-5 \
+    --num_epochs 3 \
+    --finetuning_type lora \
+    --lora_rank 16
 ```
 
+### 5. 运行 DPO 训练
 
+```bash
+python src/training/run_trainer/run_dpo_trainer.py \
+    --model_name_or_path Qwen/Qwen3-4B \
+    --train_data_dir ./data \
+    --output_dir ./output/dpo \
+    --per_device_train_batch_size 2 \
+    --learning_rate 1e-5 \
+    --num_epochs 3
+```
 
+### 6. 使用 YAML 配置训练
 
+```bash
+# SFT 训练
+python src/training/run_trainer/run_sft_trainer.py --config examples/train/sft.yaml
+
+# DPO 训练
+python src/training/run_trainer/run_dpo_trainer.py --config examples/train/dpo.yaml
+```
+
+### 7. vLLM 部署
+
+```bash
+python -m vllm.entrypoints.openai.api_server \
+    --model Qwen/Qwen3-4B \
+    --host 0.0.0.0 \
+    --port 8000
+```
+
+## Evaluation 评估
+
+项目提供多种评估器，位于 `src/evaluation/`:
+
+| 评估器 | 说明 |
+|--------|------|
+| `BleuRougeEvaluator` | BLEU/ROUGE 指标评估 |
+| `MedQALLMEvaluator` | 基于 LLM 的医疗 QA 评估 |
+| `MathEvaluator` | 数学问题评估 |
+| `CodeEvaluator` | 代码执行评估 |
+
+评估配置在 `src/config/config.yaml` 的 `evaluator` 部分。
+
+## 参考项目
+
+- **Agent**: [AgentGPT](https://github.com/reworkd/AgentGPT.git), [CAMEL](https://github.com/camel-ai/camel.git)
+- **Medical RAG**: [Medical-Graph-RAG](https://github.com/SuperMedIntel/Medical-Graph-RAG.git)
+- **RAG 架构**: [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat.git)
+- **DPO 实现参考**: [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
+
+## 修复日志
+
+- **2026-04-14**: 修复 17 项严重问题（P0），包括导入路径修正、配置安全加固、训练逻辑修复、LoggerManager 统一、训练 YAML 配置创建。详见 [docs/修复文档/FIX_1.md](docs/修复文档/FIX_1.md)
+
+## License
+
+MIT License

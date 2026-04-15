@@ -2,7 +2,7 @@
 # 用于训练 embedding 模型进行向量检索
 
 ### 基础模型配置
-model_name_or_path: "Qwen/Qwen3-14B"
+model_name_or_path: "Qwen/Qwen3-4B"
 max_seq_length: 2048
 use_gradient_checkpointing: true
 device_map: "auto"
@@ -52,7 +52,7 @@ embedding_dim: 768  # embedding 维度
 margin: 0.3  # 对比损失边界值
 
 ### LoRA 配置
-lora_rank: 64
+lora_rank: 16
 lora_alpha: 16
 lora_dropout: 0.05
 lora_bias: "none"
