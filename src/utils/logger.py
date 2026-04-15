@@ -168,39 +168,6 @@ class LoggerManager:
 
 
 
-############ 下面是 GRPO 算法的专用日志工具类 ############
-
-
-def concat_dict_to_str(dict: Dict, step):
-    output = [f"step:{step}"]
-    for k, v in dict.items():
-        if isinstance(v, numbers.Number):
-            output.append(f"{k}:{pprint.pformat(v)}")
-    output_str = " - ".join(output)
-    return output_str
-
-
-class LocalLogger:
-    """
-    A local logger that logs messages to the console.
-
-    Args:
-        print_to_console (bool): Whether to print to the console.
-    """
-
-    def __init__(self, print_to_console=True):
-        self.print_to_console = print_to_console
-
-    def flush(self):
-        pass
-
-    def log(self, data:Dict, step):
-        if self.print_to_console:
-            print(concat_dict_to_str(data, step=step), flush=True)
-
-
-
-
 class DecoratorLoggerBase:
     """
     Base class for all decorators that log messages.

@@ -1,0 +1,84 @@
+2026-04-15 22:27:37,066 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.1, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:27:37,066 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:27:37,068 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:27:42,259 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:27:42,260 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:27:42,261 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:27:43,408 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:27:44,540 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:28:19,417 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:28:19,451 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:28:19,451 - GSPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:28:21,272 - GSPOTrainer - INFO - 参考模型创建完成
+2026-04-15 22:29:21,583 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.1, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:29:21,583 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:29:21,584 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:29:26,186 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:29:26,187 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:29:26,187 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:29:27,677 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:29:29,070 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:30:05,443 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:30:05,476 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:30:05,477 - GSPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:30:07,539 - GSPOTrainer - INFO - 参考模型创建完成
+2026-04-15 22:30:07,703 - GSPOTrainer - INFO - 开始 GSPO 训练...
+2026-04-15 22:30:36,381 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.1, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:30:36,381 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:30:36,383 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:30:39,011 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:30:39,011 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:30:39,012 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:30:40,180 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:30:41,601 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:31:20,076 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:31:20,108 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:31:20,109 - GSPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:31:22,869 - GSPOTrainer - INFO - 参考模型创建完成
+2026-04-15 22:31:23,041 - GSPOTrainer - INFO - 开始 GSPO 训练...
+2026-04-15 22:33:18,344 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.0, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:33:18,344 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:33:18,346 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:33:22,572 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:33:22,573 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:33:22,574 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:33:23,894 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:33:25,197 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:33:55,704 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:33:55,733 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:33:55,734 - GSPOTrainer - INFO - 创建参考模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:33:57,281 - GSPOTrainer - INFO - 参考模型创建完成
+2026-04-15 22:33:57,431 - GSPOTrainer - INFO - 开始 GSPO 训练...
+2026-04-15 22:37:25,294 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.0, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:37:25,295 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:37:25,296 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:37:29,011 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:37:29,011 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:37:29,011 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:37:30,238 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:37:31,496 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:38:09,296 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:38:09,338 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:38:09,701 - GSPOTrainer - INFO - 开始 GSPO 训练...
+2026-04-15 22:39:57,052 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.0, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:39:57,052 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:39:57,054 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:40:00,645 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:40:00,645 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:40:00,645 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:40:01,744 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:40:03,033 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:40:37,903 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:40:37,946 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:40:38,190 - GSPOTrainer - INFO - 开始 GSPO 训练...
+2026-04-15 22:44:16,022 - GSPOTrainer - INFO - GSPO 训练器初始化完成: beta=0.0, clip_ratio=0.2, finetuning_type=lora
+2026-04-15 22:44:16,022 - GSPOTrainer - INFO - GSPOTrainer: 加载模型: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-15 22:44:16,024 - GSPOTrainer - INFO - Accelerator 初始化完成，分布式类型: DistributedType.NO
+2026-04-15 22:44:20,983 - GSPOTrainer - INFO - 配置 LoRA 微调...
+2026-04-15 22:44:20,984 - GSPOTrainer - INFO - 自动检测到模型: Qwen3-0.6B, target_modules: ['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:44:20,984 - GSPOTrainer - INFO - LoRA 配置: rank=8, alpha=16, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']
+2026-04-15 22:44:22,479 - GSPOTrainer - INFO - 已确保所有 LoRA 参数 requires_grad=True
+2026-04-15 22:44:23,825 - GSPOTrainer - INFO - 模型和分词器加载完成
+2026-04-15 22:45:18,904 - GSPOTrainer - INFO - GSPO 数据集准备完成，包含 10 个有效样本
+2026-04-15 22:45:18,938 - GSPOTrainer - INFO - 训练参数: 1 epochs, batch_size=2
+2026-04-15 22:45:19,132 - GSPOTrainer - INFO - 开始 GSPO 训练...

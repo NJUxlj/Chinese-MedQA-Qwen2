@@ -1,0 +1,104 @@
+# GSPOTrainingConfig - GSPO (Sequence-level Group Relative Policy Optimization) 训练配置
+# 千问团队提出的序列级 GRPO 算法
+# 参考: GRPO → GSPO 扩展，在序列/token 级别计算相对优势
+
+### 基础模型配置
+model_name_or_path: "Qwen/Qwen3-4B"
+max_seq_length: 2048
+use_gradient_checkpointing: true
+device_map: "auto"
+
+### 量化配置
+use_4bit: false
+use_8bit: false
+use_fp16: false
+use_bf16: false
+trust_remote_code: true
+
+### 输出配置
+output_dir: "output/gspo"
+num_train_epochs: 3
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 1
+learning_rate: 2e-5
+logging_steps: 10
+save_steps: 500
+save_total_limit: 2
+warmup_ratio: 0.03
+lr_scheduler_type: "cosine"
+report_to: "none"
+eval_strategy: "steps"
+eval_steps: 50
+load_best_model_at_end: false
+metric_for_best_model: "eval_loss"
+greater_is_better: false
+max_grad_norm: 1.0
+dataloader_pin_memory: false
+remove_unused_columns: false
+do_train: true
+do_eval: false
+dataloader_num_workers: 4
+
+### LoRA 配置
+lora_rank: 16
+lora_alpha: 16
+lora_dropout: 0.05
+target_modules: null
+lora_bias: "none"
+lora_task_type: "CAUSAL_LM"
+
+### GSPO 特有配置
+stage: "gspo"
+finetuning_type: "lora"
+
+# GSPO 超参数
+beta: 0.1  # KL 散度惩罚系数
+clip_ratio: 0.2  # 裁剪比率，控制策略更新的幅度
+gamma: 1.0  # 折扣因子
+lam: 1.0  # GAE lambda（用于优势估计）
+
+# 生成配置
+temperature: 1.0  # 生成温度
+top_k: -1  # 生成 top-k（-1 表示不使用）
+top_p: 1.0  # 生成 top-p
+max_new_tokens: 512  # 最大生成 token 数
+
+# 组配置（用于序列级相对优势）
+group_size: 4  # 每个 prompt 生成的样本数，用于组内相对优势计算
+
+# 奖励函数配置
+reward_type: "exact_match"  # exact_match, edit_distance, bleu
+reward_scale: 1.0  # 奖励缩放因子
+
+# 自博弈配置（参考模型同步）
+ref_update_interval: 100  # 参考模型更新间隔
+use_kl_loss: true  # 是否使用 KL 损失约束
+
+### 数据配置
+train_files: "data/gspo/train.parquet"
+val_files: "data/gspo/val.parquet"
+prompt_key: "messages"
+ground_truth_key: "ground_true_answer"
+id_key: "id"
+max_prompt_length: 512
+max_response_length: 512
+train_batch_size: 1024
+shuffle: true
+filter_overlong_prompts: false
+
+### 数据集字段映射
+dataset:
+  train_files: null
+  val_files: null
+  prompt_key: "messages"
+  ground_truth_key: "ground_true_answer"
+  id_key: "id"
+
+### 分布式训练配置
+distributed_strategy: "auto"
+find_unused_parameters: false
+main_process_ip: "localhost"
+main_process_port: 29500
+num_machines: 1
+machine_rank: 0

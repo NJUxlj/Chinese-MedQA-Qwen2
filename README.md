@@ -73,6 +73,7 @@ Chinese-MedQA-Qwen2
 │   │   │   ├── sft_trainer.py     # SFT 训练器
 │   │   │   ├── dpo_trainer.py     # DPO 训练器（手写）
 │   │   │   ├── dapo_trainer.py     # DAPO 训练器
+│   │   │   ├── gspo_trainer.py     # GSPO 训练器（序列级 GRPO）
 │   │   │   ├── trpo_trainer.py     # TRPO 训练器
 │   │   │   └── reward_model_trainer.py  # 奖励模型
 │   │   ├── dataset/               # 数据集处理
@@ -117,6 +118,7 @@ Chinese-MedQA-Qwen2
 │   │   ├── sft.yaml
 │   │   ├── dpo.yaml
 │   │   ├── grpo.yaml
+│   │   ├── gspo.yaml              # GSPO 训练配置
 │   │   ├── ppo.yaml
 │   │   └── reward_model.yaml
 │   └── mdagents_usage_examples.py  # MDAgents 使用示例
