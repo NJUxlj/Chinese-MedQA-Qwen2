@@ -1,0 +1,5 @@
+2026-04-20 15:51:12,157 - EmbeddingProvider - INFO - Loading sentence-transformers model: sentence-transformers/all-MiniLM-L6-v2
+2026-04-20 15:51:26,312 - EmbeddingProvider - INFO - Initializing vLLM embedding client: embedding-model
+2026-04-20 15:51:26,312 - EmbeddingProvider - INFO - Base URL: https://example.com/v1
+2026-04-20 16:38:26,340 - EmbeddingProvider - INFO - Loading sentence-transformers model: /tmp/nonexistent-model
+2026-04-20 16:39:01,686 - EmbeddingProvider - INFO - Loading sentence-transformers model: /tmp/nonexistent-model

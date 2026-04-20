@@ -7,7 +7,8 @@ import asyncio
 import logging
 import threading
 import time
-from typing import Dict, Any, List, Optional, Union
+import uuid
+from typing import Dict, Any, List, Optional
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
@@ -108,10 +109,8 @@ class MDAgentsService:
             patient_info = request.patient_context or {}
             query = request.query
             
-            loop = asyncio.get_event_loop()
-            result = await loop.run_in_executor(
-                self.executor,
-                lambda: asyncio.run(self.controller.process_medical_query(query, patient_info))
+            result = await asyncio.to_thread(
+                self.controller.process_medical_query, query, patient_info
             )
             
             processing_time = time.time() - start_time
@@ -354,21 +353,16 @@ class MDAgentsService:
                 )
             )
             
-            loop = asyncio.get_event_loop()
-            diagnosis_result = await loop.run_in_executor(
-                self.executor,
-                lambda: asyncio.run(self.controller._execute_collaborative_diagnosis(
-                    request.query, None,
-                    [self.controller.agents.get(a.value) for a in request.agent_types],
-                    complexity_result.complexity_level.value
-                ))
+            diagnosis_result = await asyncio.to_thread(
+                self.controller._execute_collaborative_diagnosis,
+                request.query, None,
+                [self.controller.agents.get(a.value) for a in request.agent_types],
+                complexity_result.complexity_level.value
             )
-            
-            consensus_result = await loop.run_in_executor(
-                self.executor,
-                lambda: asyncio.run(self.controller._achieve_consensus(
-                    diagnosis_result, complexity_result.complexity_level.value
-                ))
+
+            consensus_result = await asyncio.to_thread(
+                self.controller._achieve_consensus,
+                diagnosis_result, complexity_result.complexity_level.value
             )
             
             agent_results = []
@@ -395,7 +389,6 @@ class MDAgentsService:
             
             processing_time = time.time() - start_time
             
-            import uuid
             session_id = str(uuid.uuid4())
             
             return AgentConsultationResponse(
@@ -439,9 +432,7 @@ class MDAgentsService:
                 self.executor,
                 lambda: reviewer.process_query(request.medical_advice, context)
             )
-            
-            import uuid
-            
+
             risk_level = result.get("risk_level", "medium")
             if risk_level not in ["low", "medium", "high", "critical"]:
                 risk_level = "medium"

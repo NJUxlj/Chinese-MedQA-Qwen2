@@ -1,6 +1,5 @@
 - `document_loader.py`: Handles loading various document formats (PDF, TXT, DOCX, etc.) and web content.
 - `document_processor.py`: Processes and chunks documents, with special handling for Chinese medical content.
-- `embedding_manager.py`: Manages text embeddings with support for multiple models and caching.
 - `retrieval/retriever_base.py`: Base class defining the interface for all retrievers.
 - `retrieval/similarity_retriever.py`: Implements cosine similarity-based retrieval.
 - `retrieval/bm25_retriever.py`: Implements BM25 algorithm for text retrieval.

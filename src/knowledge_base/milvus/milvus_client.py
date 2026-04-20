@@ -25,7 +25,7 @@ from pathlib import Path
 import os, sys
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from utils.logger import setup_logger
-from embedding.embedder import TextEmbedder
+from providers.embedding_provider import EmbeddingProvider
 from config.settings import settings
 
 
@@ -66,8 +66,12 @@ class MilvusClient:
         self.consistency_level = self.milvus_config.consistency_level
         
         # 初始化嵌入函数
-        self.embedder = TextEmbedder(config=self.embedding_config)
-        
+        self.embedder = EmbeddingProvider(
+            mode="huggingface",
+            model_name=self.embedding_config.model_name,
+            device="cuda" if torch.cuda.is_available() else "cpu"
+        )
+
         # 初始化 Milvus 向量存储
         self.vector_store = None
         

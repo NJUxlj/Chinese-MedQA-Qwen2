@@ -18,7 +18,7 @@ except ImportError:
 from langchain_core.documents import Document  
 
 from knowledge_base.retrieval.base_retriever import BaseRetriever  
-from knowledge_base.embedding.embedding_manager import EmbeddingManager  
+from providers.embedding_provider import EmbeddingProvider  
 from config.settings import settings
 
 logger = logging.getLogger(__name__)  
@@ -38,7 +38,7 @@ class KNNRetriever(BaseRetriever):
     def __init__(
         self,
         config=None,
-        embedding_manager=None,
+        embedding_manager: EmbeddingProvider=None,
     ):
         """
         Initialize the KNN retriever.
@@ -50,7 +50,7 @@ class KNNRetriever(BaseRetriever):
         if config is None:
             config = settings.retriever.knn
         if embedding_manager is None:
-            embedding_manager = EmbeddingManager()
+            embedding_manager = EmbeddingProvider()
         super().__init__(config=config)
 
         self.embedding_manager = embedding_manager
@@ -389,7 +389,7 @@ def run():
     
     from langchain_core.documents import Document
     from config.settings import settings
-    from knowledge_base.embedding.embedding_manager import EmbeddingManager
+    from providers.embedding_provider import EmbeddingProvider
     
     class MockEmbeddings:
         def __init__(self, dimension: int = 768):

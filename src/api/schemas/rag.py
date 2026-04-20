@@ -3,7 +3,6 @@ RAG服务的模式定义
 """
 
 from typing import Dict, Any, List, Optional
-from datetime import datetime
 from pydantic import BaseModel, Field
 
 class Document(BaseModel):

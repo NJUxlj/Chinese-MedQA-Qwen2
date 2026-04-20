@@ -3,7 +3,7 @@
 负责加载、管理和调用LLM模型
 """
 
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional
 import threading
 import logging
 from contextlib import contextmanager

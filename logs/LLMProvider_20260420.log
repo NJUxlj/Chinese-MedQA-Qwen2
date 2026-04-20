@@ -1,0 +1,18 @@
+2026-04-20 15:50:53,499 - LLMProvider - INFO - Initializing openai LLM provider: gpt-4
+2026-04-20 15:50:53,576 - LLMProvider - INFO - Base URL: https://api.openai.com/v1
+2026-04-20 15:51:03,441 - LLMProvider - INFO - Loading local model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-20 15:51:10,504 - LLMProvider - INFO - Local model loaded successfully
+2026-04-20 15:51:26,268 - LLMProvider - INFO - Initializing openai LLM provider: test-model
+2026-04-20 15:51:26,311 - LLMProvider - INFO - Base URL: https://example.com/v1
+2026-04-20 15:51:26,311 - LLMProvider - INFO - Initializing aliyun LLM provider: test-model
+2026-04-20 15:51:26,311 - LLMProvider - INFO - Base URL: https://example.com/v1
+2026-04-20 15:51:26,311 - LLMProvider - INFO - Initializing vllm LLM provider: test-model
+2026-04-20 15:51:26,312 - LLMProvider - INFO - Base URL: https://example.com/v1
+2026-04-20 16:00:42,767 - LLMProvider - INFO - Initializing openai LLM provider: gpt-4
+2026-04-20 16:00:42,823 - LLMProvider - INFO - Base URL: https://api.openai.com/v1
+2026-04-20 16:38:09,170 - LLMProvider - INFO - Initializing openai LLM provider: gpt-4
+2026-04-20 16:38:09,204 - LLMProvider - INFO - Base URL: https://api.openai.com/v1
+2026-04-20 16:52:51,379 - LLMProvider - INFO - Initializing openai LLM provider: gpt-4
+2026-04-20 16:52:51,379 - LLMProvider - INFO - Base URL: https://api.openai.com/v1
+2026-04-20 17:28:52,846 - LLMProvider - INFO - Initializing openai LLM provider: gpt-4
+2026-04-20 17:28:52,847 - LLMProvider - INFO - Base URL: https://api.openai.com/v1

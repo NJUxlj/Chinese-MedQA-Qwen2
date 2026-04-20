@@ -37,13 +37,13 @@ async def health_check():
             "python_version": platform.python_version(),
         }
         
-        # CUDA信息
+        # GPU信息 (CUDA 或 Apple Silicon MPS)
         if torch.cuda.is_available():
             system_info["cuda_available"] = True
             system_info["cuda_version"] = torch.version.cuda
             system_info["cuda_devices"] = torch.cuda.device_count()
             system_info["gpu_info"] = []
-            
+
             for i in range(torch.cuda.device_count()):
                 gpu_info = {
                     "index": i,
@@ -52,8 +52,18 @@ async def health_check():
                     "memory_used": torch.cuda.memory_allocated(i) / (1024 * 1024 * 1024)  # GB
                 }
                 system_info["gpu_info"].append(gpu_info)
+        elif torch.backends.mps.is_available():
+            system_info["cuda_available"] = False
+            system_info["mps_available"] = True
+            system_info["gpu_info"] = [{
+                "index": 0,
+                "name": "Apple Silicon GPU (MPS)",
+                "memory_total": None,
+                "memory_used": None
+            }]
         else:
             system_info["cuda_available"] = False
+            system_info["mps_available"] = False
         
         return system_info
     except Exception as e:

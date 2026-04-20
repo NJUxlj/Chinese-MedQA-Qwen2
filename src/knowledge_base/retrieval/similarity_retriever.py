@@ -10,7 +10,7 @@ import time
 from langchain_core.documents import Document  
 
 from knowledge_base.retrieval.base_retriever import BaseRetriever  
-from knowledge_base.embedding.embedding_manager import EmbeddingManager  
+from providers.embedding_provider import EmbeddingProvider  
 from config.settings import settings
 
 
@@ -23,13 +23,13 @@ class SimilarityRetriever(BaseRetriever):
     def __init__(
         self,
         config=None,
-        embedding_manager: EmbeddingManager=None,
+        embedding_manager: EmbeddingProvider=None,
     ):
         if config is None:
             config = settings.retriever
         if embedding_manager is None:
-            from knowledge_base.embedding.embedding_manager import EmbeddingManager
-            embedding_manager = EmbeddingManager()  
+            from providers.embedding_provider import EmbeddingProvider
+            embedding_manager = EmbeddingProvider()  
         """  
         Initialize the similarity retriever.  
         

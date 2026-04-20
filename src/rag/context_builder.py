@@ -1,15 +1,11 @@
 # src/rag/context_builder.py
-import os, sys
+import sys
 import re
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
-import logging
-from typing import List, Optional, Tuple, Dict, Any
-from datetime import datetime
-from sentence_transformers import CrossEncoder
+from typing import List, Optional, Dict, Any
+
 from langchain_core.documents import Document
-from langchain_core.runnables import Runnable
-from langchain_core.callbacks import CallbackManagerForChainRun
 
 from knowledge_base.reranker.reranker_service import RerankerService, RerankerConfig
 from utils.logger import setup_logger
@@ -55,7 +51,7 @@ class ContextBuilder:
             )
         
         # 初始化重排序模型
-        self.reranker = None
+        self.reranker_service = None
         if reranker_model_name:
             try:
                 self.reranker_service = RerankerService(RerankerConfig(
@@ -139,7 +135,7 @@ class ContextBuilder:
         Returns:
             重新排序后的文档列表
         """
-        if not self.reranker:
+        if not self.reranker_service:
             logger.warning("未初始化重排序模型，跳过重排序")
             return documents
         
@@ -186,7 +182,7 @@ class ContextBuilder:
             return ""
         
         # 如果要使用重排序
-        if use_reranker and self.reranker:
+        if use_reranker and self.reranker_service:
             documents = self.rerank_documents(query, documents)
         
         # 构建上下文

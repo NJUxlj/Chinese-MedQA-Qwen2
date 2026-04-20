@@ -24,7 +24,7 @@ PyPDF2
 spacy>=3.6.0
 langchain-core>=0.1.0
 networkx>=3.0
-python-dotenv>=1.0.0
+omegaconf>=2.3.0
 langchain-community>=0.0.38
 langchain_text_splitters
 anthropic>=0.7.0

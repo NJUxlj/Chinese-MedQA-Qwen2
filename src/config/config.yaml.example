@@ -1,0 +1,271 @@
+# =============================================================================
+# Chinese-MedQA-Qwen2 统一配置文件 (示例)
+#
+# 全项目所有配置项一律集中在 src/config/config.yaml，由 settings.py 加载。
+# 拷贝本文件为 config.yaml 后，按需填写各字段（密钥、路径、端点等）。
+# 本项目不再使用 .env / python-dotenv / 任何 os.environ 注入配置。
+# =============================================================================
+
+llm:
+  model_provider: AzureOpenAI
+  model_name: glm-4.6
+  api_key: "<YOUR_LLM_API_KEY>"
+  base_url: https://open.bigmodel.cn/api/paas/v4
+  max_tokens: 2048
+  temperature: 0.7
+  top_p: 0.9
+  timeout: 60
+
+milvus:
+  uri: http://localhost:19530
+  token: ""
+  db_name: default
+  index_type: FLAT
+  metric_type: L2
+  consistency_level: Strong
+
+neo4j:
+  uri: bolt://localhost:7687
+  username: neo4j
+  password: "<NEO4J_PASSWORD>"
+
+rag:
+  retriever_type: hybrid
+  embedding_model_name: paraphrase-multilingual-MiniLM-L12-v2
+  top_k: 5
+  similarity_threshold: 0.5
+  use_reranker: true
+  hybrid_weight: 0.7
+
+agent:
+  max_iterations: 10
+  tool_timeout: 30
+  enable_auto_tool_choice: false
+  model_name: glm-4.6
+  api_key: "<YOUR_AGENT_LLM_API_KEY>"
+  base_url: https://open.bigmodel.cn/api/paas/v4
+  max_tokens: 2048
+  temperature: 0.7
+  timeout: 60
+
+embedding:
+  model_name: paraphrase-multilingual-MiniLM-L12-v2
+  model_path: ""
+  reranker_model_path: ""
+  batch_size: 32
+  dimension: 768
+
+embedding_service:
+  default_model_name: paraphrase-multilingual-MiniLM-L12-v2
+  default_dimension: 384
+  cache_dir: embedding_cache
+
+inference:
+  model_name_or_path: "<LOCAL_MODEL_PATH>"
+  device: cuda:0
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  gpu_memory_utilization: 0.9
+  max_model_len: null
+  max_new_tokens: 2048
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 50
+  dtype: auto
+  trust_remote_code: true
+
+evaluator:
+  model_name_or_path: "<LOCAL_MODEL_PATH>"
+  test_dataset_path: null
+  batch_size: 4
+  max_new_tokens: 2048
+  temperature: 0.7
+  metrics: [bleu, rouge]
+
+local_model:
+  model_path: "<LOCAL_MODEL_PATH>"
+  device: cuda:0
+  trust_remote_code: true
+
+vllm:
+  model_name_or_path: Qwen/Qwen3-4B
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  gpu_memory_utilization: 0.9
+  max_model_len: null
+  max_num_seqs: null
+  dtype: auto
+  quantization: null
+  enforce_eager: false
+  swap_space: 4
+  trust_remote_code: true
+  seed: 42
+
+api_server:
+  host: 0.0.0.0
+  port: 8000
+  base_url: http://localhost:8000
+  preload_models: true
+  cors_allowed_origins:
+    - http://localhost:3000
+    - http://localhost:8000
+  admin_api_key: "<ADMIN_API_KEY>"
+
+model_service:
+  default_model_name: qwen2-7b-instruct
+  default_model_path: Qwen/Qwen2-7B-Instruct
+
+rag_service:
+  kb_index_dir: knowledge_base/indices
+  default_retriever: hybrid
+  default_kb: ""
+
+openai:
+  api_key: ""
+
+pubmed:
+  api_key: ""
+  email: ""
+  tool_name: MedicalAIAgent
+  max_results: 10
+
+knowledge_base:
+  index_dir: knowledge_base/indices
+  default_retriever: hybrid
+
+retriever:
+  default_type: hybrid
+  default_weight: 0.7
+  bm25_score_threshold: 0.1
+  use_jieba: true
+  knn_index_type: Flat
+  knn_n_list: 100
+  knn_m: 16
+  l2_distance_threshold: 0.5
+
+ner:
+  model_provider: spacy
+  model_name: zh_core_web_sm
+  device: -1
+  batch_size: 32
+
+azure_ai:
+  project_endpoint: ""
+  subscription_id: ""
+  resource_group: ""
+  service: ""
+  agent_model_deployment_name: ""
+  project_name: ""
+
+training:
+  output_dir: ./output
+  sft_model_name: qwen2_medical_sft
+  dpo_model_name: qwen2_medical_dpo
+  deepspeed_config_path: ./src/config/ds_config.json
+
+model:
+  model_name_or_path: "<LOCAL_MODEL_PATH>"
+  trust_remote_code: true
+
+method:
+  stage: sft
+  do_train: true
+  finetuning_type: lora
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0
+  lora_target: all
+
+data:
+  dataset: alpaca_en_demo
+  template: qwen
+  flash_attn: auto
+  cutoff_len: 1024
+  max_samples: 1000
+  preprocessing_num_workers: 16
+  dataloader_num_workers: 4
+  train_files: null
+  val_files: null
+  prompt_key: question
+  response_key: answer
+
+output:
+  output_dir: ./output
+  logging_steps: 10
+  save_steps: 500
+  plot_loss: true
+  overwrite_output_dir: true
+  report_to: tensorboard
+
+train:
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 1.0e-4
+  num_train_epochs: 3.0
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.1
+  bf16: true
+  ddp_timeout: 180000000
+  max_grad_norm: 1.0
+  optim: adamw_torch
+
+eval:
+  val_size: 0.1
+  per_device_eval_batch_size: 1
+  eval_strategy: steps
+  eval_steps: 500
+
+rl_data:
+  train_files: ~/data/rlhf/gsm8k/train.parquet
+  val_files: ~/data/rlhf/gsm8k/test.parquet
+  prompt_key: prompt
+  max_prompt_length: 512
+  max_response_length: 512
+  train_batch_size: 1024
+  shuffle: true
+  dataloader_num_workers: 8
+
+actor_rollout_ref:
+  hybrid_engine: true
+  model:
+    path: "<LOCAL_MODEL_PATH>"
+    enable_gradient_checkpointing: true
+    lora_rank: 0
+    lora_alpha: 16
+  actor:
+    strategy: fsdp
+    ppo_mini_batch_size: 256
+    grad_clip: 1.0
+    clip_ratio: 0.2
+    lr: 1e-6
+    weight_decay: 0.01
+  rollout:
+    name: vllm
+    temperature: 1.0
+    top_k: -1
+    top_p: 1.0
+    dtype: bfloat16
+    gpu_memory_utilization: 0.5
+
+algorithm:
+  gamma: 1.0
+  lam: 1.0
+  adv_estimator: gae
+  kl_penalty: kl
+  kl_ctrl:
+    type: fixed
+    kl_coef: 0.001
+
+rl_trainer:
+  total_epochs: 30
+  project_name: verl_examples
+  experiment_name: gsm8k
+  logger: [console, wandb]
+  nnodes: 1
+  n_gpus_per_node: 8
+  save_freq: -1
+  test_freq: -1
+  device: cuda
+
+ray_init:
+  num_cpus: null

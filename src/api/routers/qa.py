@@ -3,9 +3,9 @@
 提供医疗问答接口
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, BackgroundTasks
-from fastapi.responses import JSONResponse, StreamingResponse
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 import time
 import json
 import asyncio
@@ -61,13 +61,20 @@ async def ask_question(
         
         # 处理结果
         process_time = time.time() - start_time
-        
+
+        # 使用 tokenizer 精确计数
+        try:
+            tokenizer = model.tokenizer
+            tokens_used = len(tokenizer.encode(answer, add_special_tokens=True))
+        except Exception:
+            tokens_used = len(answer)
+
         return QuestionResponse(
             question=request.question,
             answer=answer,
             model=request.model_name or "default",
             process_time=process_time,
-            tokens_used=len(answer.split())  # 简单估计
+            tokens_used=tokens_used
         )
         
     except Exception as e:
@@ -134,12 +141,18 @@ async def ask_question_stream(
             
             # 发送完成事件
             process_time = time.time() - start_time
+            # 使用 tokenizer 精确计数
+            try:
+                tokenizer = model.tokenizer
+                tokens_used = len(tokenizer.encode(full_answer, add_special_tokens=True))
+            except Exception:
+                tokens_used = len(full_answer)
             data = {
                 "chunk": "",
                 "full": full_answer,
                 "finished": True,
                 "process_time": process_time,
-                "tokens_used": len(full_answer.split())  # 简单估计
+                "tokens_used": tokens_used
             }
             
             yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"

@@ -149,10 +149,10 @@ Chinese-MedQA-Qwen2
 
 主要基座模型: **`Qwen/Qwen3-4B`** (HuggingFace)
 
-模型路径通过环境变量配置:
-- `LOCAL_MODEL_PATH` - 本地模型路径
-- `EMBEDDING_MODEL_PATH` - Embedding 模型路径
-- `RERANKER_MODEL_PATH` - Reranker 模型路径
+所有模型路径与服务参数均集中在 `src/config/config.yaml`：
+- `local_model.model_path` / `inference.model_name_or_path` - 本地模型路径
+- `embedding.model_path` - Embedding 模型路径
+- `embedding.reranker_model_path` - Reranker 模型路径
 
 ## 如何运行本项目
 
@@ -162,12 +162,18 @@ Chinese-MedQA-Qwen2
 pip install -r requirements.txt
 ```
 
-### 2. 配置环境变量
+### 2. 配置项目
+
+本项目**只使用** `src/config/config.yaml` 作为配置入口，**不再读取任何环境变量**，
+不再使用 `.env` / `python-dotenv`。所有路径、密钥、端口等参数均在 YAML 中维护：
 
 ```bash
-export LOCAL_MODEL_PATH="/path/to/Qwen3-4B"
-export EMBEDDING_MODEL_PATH="/path/to/embedding/model"
-export RERANKER_MODEL_PATH="/path/to/reranker/model"
+cp src/config/config.yaml.example src/config/config.yaml
+# 然后按需编辑 config.yaml 中的字段，例如：
+#   llm.api_key / llm.base_url
+#   local_model.model_path / embedding.model_path
+#   api_server.host / api_server.port / api_server.admin_api_key
+#   milvus.uri / neo4j.password ...
 ```
 
 ### 3. 启动 API 服务

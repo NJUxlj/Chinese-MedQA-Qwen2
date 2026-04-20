@@ -2,7 +2,7 @@
 通用的模式定义
 """
 
-from typing import Dict, Any, List, Optional, Generic, TypeVar, Union
+from typing import Dict, Any, List, Optional, Generic, TypeVar
 from pydantic import BaseModel, Field
 
 T = TypeVar('T')

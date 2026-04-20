@@ -1,5 +1,4 @@
 
-import os
 import time
 from typing import Dict, List, Optional, Union, Any
 
@@ -10,21 +9,28 @@ from tqdm import tqdm
 import requests
 from bs4 import BeautifulSoup
 
+from config.settings import settings
+
+
 class PubMedRetriever:
     """PubMed检索器，用于从PubMed获取医学文献信息"""
-    
-    def __init__(self, config: Dict[str, Any]):
+
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
         初始化PubMed检索器。
-        
+
         Args:
-            config: PubMed配置字典
+            config: PubMed 配置字典；不传则全部从 ``settings.pubmed`` 读取。
+                    任何未在 ``config`` 中给出的字段，均回退到 ``settings.pubmed``。
         """
+        config = config or {}
+        pubmed_cfg = settings.pubmed
+
         self.config = config
-        self.email = config.get('email')
-        self.api_key = config.get('api_key', os.environ.get('PUBMED_API_KEY'))
-        self.tool_name = config.get('tool_name', 'MedicalAIAgent')
-        self.max_results = config.get('max_results', 10)
+        self.email = config.get('email', getattr(pubmed_cfg, 'email', '') or '')
+        self.api_key = config.get('api_key', getattr(pubmed_cfg, 'api_key', '') or '')
+        self.tool_name = config.get('tool_name', getattr(pubmed_cfg, 'tool_name', 'MedicalAIAgent'))
+        self.max_results = config.get('max_results', int(getattr(pubmed_cfg, 'max_results', 10)))
         
         # 设置Entrez
         Entrez.email = self.email

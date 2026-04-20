@@ -4,8 +4,13 @@
 """
 
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+import time
+import numpy as np
+from sklearn.metrics import f1_score
+from sklearn.feature_extraction.text import CountVectorizer
+from difflib import SequenceMatcher
 
 from services.model_service import get_model_service, ModelService
 from services.rag_service import get_rag_service, RAGService
@@ -50,11 +55,6 @@ async def evaluate_model(
     Returns:
         评估结果
     """
-    import time
-    import numpy as np
-    from sklearn.metrics import f1_score
-    from sklearn.feature_extraction.text import CountVectorizer
-    
     start_time = time.time()
     
     try:
@@ -86,7 +86,6 @@ async def evaluate_model(
         
         # 简单相似度评分
         if "similarity" in request.metrics:
-            from difflib import SequenceMatcher
             similarity = SequenceMatcher(None, request.reference_answer, model_answer).ratio()
             metrics["similarity"] = similarity
         
@@ -115,7 +114,7 @@ async def evaluate_model(
                 metrics["rouge-2"] = scores["rouge-2"]["f"]
                 metrics["rouge-l"] = scores["rouge-l"]["f"]
             except ImportError:
-                metrics["rouge"] = "rouge库未安装"
+                logger.warning("rouge库未安装，跳过ROUGE指标计算")
         
         process_time = time.time() - start_time
         
@@ -163,8 +162,6 @@ async def batch_evaluate_model(
     Returns:
         批量评估结果
     """
-    import time
-    
     start_time = time.time()
     results = []
     

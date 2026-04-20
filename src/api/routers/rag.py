@@ -3,12 +3,9 @@ RAG服务路由
 提供知识检索和增强生成接口  
 """  
 
-from typing import Dict, Any, List, Optional  
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, BackgroundTasks  
-from fastapi.responses import JSONResponse, StreamingResponse  
-import time  
-import json  
-import asyncio  
+from typing import Dict, Any, List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Path
+import time
 
 from schemas.rag import (  
     RetrieveRequest, RetrieveResponse,   
@@ -38,11 +35,12 @@ async def retrieve_documents(
     start_time = time.time()  
     
     try:  
-        # 执行检索  
-        documents = rag_service.retrieve(  
-            kb_name=request.kb_name,  
-            query=request.query,  
-            top_k=request.top_k  
+        # 执行检索
+        documents = rag_service.retrieve(
+            kb_name=request.kb_name,
+            query=request.query,
+            top_k=request.top_k,
+            filter=request.filter
         )  
         
         # 处理结果

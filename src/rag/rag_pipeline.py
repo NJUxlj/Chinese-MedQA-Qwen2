@@ -7,12 +7,12 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from langchain_core.documents import Document
 
-from typing import Dict, List, Optional, Union, Any, Tuple
+from typing import Dict, List, Optional, Any
 from knowledge_base.retrieval.knn_retriever import KNNRetriever
 from knowledge_base.retrieval.similarity_retriever import SimilarityRetriever
 from knowledge_base.retrieval.bm25_retriever import BM25Retriever
 from knowledge_base.retrieval.l2_retriever import L2Retriever
-from knowledge_base.embedding.embedding_manager import EmbeddingManager
+from providers.embedding_provider import EmbeddingProvider
 from rag.query_processor import QueryProcessor
 from rag.context_builder import ContextBuilder
 from rag.response_generator import ResponseGenerator
@@ -104,8 +104,8 @@ class RAGPipeline:
 
         # 初始化嵌入管理器 (对于某些检索器需要)
         if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
-            self.embedding_manager = EmbeddingManager(
-                embedding_model_name=self.embedding_model_name,
+            self.embedding_manager = EmbeddingProvider(
+                model_name=self.embedding_model_name,
                 cache_dir=self.cache_dir
             )
         else:
@@ -194,27 +194,28 @@ class RAGPipeline:
             template=self.response_generator.template if self.response_generator else None
         )
     
-    def _query_hybrid(self, query_text: str, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
+    def _query_hybrid(self, query_text: str, top_k: Optional[int] = None, filter: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         使用混合检索方式进行查询
-        
+
         Args:
             query_text: 查询文本
             top_k: 检索文档数量
-            
+            filter: 过滤条件
+
         Returns:
             检索到的文档列表
         """
         k = top_k or self.top_k
-        
+
         dense_results = self.dense_retriever.search(query_text, k*2)
         sparse_results = self.sparse_retriever.search(query_text, k*2)
-        
+
         dense_docs = [(doc.page_content, doc.metadata, score) for doc, score in dense_results]
         sparse_docs = [(doc.page_content, doc.metadata, score) for doc, score in sparse_results]
-        
+
         combined_docs = {}
-        
+
         for i, (content, metadata, score) in enumerate(dense_docs):
             doc_id = metadata.get("doc_id", f"dense_{i}")
             if doc_id not in combined_docs:
@@ -225,7 +226,7 @@ class RAGPipeline:
                 }
             combined_docs[doc_id]["dense_score"] = score
             combined_docs[doc_id]["combined_score"] += self.hybrid_weight * score
-        
+
         for i, (content, metadata, score) in enumerate(sparse_docs):
             doc_id = metadata.get("doc_id", f"sparse_{i}")
             if doc_id not in combined_docs:
@@ -237,47 +238,52 @@ class RAGPipeline:
                 }
             combined_docs[doc_id]["sparse_score"] = score
             combined_docs[doc_id]["combined_score"] += (1 - self.hybrid_weight) * score
-        
+
         sorted_docs = sorted(
-            combined_docs.values(), 
-            key=lambda x: x["combined_score"], 
+            combined_docs.values(),
+            key=lambda x: x["combined_score"],
             reverse=True
         )
-        
+
+        # 应用过滤器
+        if filter:
+            sorted_docs = self._apply_filter(sorted_docs, filter)
+
         return sorted_docs[:k]
     
-    def query(self, query_text: str, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
+    def query(self, query_text: str, top_k: Optional[int] = None, filter: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         根据查询文本检索相关文档
-        
+
         Args:
             query_text: 查询文本
             top_k: 检索文档数量
-            
+            filter: 过滤条件，格式为 {"field": "value"}
+
         Returns:
             检索到的文档列表
         """
         if not query_text or not query_text.strip():
             logger.warning("查询文本为空")
             return []
-        
+
         processed_query = self.query_processor.process_query(query_text)
-        
+
         if not processed_query or not processed_query.strip():
             logger.warning(f"处理后的查询为空，使用原始查询: {query_text}")
             processed_query = query_text
-        
+
         if not processed_query or not processed_query.strip():
             logger.warning("查询文本为空，无法执行检索")
             return []
-        
+
         k = top_k or self.top_k
-        
+
         if self.retriever_type == "hybrid":
-            return self._query_hybrid(processed_query, k)
-        
+            return self._query_hybrid(processed_query, k, filter=filter)
+
         results = self.retriever.search(processed_query, k)
-        
+
         docs = []
         for doc, score in results:
             docs.append({
@@ -286,8 +292,26 @@ class RAGPipeline:
                 "metadata": doc.metadata,
                 "score": score
             })
-        
+
+        # 应用过滤器
+        if filter:
+            docs = self._apply_filter(docs, filter)
+
         return docs
+
+    def _apply_filter(self, docs: List[Dict[str, Any]], filter: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """对文档列表应用过滤条件"""
+        filtered = []
+        for doc in docs:
+            metadata = doc.get("metadata", {})
+            match = True
+            for key, value in filter.items():
+                if metadata.get(key) != value:
+                    match = False
+                    break
+            if match:
+                filtered.append(doc)
+        return filtered
     
     def build_context(self, query_text: str, top_k: Optional[int] = None, 
                      use_reranker: Optional[bool] = None) -> str:

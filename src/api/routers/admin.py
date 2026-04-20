@@ -7,16 +7,15 @@ from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Security, Query
 from fastapi.security import APIKeyHeader
 import time
-import os
 
+from config.settings import settings
 from services.model_service import get_model_service, ModelService
 from services.embedding_service import get_embedding_service, EmbeddingService
 from services.rag_service import get_rag_service, RAGService
 
 router = APIRouter()
 
-# API密钥认证
-API_KEY = os.environ.get("ADMIN_API_KEY")
+API_KEY = settings.api_server.admin_api_key
 api_key_header = APIKeyHeader(name="X-API-Key")
 
 def get_api_key(api_key: str = Security(api_key_header)):
@@ -116,10 +115,7 @@ async def load_embedding_model(
         操作结果
     """
     try:
-        manager = embedding_service.get_embedding_manager(
-            model_name=model_name,
-            dimension=dimension
-        )
+        manager = embedding_service.get_embedding_provider(model_name=model_name)
         
         return {
             "success": True,

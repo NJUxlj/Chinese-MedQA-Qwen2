@@ -18,11 +18,7 @@ sys.path.insert(0, str(project_root))
 from training.trainer.trpo_trainer import TRPOTrainer
 from config.settings import settings
 
-
-from dotenv import load_dotenv
-load_dotenv()
-
-LOCAL_MODEL_PATH = os.getenv('LOCAL_MODEL_PATH')
+LOCAL_MODEL_PATH = str(settings.local_model.model_path)
 
 def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """设置日志记录器"""

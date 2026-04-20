@@ -3,29 +3,17 @@
 提供文本嵌入接口
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException
 
+from schemas.embedding import (
+    EmbeddingRequest,
+    BatchEmbeddingRequest,
+    SimilarityRequest
+)
 from services.embedding_service import get_embedding_service, EmbeddingService
 
 router = APIRouter()
-
-class EmbeddingRequest(BaseModel):
-    """嵌入请求"""
-    text: str
-    model_name: Optional[str] = None
-
-class BatchEmbeddingRequest(BaseModel):
-    """批量嵌入请求"""
-    texts: List[str]
-    model_name: Optional[str] = None
-
-class SimilarityRequest(BaseModel):
-    """相似度计算请求"""
-    text1: str
-    text2: str
-    model_name: Optional[str] = None
 
 @router.post("/embed", response_model=List[float])
 async def get_embedding(

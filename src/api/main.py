@@ -16,19 +16,18 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-# 导入路由
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from config.settings import settings
+
 from routers import qa, admin, rag, embedding, health, evaluation, mdagents
 
-# 导入模型服务
 from services.model_service import get_model_service, ModelService
 from services.rag_service import get_rag_service, RAGService
 from services.embedding_service import get_embedding_service, EmbeddingService
 from services.mdagents_service import get_mdagents_service, MDAgentsService
 
-# 导入Gradio UI
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from ui.medagents_ui import MDAgentsUI
 
 # 配置日志
@@ -55,7 +54,7 @@ async def lifespan(app: FastAPI):
     embedding_service = get_embedding_service()
     mdagents_service = get_mdagents_service()
     
-    if os.environ.get("PRELOAD_MODELS", "true").lower() == "true":
+    if bool(settings.api_server.preload_models):
         try:
             # 预加载模型
             model_service.load_default_model()
@@ -83,9 +82,15 @@ app = FastAPI(
 )
 
 # 添加中间件
+_cors_origins = settings.api_server.cors_allowed_origins
+if isinstance(_cors_origins, str):
+    _cors_origins = [o.strip() for o in _cors_origins.split(",") if o.strip()]
+else:
+    _cors_origins = list(_cors_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000").split(","),
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -131,7 +136,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 # 静态文件
 try:
     app.mount("/static", StaticFiles(directory="static"), name="static")
-except:
+except Exception:
     logger.warning("未找到static目录，跳过静态文件挂载")
 
 # 根路由
@@ -146,10 +151,8 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    
-    # 获取配置
-    host = os.environ.get("API_HOST", "0.0.0.0")
-    port = int(os.environ.get("API_PORT", 8000))
-    
-    # 启动服务
+
+    host = str(settings.api_server.host)
+    port = int(settings.api_server.port)
+
     uvicorn.run("main:app", host=host, port=port, reload=True)

@@ -4,12 +4,11 @@ RAG服务
 """
 
 from typing import Dict, Any, List, Optional, Union
-import os
 import threading
 import logging
 from pathlib import Path
 
-# 导入RAG组件
+from config.settings import settings
 from rag.rag_pipeline import RAGPipeline
 from knowledge_base.kb_manager import KnowledgeBaseManager
 from services.model_service import get_model_service, ModelService
@@ -19,25 +18,20 @@ logger = logging.getLogger(__name__)
 
 class RAGService:
     """RAG服务类"""
-    
+
     def __init__(self):
         """初始化RAG服务"""
         self.pipelines: Dict[str, RAGPipeline] = {}
         self._pipelines_lock = threading.RLock()
-        
-        # 获取服务依赖
+
         self.model_service = get_model_service()
         self.embedding_service = get_embedding_service()
-        
-        # 初始化知识库管理器
-        self.kb_manager = KnowledgeBaseManager(
-            index_dir=os.environ.get("KB_INDEX_DIR", "knowledge_base/indices")
-        )
-        
-        # 默认检索器类型
-        self.default_retriever_type = os.environ.get("DEFAULT_RETRIEVER", "hybrid")
-        
-        # 配置初始化标志
+
+        cfg = settings.rag_service
+        self.kb_manager = KnowledgeBaseManager(index_dir=str(cfg.kb_index_dir))
+        self.default_retriever_type = str(cfg.default_retriever)
+        self._default_kb = str(cfg.default_kb) if cfg.default_kb else ""
+
         self.initialized = False
     
     def initialize(self) -> None:
@@ -48,13 +42,10 @@ class RAGService:
         logger.info("初始化RAG服务")
         
         try:
-            # 初始化数据库管理器
             self.kb_manager.initialize()
-            
-            # 如果环境变量设置了默认知识库，则创建默认管道
-            default_kb = os.environ.get("DEFAULT_KB", None)
-            if default_kb:
-                self.get_or_create_pipeline(default_kb)
+
+            if self._default_kb:
+                self.get_or_create_pipeline(self._default_kb)
             
             self.initialized = True
             logger.info("RAG服务初始化成功")
@@ -88,7 +79,7 @@ class RAGService:
                     raise ValueError(f"知识库 {kb_name} 不存在或索引未创建")
                 
                 # 获取嵌入模型
-                embedding_manager = self.embedding_service.get_default_embedding_manager()
+                embedding_manager = self.embedding_service.get_default_embedding_provider()
                 
                 # 创建RAG管道
                 pipeline = RAGPipeline(
@@ -111,24 +102,25 @@ class RAGService:
                 logger.error(f"创建RAG管道 {kb_name} 失败: {e}")
                 raise
     
-    def retrieve(self, kb_name: str, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def retrieve(self, kb_name: str, query: str, top_k: int = 5, filter: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         执行知识检索
-        
+
         Args:
             kb_name: 知识库名称
             query: 查询文本
             top_k: 返回文档数量
-            
+            filter: 过滤条件
+
         Returns:
             检索到的文档列表
         """
         # 获取RAG管道
         pipeline = self.get_or_create_pipeline(kb_name)
-        
+
         # 执行检索
-        documents = pipeline.query(query, top_k)
-        
+        documents = pipeline.query(query, top_k, filter=filter)
+
         return documents
     
     def build_context(self, kb_name: str, query: str, top_k: int = 5) -> str:
@@ -205,19 +197,19 @@ class RAGService:
     def delete_knowledge_base(self, kb_name: str) -> bool:
         """
         删除知识库
-        
+
         Args:
             kb_name: 知识库名称
-            
+
         Returns:
             是否删除成功
         """
-        # 如果有对应的管道，先移除
+        # 如果有对应的管道，先移除（锁内删除 pipeline 和调用 kb_manager 保持原子）
         with self._pipelines_lock:
             if kb_name in self.pipelines:
                 del self.pipelines[kb_name]
-        
-        return self.kb_manager.delete_knowledge_base(kb_name)
+
+            return self.kb_manager.delete_knowledge_base(kb_name)
     
     def add_documents(self, kb_name: str, documents: List[Dict[str, Any]]) -> bool:
         """
