@@ -4,7 +4,6 @@
 """
 
 from typing import Dict, Any, List, Optional, Union
-import os
 import threading
 import logging
 from contextlib import contextmanager
@@ -13,8 +12,8 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from models.qwen_model import Qwen2Model
-from models.base_model import BaseGenerativeModel
+from config.settings import settings
+from providers import LLMProvider
 
 logger = logging.getLogger(__name__)
 from utils.logger import setup_logger
@@ -25,12 +24,13 @@ class ModelService:
 
     def __init__(self):
         """初始化模型服务"""
-        self.models: Dict[str, BaseGenerativeModel] = {}
+        self.models: Dict[str, LLMProvider] = {}
         self._models_lock = threading.RLock()
         self.logger = setup_logger(self.__class__.__name__)
 
-        self.default_model_name = os.environ.get("DEFAULT_MODEL", "qwen2-7b-instruct")
-        self.default_model_path = os.environ.get("DEFAULT_MODEL_PATH", "Qwen/Qwen2-7B-Instruct")
+        cfg = settings.model_service
+        self.default_model_name = str(cfg.default_model_name)
+        self.default_model_path = str(cfg.default_model_path)
 
     def load_model(
         self,
@@ -42,7 +42,7 @@ class ModelService:
         use_flash_attention: bool = False,
         device: str = None,
         **kwargs
-    ) -> BaseGenerativeModel:
+    ) -> LLMProvider:
         """
         加载模型
 
@@ -68,12 +68,12 @@ class ModelService:
 
             try:
                 if any(name in model_type.lower() for name in ['qwen2', 'qwen3', 'qwen2.5', 'gpt2']):
-                    model = Qwen2Model(
+                    model = LLMProvider(
+                        provider="local",
                         model_path=model_path,
                         device=device,
                         load_in_8bit=load_in_8bit,
                         load_in_4bit=load_in_4bit,
-                        use_flash_attention=use_flash_attention,
                         **kwargs
                     )
                 else:
@@ -93,7 +93,7 @@ class ModelService:
         load_in_4bit: bool = False,
         use_flash_attention: bool = False,
         device: str = None
-    ) -> BaseGenerativeModel:
+    ) -> LLMProvider:
         """
         加载默认模型
 
@@ -116,7 +116,7 @@ class ModelService:
             device=device
         )
 
-    def get_model(self, model_name: Optional[str] = None) -> BaseGenerativeModel:
+    def get_model(self, model_name: Optional[str] = None) -> LLMProvider:
         """
         获取模型实例
 

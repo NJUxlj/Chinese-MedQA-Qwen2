@@ -5,7 +5,7 @@ from agent.base_agent import BaseAgent
 from agent.agent_factory import AgentFactory
 from utils.logger import setup_logger
 from config.settings import settings
-from models.api_model import ApiModel
+from providers import LLMProvider
 from rag.rag_pipeline import RAGPipeline
 
 

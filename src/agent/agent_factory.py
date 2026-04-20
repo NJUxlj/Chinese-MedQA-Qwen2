@@ -16,7 +16,7 @@ from tools.medical_assessment_tool import MedicalAssessmentTool
 
 from utils.logger import setup_logger
 from config.settings import settings
-from models.base_model import BaseGenerativeModel
+from providers import LLMProvider
 from rag.rag_pipeline import RAGPipeline
 
 logger = setup_logger(__name__, level="INFO")
@@ -29,7 +29,7 @@ class AgentFactory:
     @staticmethod
     def create_agent(
         agent_type: str,
-        model: BaseGenerativeModel,
+        model: LLMProvider,
         rag_pipeline: Optional[RAGPipeline] = None,
         config: Optional = None,
         **kwargs
@@ -68,7 +68,7 @@ class AgentFactory:
     @staticmethod
     def load_default_tools(
         agent: AgentBase,
-        model: BaseGenerativeModel,
+        model: LLMProvider,
         config=None
     ) -> None:
         """

@@ -35,7 +35,7 @@ from .base_agent import BaseAgent
 from .agent_factory import AgentFactory
 from .agent_manager import AgentManager
 from ..utils.logger import setup_logger
-from ..models.base_model import BaseGenerativeModel
+from providers import LLMProvider
 from ..rag.rag_pipeline import RAGPipeline
 
 logger = setup_logger(__name__, level="INFO")
@@ -3555,7 +3555,7 @@ class MultiAgentSystem:
 
     def __init__(
         self,
-        model: BaseGenerativeModel,
+        model: LLMProvider,
         rag_pipeline: Optional[RAGPipeline] = None,
         agent_manager: Optional[AgentManager] = None,
         pipeline_id: Optional[str] = None,

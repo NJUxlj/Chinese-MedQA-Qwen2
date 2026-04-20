@@ -7,7 +7,7 @@ from typing import Dict, List, Any, Optional, Union
 import json
 from datetime import datetime
 
-from models.api_model import ApiModel, ZhipuApiModel, OpenAIApiModel
+from src.providers import LLMProvider, EmbeddingProvider
 from config.settings import settings
 from ..tools.logger import setup_logger
 
@@ -26,7 +26,9 @@ class ApiIntegrationManager:
         self.logger = setup_logger(self.__class__.__name__)
         
         # 初始化API模型
-        self.api_model = self._initialize_api_model()
+        self.llm_provider = self._initialize_llm_provider()
+        # 初始化嵌入提供者
+        self.embedding_provider = self._initialize_embedding_provider()
         
         # API调用历史
         self.api_call_history = []
@@ -42,27 +44,34 @@ class ApiIntegrationManager:
             "average_response_time": 0.0
         }
     
-    def _initialize_api_model(self) -> ApiModel:
-        """初始化API模型"""
+    def _initialize_llm_provider(self) -> LLMProvider:
+        """初始化LLM Provider"""
         try:
-            if self.llm_config.model_provider == "zhipuai":
-                return ZhipuApiModel(
-                    api_key=self.llm_config.api_key,
-                    api_base=self.llm_config.base_url,
-                    model_name=self.llm_config.model_name
-                )
-            elif self.llm_config.model_provider == "openai":
-                return OpenAIApiModel(
-                    api_key=self.llm_config.api_key,
-                    api_base=self.llm_config.base_url,
-                    model_name=self.llm_config.model_name
-                )
-            else:
-                raise ValueError(f"不支持的模型提供商: {self.llm_config.model_provider}")
-                
+            return LLMProvider(
+                provider=self.llm_config.model_provider,
+                model_name=self.llm_config.model_name,
+                base_url=self.llm_config.base_url,
+                api_key=self.llm_config.api_key,
+                max_tokens=getattr(self.llm_config, 'max_tokens', 2048),
+                temperature=getattr(self.llm_config, 'temperature', 0.7),
+            )
         except Exception as e:
-            self.logger.error(f"API模型初始化失败: {str(e)}")
+            self.logger.error(f"LLM Provider初始化失败: {str(e)}")
             raise
+
+    def _initialize_embedding_provider(self) -> EmbeddingProvider:
+        """初始化Embedding Provider"""
+        try:
+            from config.settings import settings as global_settings
+            emb_cfg = global_settings.embedding
+            return EmbeddingProvider(
+                model_name=emb_cfg.model_name,
+                model_type=emb_cfg.model_type if hasattr(emb_cfg, 'model_type') else 'local',
+                encode_kwargs=getattr(emb_cfg, 'encode_kwargs', {}),
+            )
+        except Exception as e:
+            self.logger.warning(f"Embedding Provider初始化失败: {str(e)}，嵌入功能可能不可用")
+            return None
     
     def _initialize_prompt_templates(self) -> Dict[str, str]:
         """初始化提示词模板"""
@@ -197,13 +206,11 @@ class ApiIntegrationManager:
             self.logger.info(f"调用{prompt_type}类型的API")
             
             # 调用API
-            response = self.api_model.generate(
+            response = self.llm_provider.generate(
                 prompt=prompt,
-                additional_args={
-                    "temperature": self.llm_config.temperature,
-                    "top_p": self.llm_config.top_p,
-                    "max_tokens": self.llm_config.max_tokens
-                }
+                temperature=self.llm_config.temperature,
+                top_p=self.llm_config.top_p,
+                max_tokens=self.llm_config.max_tokens
             )
             
             # 计算响应时间
@@ -303,14 +310,12 @@ class ApiIntegrationManager:
             self.logger.info("调用API（消息格式）")
             
             # 调用API
-            response = self.api_model.generate(
-                prompt=None,
+            response = self.llm_provider.generate(
+                prompt=prompt,
                 messages=messages,
-                additional_args={
-                    "temperature": self.llm_config.temperature,
-                    "top_p": self.llm_config.top_p,
-                    "max_tokens": self.llm_config.max_tokens
-                }
+                temperature=self.llm_config.temperature,
+                top_p=self.llm_config.top_p,
+                max_tokens=self.llm_config.max_tokens
             )
             
             # 计算响应时间
@@ -376,7 +381,7 @@ class ApiIntegrationManager:
             self.logger.info(f"获取{len(texts) if isinstance(texts, list) else 1}个文本的嵌入")
             
             # 调用API获取嵌入
-            embeddings = self.api_model.get_embeddings(texts, **kwargs)
+            embeddings = self.embedding_provider.get_embeddings(texts, **kwargs) if self.embedding_provider else None
             
             # 计算响应时间
             end_time = datetime.now()

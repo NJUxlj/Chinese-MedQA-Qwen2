@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from agent.base_agent import BaseAgent
 from tools.tool_manager import ToolManager
-from models.api_model import ApiModel
+from providers import LLMProvider
 from rag.rag_pipeline import RAGPipeline
 from utils.logger import setup_logger
 
@@ -21,7 +21,7 @@ class MedicalAgent(BaseAgent):
     
     def __init__(
         self, 
-        model: ApiModel,
+        model: LLMProvider,
         rag_pipeline: Optional[RAGPipeline] = None,
         agent_id: Optional[str] = None,
         name: str = "医疗助手",

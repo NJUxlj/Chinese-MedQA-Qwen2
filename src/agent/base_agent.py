@@ -5,7 +5,7 @@ from langchain_core.output_parsers import StrOutputParser
 from pathlib import Path
 import os, sys
 sys.path.append(str(Path(__file__).parent.parent))
-from models.api_model import ApiModel
+from providers import LLMProvider
 import json
 import re
 from utils.logger import setup_logger
@@ -17,7 +17,7 @@ class BaseAgent:
     
     def __init__(
         self,
-        model: ApiModel,
+        model: LLMProvider,
         system_prompt: Optional[str] = None,
         tools: Optional[List[Dict[str, Any]]] = None,
         max_iterations: int = 5,

@@ -15,20 +15,20 @@ from typing import Dict, Any, List, Optional
 
 
 from config.evaluator_config import MedQALLMEvaluatorConfig
-from config.llm_config import LLMConfig
+from config.settings import settings
 from evaluation.base_evaluator import BaseEvaluator, EvaluatorDataset
 
-class MedQALLMEvaluator(BaseEvaluator):  
+class MedQALLMEvaluator(BaseEvaluator):
     def __init__(
         self,
-        llm_config: LLMConfig,
-        config: MedQALLMEvaluatorConfig):  
-        """  
-        初始化评估器  
-        """  
+        llm_config=None,
+        config: MedQALLMEvaluatorConfig=None):
+        """
+        初始化评估器
+        """
         super().__init__(config)
         self.config = config
-        self.llm_config = llm_config
+        self.llm_config = llm_config if llm_config is not None else settings.llm
         
     
     def format_prompt(self, sample):  

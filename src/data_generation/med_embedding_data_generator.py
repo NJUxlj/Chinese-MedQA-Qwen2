@@ -6,8 +6,8 @@ from typing import List, Dict, Any, Union, Literal, Tuple
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from models.api_model import ApiModel
-from config.llm_config import LLMConfig
+from providers import LLMProvider
+from config.settings import settings
 from knowledge_base.milvus.milvus_client import MilvusClient
 from knowledge_base.lda.lda_pipeline import LDAPipeline
 from config.lda_config import LDAConfig
@@ -21,18 +21,25 @@ class MedEmbeddingDataGenerator:
     并通过页面分组或 LDA 主题建模生成正例对和负例对。
     """
 
-    def __init__(self, llm_config: LLMConfig, save_path: str, data_num: int = 1000):
+    def __init__(self, llm_config=None, save_path: str = None, data_num: int = 1000):
         """
         初始化嵌入数据生成器
-        
+
         Args:
-            llm_config: LLM 配置
+            llm_config: LLM 配置（可选，默认使用settings.llm）
             save_path: 数据保存路径
             data_num: 生成的嵌入数据数量
         """
         self.data_num = data_num
-        self.llm_config = llm_config
-        self.api_model = ApiModel(llm_config)
+        self.llm_config = llm_config if llm_config is not None else settings.llm
+        self.llm_provider = LLMProvider(
+            provider=self.llm_config.model_provider,
+            model_name=self.llm_config.model_name,
+            base_url=self.llm_config.base_url,
+            api_key=self.llm_config.api_key,
+            max_tokens=getattr(self.llm_config, 'max_tokens', 2048),
+            temperature=getattr(self.llm_config, 'temperature', 0.7),
+        )
         self.save_path = save_path
         
         # 初始化 Milvus 客户端
@@ -782,21 +789,15 @@ def run():
     """
     运行示例
     """
-    from config.llm_config import LLMConfig
-    
-    # 配置
-    llm_config = LLMConfig(
-        model_name="Qwen2-7B-Instruct",
-        api_key="your-api-key",
-        base_url="http://localhost:8000/v1"
-    )
-    
+    from config.settings import settings
+
+    # 配置（使用默认settings.llm）
     save_path = "./data/embedding_training_data"
     data_num = 1000
-    
+
     # 创建生成器
     generator = MedEmbeddingDataGenerator(
-        llm_config=llm_config,
+        llm_config=settings.llm,
         save_path=save_path,
         data_num=data_num
     )

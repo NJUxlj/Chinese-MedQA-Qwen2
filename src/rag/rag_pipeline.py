@@ -16,7 +16,7 @@ from knowledge_base.embedding.embedding_manager import EmbeddingManager
 from rag.query_processor import QueryProcessor
 from rag.context_builder import ContextBuilder
 from rag.response_generator import ResponseGenerator
-from models.base_model import BaseGenerativeModel
+from providers import LLMProvider
 from utils.logger import setup_logger
 
 from config.settings import settings
@@ -83,7 +83,7 @@ class RAGPipeline:
         self.embedding_dimension: int = self.config.embedding_dimension if hasattr(self.config, 'embedding_dimension') else 768
         self.index_path: Optional[str] = self.config.index_path if hasattr(self.config, 'index_path') else None
         self.top_k: int = self.config.top_k if hasattr(self.config, 'top_k') else 3
-        self.model: Optional[BaseGenerativeModel] = self.config.model if hasattr(self.config, 'model') else None
+        self.model: Optional[LLMProvider] = self.config.model if hasattr(self.config, 'model') else None
         self.cache_dir: Optional[str] = self.config.cache_dir if hasattr(self.config, 'cache_dir') else None
         self.reranker_model_provider: str = self.config.reranker_model_provider if hasattr(self.config, 'reranker_model_provider') else 'transformers'
         self.reranker_model_path: Optional[str] = self.config.reranker_model_path if hasattr(self.config, 'reranker_model_path') else None
@@ -178,7 +178,7 @@ class RAGPipeline:
         
         return str(base_path.parent / new_name)
     
-    def set_model(self, model: BaseGenerativeModel) -> None:
+    def set_model(self, model: LLMProvider) -> None:
         """
         设置用于生成响应的模型
         
@@ -334,20 +334,26 @@ class RAGPipeline:
         Returns:
             包含查询、上下文和格式化提示的字典
         """
-        # 获取上下文
-        context = self.build_context(query_text, top_k, use_reranker)
-        
-        # 检索相关文档
+        _use_reranker = use_reranker if use_reranker is not None else self.use_reranker
         documents = self.query(query_text, top_k)
-        
-        # 构建提示
+
+        if not documents:
+            logger.warning("没有检索到相关文档")
+            context = ""
+        else:
+            context = self.context_builder.build_context(
+                query=query_text,
+                documents=documents,
+                use_reranker=_use_reranker
+            )
+
         prompt = {
             "query": query_text,
             "context": context,
             "documents": documents,
             "formatted_prompt": self.context_builder.format_prompt(query_text, context)
         }
-        
+
         return prompt
     
     def generate_response(self, query_text: str, top_k: Optional[int] = None,

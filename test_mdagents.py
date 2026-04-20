@@ -49,18 +49,18 @@ from agent.mdagents.agents.integrator_agent import IntegratorAgent
 from agent.mdagents.core.main_controller import MainController
 
 # 导入API模型（用于集成测试）
-from models.api_model import ApiModel, ZhipuApiModel
-from config.llm_config import LLMConfig
+from src.providers import LLMProvider, EmbeddingProvider
+from config.settings import settings
 
 
-class MockApiModel:
-    """Mock API模型用于测试"""
-    
+class MockLLMProvider:
+    """Mock LLMProvider用于测试"""
+
     def __init__(self):
         self.call_count = 0
-    
-    def generate(self, prompt: str, messages: List[Dict[str, str]] = None, 
-                 additional_args: Dict[str, Any] = None) -> str:
+
+    def generate(self, prompt: str, messages: List[Dict[str, str]] = None,
+                 temperature: float = 0.7, top_p: float = 0.9, max_tokens: int = 2048, **kwargs) -> str:
         self.call_count += 1
         return f"Mock响应 #{self.call_count}: 测试回复"
 
@@ -360,7 +360,7 @@ class TestBaseAgent(unittest.TestCase):
             agent_type="pcc",
             description="测试基础智能体"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_agent_initialization(self):
         """测试智能体初始化（使用具体实现类）"""
@@ -417,7 +417,7 @@ class TestPCRAgent(unittest.TestCase):
             agent_type="pcc",
             description="测试用初级保健医生"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_pcc_agent_initialization(self):
         """测试PCC智能体初始化"""
@@ -450,7 +450,7 @@ class TestSpecialistAgent(unittest.TestCase):
             agent_type="specialist",
             description="测试用心血管专家"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_specialist_agent_initialization(self):
         """测试专科医生初始化"""
@@ -501,7 +501,7 @@ class TestModeratorAgent(unittest.TestCase):
             agent_type="moderator",
             description="测试用主持人"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_moderator_agent_initialization(self):
         """测试主持人初始化"""
@@ -532,7 +532,7 @@ class TestRecruiterAgent(unittest.TestCase):
             agent_type="recruiter",
             description="测试用招募者"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_recruiter_agent_initialization(self):
         """测试招募者初始化"""
@@ -563,7 +563,7 @@ class TestReviewerAgent(unittest.TestCase):
             agent_type="reviewer",
             description="测试用审查员"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_reviewer_agent_initialization(self):
         """测试审查员初始化"""
@@ -601,7 +601,7 @@ class TestIntegratorAgent(unittest.TestCase):
             agent_type="integrator",
             description="测试用整合者"
         )
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_integrator_agent_initialization(self):
         """测试整合者初始化"""
@@ -634,7 +634,7 @@ class TestMainController(unittest.TestCase):
     """测试主控制器"""
     
     def setUp(self):
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_controller_initialization(self):
         """测试控制器初始化"""
@@ -703,51 +703,50 @@ class TestMainController(unittest.TestCase):
 
 class TestApiModelIntegration(unittest.TestCase):
     """测试API模型集成"""
-    
-    def test_api_model_initialization(self):
-        """测试API模型初始化"""
+
+    def test_llm_provider_initialization(self):
+        """测试LLM Provider初始化"""
         try:
-            # 注意：这需要真实的API密钥，这里测试的是导入和基本结构
-            from config.llm_config import LLMConfig
-            
-            config = LLMConfig(
-                model_name="test-model",
-                api_key="test-key",
-                base_url="http://test.com"
+            # 测试使用settings.llm初始化
+            llm = LLMProvider(
+                provider=settings.llm.model_provider,
+                model_name=settings.llm.model_name,
+                base_url=settings.llm.base_url,
+                api_key=settings.llm.api_key,
             )
-            
-            self.assertEqual(config.model_name, "test-model")
-            print("✓ LLMConfig 初始化测试通过")
+
+            self.assertEqual(llm.model_name, settings.llm.model_name)
+            print("✓ LLMProvider 初始化测试通过")
         except Exception as e:
-            print(f"⚠ LLMConfig 初始化测试跳过: {e}")
-    
-    def test_api_model_generate_signature(self):
-        """测试API模型generate方法签名"""
-        # 验证ApiModel类的generate方法签名
+            print(f"⚠ LLMProvider 初始化测试跳过: {e}")
+
+    def test_llm_provider_generate_signature(self):
+        """测试LLM Provider generate方法签名"""
+        # 验证LLMProvider类的generate方法签名
         import inspect
-        
-        sig = inspect.signature(ApiModel.generate)
+
+        sig = inspect.signature(LLMProvider.generate)
         params = list(sig.parameters.keys())
-        
+
         self.assertIn('prompt', params)
-        self.assertIn('additional_args', params)
-        self.assertIn('messages', params)
-        print("✓ ApiModel.generate 方法签名测试通过")
-    
-    def test_zhipu_api_model_available(self):
-        """测试智谱API模型可用性"""
+        self.assertIn('temperature', params)
+        self.assertIn('max_tokens', params)
+        print("✓ LLMProvider.generate 方法签名测试通过")
+
+    def test_embedding_provider_available(self):
+        """测试EmbeddingProvider可用性"""
         try:
-            self.assertTrue(issubclass(ZhipuApiModel, ApiModel))
-            print("✓ ZhipuApiModel 继承测试通过")
+            self.assertTrue(hasattr(EmbeddingProvider, 'get_embeddings'))
+            print("✓ EmbeddingProvider 可用性测试通过")
         except Exception as e:
-            print(f"⚠ ZhipuApiModel 测试跳过: {e}")
+            print(f"⚠ EmbeddingProvider 测试跳过: {e}")
 
 
 class TestIntegration(unittest.TestCase):
     """端到端集成测试"""
     
     def setUp(self):
-        self.mock_api = MockApiModel()
+        self.mock_api = MockLLMProvider()
     
     def test_full_medical_query_flow(self):
         """测试完整医疗查询流程"""

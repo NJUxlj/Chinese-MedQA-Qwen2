@@ -4,7 +4,7 @@
 """
 
 from typing import Dict, Any, List, Optional, Union
-import os, sys
+import sys
 import threading
 import logging
 import numpy as np
@@ -12,29 +12,24 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-# 导入嵌入管理器
+from config.settings import settings
 from knowledge_base.embedding.embedding_manager import EmbeddingManager
 from utils.logger import setup_logger
 
 
 class EmbeddingService:
     """嵌入服务类"""
-    
+
     def __init__(self):
         """初始化嵌入服务"""
         self.embedding_managers: Dict[str, EmbeddingManager] = {}
         self._managers_lock = threading.RLock()
         self.logger = setup_logger(self.__class__.__name__)
-        
-        # 默认嵌入模型配置
-        self.default_model_name = os.environ.get(
-            "DEFAULT_EMBEDDING_MODEL", 
-            "paraphrase-multilingual-MiniLM-L12-v2"
-        )
-        self.default_dimension = int(os.environ.get("DEFAULT_EMBEDDING_DIM", "384"))
-        
-        # 缓存目录
-        self.cache_dir = os.environ.get("EMBEDDING_CACHE_DIR", "embedding_cache")
+
+        cfg = settings.embedding_service
+        self.default_model_name = str(cfg.default_model_name)
+        self.default_dimension = int(cfg.default_dimension)
+        self.cache_dir = str(cfg.cache_dir)
     
     def load_default_model(self) -> EmbeddingManager:
         """

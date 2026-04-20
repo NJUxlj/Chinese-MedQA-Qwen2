@@ -6,8 +6,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 
-from models.api_model import ApiModel
-from config.llm_config import LLMConfig
+from providers import LLMProvider
+from config.settings import settings
 from config.milvus_config import MilvusConfig
 from knowledge_base.milvus.milvus_client import MilvusClient
 from knowledge_base.lda.lda_pipeline import LDAPipeline
@@ -60,21 +60,32 @@ class MedQaDataGenerator:
     
     """
 
-    def __init__(self, 
+    def __init__(self,
         milvus_config: MilvusConfig,
-        llm_config: LLMConfig, 
-        save_path: str, 
+        llm_config=None,
+        save_path: str = None,
         data_num: int = 1000,
         textbook_collection_name:str = None):
         """
         初始化问答数据生成器
-        
+
         Args:
+            milvus_config: Milvus配置
+            llm_config: LLM配置（可选，默认使用settings.llm）
+            save_path: 数据保存路径
             data_num: 生成的问答数据数量
+            textbook_collection_name: 教科书collection名称
         """
         self.data_num = data_num
-        self.llm_config = llm_config
-        self.api_model = ApiModel(llm_config)
+        self.llm_config = llm_config if llm_config is not None else settings.llm
+        self.llm_provider = LLMProvider(
+            provider=self.llm_config.model_provider,
+            model_name=self.llm_config.model_name,
+            base_url=self.llm_config.base_url,
+            api_key=self.llm_config.api_key,
+            max_tokens=getattr(self.llm_config, 'max_tokens', 2048),
+            temperature=getattr(self.llm_config, 'temperature', 0.7),
+        )
         self.save_path = save_path
 
         self.textbook_collection_name = textbook_collection_name
@@ -87,7 +98,7 @@ class MedQaDataGenerator:
         ]
 
         self.milvus_client = MilvusClient(milvus_config)
-        self.llm = ApiModel(llm_config)
+        self.llm = self.llm_provider
 
         self.doctor_gen_prompt = None
         self.patient_gen_prompt = None

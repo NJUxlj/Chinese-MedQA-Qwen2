@@ -6,11 +6,9 @@ from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Union, Any
 import uvicorn
 
-from models.qwen_model import QwenModel
-from models.api_model import ApiModel
 from inference.fastllm_inference import FastLLMInference
 from inference.vllm_inference import VLLMInference
-from knowledge_base.embedding_manager import EmbeddingManager
+from knowledge_base.embedding.embedding_manager import EmbeddingManager
 from knowledge_base.retrieval.knn_retriever import KNNRetriever
 from rag.rag_pipeline import RAGPipeline
 from rag.response_generator import ResponseGenerator
