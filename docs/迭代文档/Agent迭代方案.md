@@ -81,9 +81,9 @@ agent:
   max_iterations: 10
   tool_timeout: 30
   enable_auto_tool_choice: false
-  model_name: ${MODEL_NAME}       # ← DashScopeChatModel 的 model_name
-  api_key: ${API_KEY}             # ← DashScopeChatModel 的 api_key
-  base_url: ${BASE_URL}           # ← DashScopeChatModel 的 base_url（用于兼容非 DashScope 端点）
+  model_name: <MODEL_NAME>       # ← DashScopeChatModel 的 model_name
+  api_key: <API_KEY>             # ← DashScopeChatModel 的 api_key
+  base_url: <BASE_URL>           # ← DashScopeChatModel 的 base_url（用于兼容非 DashScope 端点）
   max_tokens: 2048
   temperature: 0.7
   timeout: 60
@@ -91,14 +91,12 @@ agent:
 
 **配置读取链路**：
 ```
-.env 中设置 MODEL_NAME / API_KEY / BASE_URL
-    ↓ 环境变量替换
 config.yaml → settings.agent（OmegaConf 单例）
     ↓ llm_factory.create_llm() 读取 settings.agent
 DashScopeChatModel(model_name=..., api_key=..., ...)
 ```
 
-**不新增任何环境变量**。Agent 使用的 `MODEL_NAME`、`API_KEY`、`BASE_URL` 与项目其他模块（如 `settings.llm`）共享同一批环境变量，但通过 `settings.agent` 节独立读取，允许 Agent 使用与其他模块不同的模型/参数。
+**不新增任何环境变量**。Agent 使用的 `model_name`、`api_key`、`base_url` 来自于项目中的根配置（`settings`）中的 `settings.agent` 节。
 
 ---
 
@@ -188,7 +186,7 @@ def create_llm(**overrides) -> DashScopeChatModel:
     )
 ```
 
-> **说明**：`settings.agent` 来自 `src/config/config.yaml` 的 `agent` 节，其中 `model_name`、`api_key`、`base_url` 均通过 `${MODEL_NAME}`、`${API_KEY}`、`${BASE_URL}` 环境变量注入。不新增任何环境变量，复用项目已有的 `.env` 配置。
+> **说明**：`settings.agent` 来自 `src/config/config.yaml` 的 `agent` 节。
 
 **⚠️ 依赖注入原则：谁调用 `llm_factory`？**
 
