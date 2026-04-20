@@ -5,7 +5,7 @@ LLM Provider - 统一的大语言模型调用接口
 - openai: OpenAI 兼容 API (model_name, base_url, api_key)
 - aliyun: 阿里云百炼 API (model_name, base_url, api_key)
 - vllm: vLLM 部署的模型 API (model_name, base_url, api_key)
-- local: 本地 transformers 模型 (model_path)
+- local: 本地模型推理，支持 transformers / vllm / ollama 三种后端
 """
 
 import sys
@@ -31,7 +31,12 @@ class LLMProvider:
         - openai: OpenAI 兼容 API
         - aliyun: 阿里云百炼 API
         - vllm: vLLM 部署的模型 API
-        - local: 本地 transformers 模型
+        - local: 本地模型推理（后端由 local_backend 指定）
+
+    本地后端类型 (local_backend):
+        - transformers: 使用 transformers 库加载本地模型权重
+        - vllm: 使用 vLLM 引擎加载本地模型
+        - ollama: 连接到本地 Ollama 服务（需提前启动 ollama run）
     """
 
     def __init__(
@@ -52,6 +57,11 @@ class LLMProvider:
         load_in_4bit: bool = False,
         trust_remote_code: bool = True,
         max_context_length: int = 8192,
+        # local 模式专用参数
+        local_backend: Literal["transformers", "vllm", "ollama"] = "transformers",
+        tensor_parallel_size: int = 1,
+        gpu_memory_utilization: float = 0.9,
+        ollama_host: str = "http://localhost:11434",
         **kwargs,
     ):
         """
@@ -69,11 +79,15 @@ class LLMProvider:
             max_tokens: 最大生成长度
             timeout: 请求超时时间（秒）
             stream: 是否使用流式输出
-            device: 运行设备（cuda/cpu/mps），仅 local 模式有效
-            load_in_8bit: 是否量化到 8bit，仅 local 模式有效
-            load_in_4bit: 是否量化到 4bit，仅 local 模式有效
-            trust_remote_code: 是否信任远程代码，仅 local 模式有效
+            device: 运行设备（cuda/cpu/mps），仅 transformers 后端有效
+            load_in_8bit: 是否量化到 8bit，仅 transformers 后端有效
+            load_in_4bit: 是否量化到 4bit，仅 transformers 后端有效
+            trust_remote_code: 是否信任远程代码
             max_context_length: 最大上下文长度
+            local_backend: 本地推理后端，transformers / vllm / ollama
+            tensor_parallel_size: 张量并行大小，仅 vllm 后端有效
+            gpu_memory_utilization: GPU 显存使用率，仅 vllm 后端有效
+            ollama_host: Ollama 服务地址，仅 ollama 后端有效
             **kwargs: 额外参数
         """
         self.provider = provider
@@ -92,16 +106,19 @@ class LLMProvider:
         self.load_in_4bit = load_in_4bit
         self.trust_remote_code = trust_remote_code
         self.max_context_length = max_context_length
+        self.local_backend = local_backend
+        self.tensor_parallel_size = tensor_parallel_size
+        self.gpu_memory_utilization = gpu_memory_utilization
+        self.ollama_host = ollama_host
         self.kwargs = kwargs
 
         self.logger = setup_logger(self.__class__.__name__)
 
-        # API client for HTTP requests (used by openai/aliyun/vllm providers)
-        self._client = None
-
-        # Local model components (used by local provider)
-        self._model = None
-        self._tokenizer = None
+        # Local backend model components
+        self._model = None       # transformers/vllm 模型实例
+        self._tokenizer = None   # transformers/ollama tokenizer
+        self._llm = None         # vLLM LLM 实例
+        self._ollama_client = None  # ollama.Client 实例
 
         # Initialize based on provider type
         if self.provider == "local":
@@ -125,17 +142,38 @@ class LLMProvider:
         self.logger.info(f"Base URL: {self.base_url}")
 
     def _init_local_model(self) -> None:
-        """初始化本地 transformers 模型。"""
+        """
+        初始化本地模型，根据 local_backend 选择对应后端。
+
+        支持的后端:
+            - transformers: 使用 transformers 库加载本地模型权重
+            - vllm: 使用 vLLM 引擎加载本地模型（高吞吐量）
+            - ollama: 连接到本地 Ollama 服务（需提前启动 ollama run）
+        """
         if not self.model_path:
             raise ValueError("model_path is required for local provider")
 
+        if self.local_backend == "transformers":
+            self._init_transformers()
+        elif self.local_backend == "vllm":
+            self._init_vllm()
+        elif self.local_backend == "ollama":
+            self._init_ollama()
+        else:
+            raise ValueError(
+                f"Unknown local_backend: {self.local_backend}. "
+                "Supported: transformers, vllm, ollama"
+            )
+
+    def _init_transformers(self) -> None:
+        """使用 transformers 库加载本地模型。"""
         from transformers import (
             AutoTokenizer,
             AutoModelForCausalLM,
             BitsAndBytesConfig,
         )
 
-        self.logger.info(f"Loading local model from: {self.model_path}")
+        self.logger.info(f"[transformers] Loading model from: {self.model_path}")
 
         quantization_config = None
         if self.load_in_4bit:
@@ -169,148 +207,104 @@ class LLMProvider:
         if self.device == "cpu":
             self._model = self._model.to(self.device)
 
-        self.logger.info("Local model loaded successfully")
+        self.logger.info("[transformers] Model loaded successfully")
 
-    def generate(
-        self,
-        prompt: Union[str, List[Dict[str, str]]],
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None,
-        top_p: Optional[float] = None,
-        top_k: Optional[int] = None,
-        stop: Optional[List[str]] = None,
-        **kwargs,
-    ) -> str:
+    def _init_vllm(self) -> None:
         """
-        生成文本。
+        使用 vLLM 引擎加载本地模型。
 
-        Args:
-            prompt: 输入提示词（字符串或消息列表）
-            max_tokens: 最大生成长度
-            temperature: 生成温度
-            top_p: 核采样参数
-            top_k: top-k 采样参数
-            stop: 停止词列表
-            **kwargs: 额外参数
+        vLLM 支持:
+        - PagedAttention 高效显存管理
+        - 张量并行 (tensor_parallel_size > 1)
+        - 量化 (awq/gptq/squeezellm)
+        - 流式生成
 
-        Returns:
-            生成的文本
+        安装: pip install vllm
         """
-        if self.provider == "local":
-            return self._generate_local(
-                prompt,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k,
-                **kwargs,
-            )
-        else:
-            return self._generate_api(
-                prompt,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k,
-                stop=stop,
-                **kwargs,
-            )
-
-    def _generate_api(
-        self,
-        prompt: Union[str, List[Dict[str, str]]],
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None,
-        top_p: Optional[float] = None,
-        top_k: Optional[int] = None,
-        stop: Optional[List[str]] = None,
-        **kwargs,
-    ) -> str:
-        """通过 API 生成文本（openai/aliyun/vllm 供应商）。"""
-        max_tokens = max_tokens or self.max_tokens
-        temperature = temperature if temperature is not None else self.temperature
-        top_p = top_p if top_p is not None else self.top_p
-        top_k = top_k if top_k is not None else self.top_k
-
-        # Build messages
-        if isinstance(prompt, str):
-            messages = [{"role": "user", "content": prompt}]
-        elif isinstance(prompt, list) and all(isinstance(m, dict) and "role" in m and "content" in m for m in prompt):
-            messages = prompt
-        else:
-            messages = [{"role": "user", "content": str(prompt)}]
-
-        # Build request payload
-        payload = {
-            "model": self.model_name,
-            "messages": messages,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "top_p": top_p,
-            "stream": self.stream,
-        }
-
-        if top_k != 50:  # Only include if non-default
-            payload["top_k"] = top_k
-
-        if stop:
-            payload["stop"] = stop
-
-        # Extra body for specific models (e.g., qwen)
-        extra_body = kwargs.get("extra_body")
-        if extra_body:
-            payload["extra_body"] = extra_body
-
-        # Build headers
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}",
-        }
-
-        # For some providers, use API key directly without Bearer prefix
-        if self.provider in ("aliyun",):
-            headers["Authorization"] = self.api_key
-
         try:
-            self.logger.info(f"[{self.provider}] Sending request to {self.base_url}")
-            self.logger.info(f"[{self.provider}] Model: {self.model_name}, messages count: {len(messages)}")
-
-            response = requests.post(
-                f"{self.base_url}/chat/completions",
-                headers=headers,
-                json=payload,
-                timeout=min(self.timeout, 200),
+            from vllm import LLM, SamplingParams
+        except ImportError:
+            raise ImportError(
+                "[vllm] vLLM is not installed. "
+                "Install with: pip install vllm"
             )
 
-            if response.status_code != 200:
-                self.logger.error(f"[{self.provider}] Response status: {response.status_code}")
-                self.logger.error(f"[{self.provider}] Response body: {response.text}")
-                response.raise_for_status()
+        self.logger.info(f"[vllm] Loading model from: {self.model_path}")
+        self.logger.info(f"[vllm] tensor_parallel_size={self.tensor_parallel_size}, "
+                         f"gpu_memory_utilization={self.gpu_memory_utilization}")
 
-            response_data = response.json()
+        gpu_count = torch.cuda.device_count() if torch.cuda.is_available() else 0
+        if gpu_count < self.tensor_parallel_size:
+            self.logger.warning(
+                f"[vllm] Available GPUs ({gpu_count}) < requested tensor_parallel_size "
+                f"({self.tensor_parallel_size}), using {max(1, gpu_count)}"
+            )
+            self.tensor_parallel_size = max(1, gpu_count)
 
-            if "error" in response_data:
-                raise ValueError(f"[{self.provider}] API Error: {response_data['error']}")
+        self._llm = LLM(
+            model=self.model_path,
+            tensor_parallel_size=self.tensor_parallel_size,
+            gpu_memory_utilization=self.gpu_memory_utilization,
+            trust_remote_code=self.trust_remote_code,
+            max_model_len=self.max_context_length,
+            dtype="auto",
+        )
 
-            if "choices" not in response_data or not response_data["choices"]:
-                raise ValueError(f"[{self.provider}] Empty choices in response: {response_data}")
+        self.logger.info("[vllm] Model loaded successfully")
 
-            choice = response_data["choices"][0]
+    def _init_ollama(self) -> None:
+        """
+        连接到本地 Ollama 服务进行推理。
 
-            if "message" in choice and "content" in choice["message"]:
-                return choice["message"]["content"]
+        Ollama 特点:
+        - 模型需提前通过 `ollama run <model>` 或 `ollama pull <model>` 下载
+        - 服务默认运行在 http://localhost:11434
+        - 支持流式输出和对话模板
 
-            if "delta" in choice and "content" in choice["delta"]:
-                return choice["delta"]["content"]
+        安装 Ollama: https://ollama.ai
+        下载模型: ollama pull qwen2.5
+        启动服务: ollama serve  (通常自动启动)
+        """
+        try:
+            import ollama
+        except ImportError:
+            raise ImportError(
+                "[ollama] ollama Python client is not installed. "
+                "Install with: pip install ollama"
+            )
 
-            raise ValueError(f"[{self.provider}] No content in response: {response_data}")
+        self.logger.info(f"[ollama] Connecting to Ollama at: {self.ollama_host}")
+        self.logger.info(f"[ollama] Model name: {self.model_name or self.model_path}")
 
-        except requests.exceptions.Timeout:
-            raise TimeoutError(f"[{self.provider}] API request timeout ({self.timeout}s)")
-        except requests.exceptions.RequestException as e:
-            raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+        # model_name 用于 ollama API，model_path 作为 fallback 显示名
+        model_identifier = self.model_name or self.model_path
+
+        # 验证服务可连接
+        try:
+            client = ollama.Client(host=self.ollama_host)
+            models_response = client.list()
+            self.logger.info(f"[ollama] Connected. Available models: {models_response}")
+
+            # 检查模型是否已存在
+            available_names = []
+            if hasattr(models_response, 'models'):
+                available_names = [m.get('name', '') for m in models_response.models]
+            elif isinstance(models_response, dict) and 'models' in models_response:
+                available_names = [m.get('name', '') for m in models_response.get('models', [])]
+
+            if model_identifier not in available_names:
+                self.logger.warning(
+                    f"[ollama] Model '{model_identifier}' not found in available models. "
+                    f"Available: {available_names}. "
+                    f"Pull it with: ollama pull {model_identifier}"
+                )
         except Exception as e:
-            raise RuntimeError(f"[{self.provider}] Generation error: {e}")
+            self.logger.warning(f"[ollama] Could not connect to Ollama: {e}")
+
+        self._ollama_client = client
+        # model_name 存储 ollama 使用的模型名
+        self.model_name = model_identifier
+        self.logger.info(f"[ollama] Ollama client initialized for model: {self.model_name}")
 
     def _generate_local(
         self,
@@ -321,19 +315,48 @@ class LLMProvider:
         top_k: Optional[int] = None,
         **kwargs,
     ) -> str:
-        """使用本地模型生成文本。"""
+        """使用本地模型生成文本，根据后端分发到对应生成逻辑。"""
+        if self.local_backend == "transformers":
+            return self._generate_transformers(
+                prompt, max_tokens, temperature, top_p, top_k, **kwargs
+            )
+        elif self.local_backend == "vllm":
+            return self._generate_vllm(
+                prompt, max_tokens, temperature, top_p, top_k, **kwargs
+            )
+        elif self.local_backend == "ollama":
+            return self._generate_ollama(
+                prompt, max_tokens, temperature, top_p, top_k, **kwargs
+            )
+        else:
+            raise ValueError(f"Unknown local_backend: {self.local_backend}")
+
+    def _generate_transformers(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        top_k: Optional[int] = None,
+        **kwargs,
+    ) -> str:
+        """使用 transformers 模型生成文本。"""
         if self._model is None or self._tokenizer is None:
-            raise RuntimeError("Local model not loaded. Check initialization.")
+            raise RuntimeError("Transformers model not loaded.")
 
         max_tokens = max_tokens or self.max_tokens
         temperature = temperature if temperature is not None else self.temperature
         top_p = top_p if top_p is not None else self.top_p
         top_k = top_k if top_k is not None else self.top_k
 
-        use_chat_template = hasattr(self._tokenizer, "apply_chat_template") and isinstance(prompt, list)
+        use_chat_template = (
+            hasattr(self._tokenizer, "apply_chat_template")
+            and isinstance(prompt, list)
+        )
 
         if use_chat_template and all(
-            isinstance(msg, dict) and "role" in msg and "content" in msg for msg in prompt
+            isinstance(msg, dict) and "role" in msg and "content" in msg
+            for msg in prompt
         ):
             messages = prompt
             input_ids = self._tokenizer.apply_chat_template(
@@ -374,7 +397,6 @@ class LLMProvider:
 
         if use_chat_template:
             response = self._tokenizer.decode(outputs[0], skip_special_tokens=True)
-            # Extract assistant response after the last user message
             if "assistant" in response.lower():
                 parts = response.split("assistant")
                 if len(parts) > 1:
@@ -387,6 +409,256 @@ class LLMProvider:
                 response = response[len(prompt):].strip()
 
         return response
+
+    def _generate_vllm(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        top_k: Optional[int] = None,
+        **kwargs,
+    ) -> str:
+        """使用 vLLM 引擎生成文本。"""
+        if self._llm is None:
+            raise RuntimeError("vLLM model not loaded.")
+
+        max_tokens = max_tokens or self.max_tokens
+        temperature = temperature if temperature is not None else self.temperature
+        top_p = top_p if top_p is not None else self.top_p
+        top_k = top_k if top_k is not None else self.top_k
+        stop = kwargs.get("stop")
+
+        # vLLM 的 SamplingParams
+        from vllm import SamplingParams
+
+        sampling_params = SamplingParams(
+            max_tokens=max_tokens,
+            temperature=0.0 if temperature == 0 else temperature,
+            top_p=1.0 if top_p is None else top_p,
+            top_k=-1 if top_k is None else top_k,
+            stop=stop or ["<|im_end|>"],
+            echo=False,
+        )
+
+        # 处理 prompt 格式
+        if isinstance(prompt, list) and all(
+            isinstance(msg, dict) and "role" in msg and "content" in msg
+            for msg in prompt
+        ):
+            # 使用 chat template
+            prompt_text = self._build_chat_prompt(prompt)
+        elif isinstance(prompt, list):
+            prompt_text = "\n".join(prompt)
+        else:
+            prompt_text = prompt
+
+        outputs = self._llm.generate(prompt_text, sampling_params)
+        return outputs[0].outputs[0].text
+
+    def _generate_ollama(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        top_k: Optional[int] = None,
+        **kwargs,
+    ) -> str:
+        """使用 Ollama 服务生成文本。"""
+        import ollama
+
+        max_tokens = max_tokens or self.max_tokens
+        temperature = temperature if temperature is not None else self.temperature
+
+        # 处理 prompt 格式
+        if isinstance(prompt, list) and all(
+            isinstance(msg, dict) and "role" in msg and "content" in msg
+            for msg in prompt
+        ):
+            # Ollama chat 模式
+            messages = [
+                {"role": msg["role"], "content": msg["content"]}
+                for msg in prompt
+            ]
+            response = ollama.chat(
+                model=self.model_name,
+                messages=messages,
+                options={
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "num_predict": max_tokens,
+                    "stop": kwargs.get("stop"),
+                },
+                stream=False,
+            )
+            return response["message"]["content"]
+        else:
+            # Ollama generate 模式
+            prompt_text = prompt if isinstance(prompt, str) else "\n".join(prompt)
+            response = ollama.generate(
+                model=self.model_name,
+                prompt=prompt_text,
+                options={
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "num_predict": max_tokens,
+                    "stop": kwargs.get("stop"),
+                },
+                stream=False,
+            )
+            return response["response"]
+
+    def _build_chat_prompt(self, messages: List[Dict[str, str]]) -> str:
+        """将消息列表构建为纯文本 prompt（用于不支持 chat template 的后端）。"""
+        parts = []
+        for msg in messages:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            parts.append(f"<|im_start|>{role}\n{content}<|im_end|>")
+        parts.append("<|im_start|>assistant\n")
+        return "\n".join(parts)
+
+    def generate(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        **kwargs,
+    ) -> str:
+        """
+        生成文本。
+
+        Args:
+            prompt: 输入提示词（字符串或消息列表）
+            max_tokens: 最大生成长度
+            temperature: 生成温度
+            top_p: 核采样参数
+            top_k: top-k 采样参数
+            stop: 停止词列表
+            **kwargs: 额外参数
+
+        Returns:
+            生成的文本
+        """
+        if self.provider == "local":
+            return self._generate_local(
+                prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                stop=stop,
+                **kwargs,
+            )
+        else:
+            return self._generate_api(
+                prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                stop=stop,
+                **kwargs,
+            )
+
+    def _generate_api(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        **kwargs,
+    ) -> str:
+        """通过 API 生成文本（openai/aliyun/vllm 供应商）。"""
+        max_tokens = max_tokens or self.max_tokens
+        temperature = temperature if temperature is not None else self.temperature
+        top_p = top_p if top_p is not None else self.top_p
+        top_k = top_k if top_k is not None else self.top_k
+
+        # Build messages
+        if isinstance(prompt, str):
+            messages = [{"role": "user", "content": prompt}]
+        elif isinstance(prompt, list) and all(
+            isinstance(m, dict) and "role" in m and "content" in m for m in prompt
+        ):
+            messages = prompt
+        else:
+            messages = [{"role": "user", "content": str(prompt)}]
+
+        # Build request payload
+        payload = {
+            "model": self.model_name,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": top_p,
+            "stream": self.stream,
+        }
+
+        if top_k != 50:
+            payload["top_k"] = top_k
+
+        if stop:
+            payload["stop"] = stop
+
+        extra_body = kwargs.get("extra_body")
+        if extra_body:
+            payload["extra_body"] = extra_body
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        if self.provider in ("aliyun",):
+            headers["Authorization"] = self.api_key
+
+        try:
+            self.logger.info(f"[{self.provider}] Sending request to {self.base_url}")
+            self.logger.info(f"[{self.provider}] Model: {self.model_name}")
+
+            response = requests.post(
+                f"{self.base_url}/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=min(self.timeout, 200),
+            )
+
+            if response.status_code != 200:
+                self.logger.error(f"[{self.provider}] Response status: {response.status_code}")
+                self.logger.error(f"[{self.provider}] Response body: {response.text}")
+                response.raise_for_status()
+
+            response_data = response.json()
+
+            if "error" in response_data:
+                raise ValueError(f"[{self.provider}] API Error: {response_data['error']}")
+
+            if "choices" not in response_data or not response_data["choices"]:
+                raise ValueError(f"[{self.provider}] Empty choices in response: {response_data}")
+
+            choice = response_data["choices"][0]
+
+            if "message" in choice and "content" in choice["message"]:
+                return choice["message"]["content"]
+
+            if "delta" in choice and "content" in choice["delta"]:
+                return choice["delta"]["content"]
+
+            raise ValueError(f"[{self.provider}] No content in response: {response_data}")
+
+        except requests.exceptions.Timeout:
+            raise TimeoutError(f"[{self.provider}] API request timeout ({self.timeout}s)")
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+        except Exception as e:
+            raise RuntimeError(f"[{self.provider}] Generation error: {e}")
 
     def prepare_inputs_for_rag(
         self, query: str, context: List[str]
@@ -425,7 +697,7 @@ class LLMProvider:
     @property
     def model(self):
         """获取本地模型实例。"""
-        return self._model
+        return self._model or self._llm
 
     @property
     def tokenizer(self):
@@ -433,7 +705,12 @@ class LLMProvider:
         return self._tokenizer
 
     def __repr__(self) -> str:
+        if self.provider == "local":
+            return (
+                f"LLMProvider(provider=local, backend={self.local_backend}, "
+                f"model_path={self.model_path}, device={self.device})"
+            )
         return (
             f"LLMProvider(provider={self.provider}, model_name={self.model_name}, "
-            f"model_path={self.model_path}, device={self.device})"
+            f"base_url={self.base_url})"
         )
