@@ -21,11 +21,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from config.settings import settings
 
-from routers import qa, admin, rag, embedding, health, evaluation, mdagents
+from routers import qa, admin, rag, health, evaluation, mdagents
+from utils.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
 
-from services.model_service import get_model_service, ModelService
 from services.rag_service import get_rag_service, RAGService
-from services.embedding_service import get_embedding_service, EmbeddingService
 from services.mdagents_service import get_mdagents_service, MDAgentsService
 
 from ui.medagents_ui import MDAgentsUI
@@ -48,17 +47,12 @@ async def lifespan(app: FastAPI):
     """
     logger.info("API服务启动，开始加载模型...")
     
-    # 加载模型
-    model_service = get_model_service()
+    # 加载服务
     rag_service = get_rag_service()
-    embedding_service = get_embedding_service()
     mdagents_service = get_mdagents_service()
-    
+
     if bool(settings.api_server.preload_models):
         try:
-            # 预加载模型
-            model_service.load_default_model()
-            embedding_service.load_default_model()
             global models_loaded
             models_loaded = True
             logger.info("模型加载完成")
@@ -66,12 +60,14 @@ async def lifespan(app: FastAPI):
             logger.error(f"模型加载失败: {e}")
     else:
         logger.info("跳过模型预加载")
+
+    await start_evaluation_worker()
     
     yield  # 应用运行
     
     # 清理资源
     logger.info("API服务关闭，释放资源...")
-    model_service.unload_all_models()
+    await stop_evaluation_worker()
 
 # 创建应用
 app = FastAPI(
@@ -100,7 +96,6 @@ app.add_middleware(
 app.include_router(health.router, tags=["健康检查"])
 app.include_router(qa.router, prefix="/api/qa", tags=["问答服务"])
 app.include_router(rag.router, prefix="/api/rag", tags=["知识检索"])
-app.include_router(embedding.router, prefix="/api/embedding", tags=["嵌入服务"])
 app.include_router(evaluation.router, prefix="/api/evaluation", tags=["评估服务"])
 app.include_router(admin.router, prefix="/api/admin", tags=["管理接口"])
 app.include_router(mdagents.router, prefix="/api/mdagents", tags=["MDAgents医疗多智能体系统"])

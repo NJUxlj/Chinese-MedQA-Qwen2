@@ -1,7 +1,5 @@
 - `document_loader.py`: Handles loading various document formats (PDF, TXT, DOCX, etc.) and web content.
 - `document_processor.py`: Processes and chunks documents, with special handling for Chinese medical content.
 - `retrieval/retriever_base.py`: Base class defining the interface for all retrievers.
-- `retrieval/similarity_retriever.py`: Implements cosine similarity-based retrieval.
+- `retrieval/milvus_retriever.py`: Unified vector retriever backed by Milvus. Replaces the old FAISS-based KNN/Similarity/L2 retrievers. Searches across multiple collections (web_crawled_texts, text_books, guidelines) and merges results.
 - `retrieval/bm25_retriever.py`: Implements BM25 algorithm for text retrieval.
-- `retrieval/l2_retriever.py`: Implements Euclidean distance-based retrieval.
-- `retrieval/knn_retriever.py`: Implements KNN with FAISS for fast and scalable similarity search.

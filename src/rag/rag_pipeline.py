@@ -8,10 +8,8 @@ sys.path.append(str(Path(__file__).parent.parent))
 from langchain_core.documents import Document
 
 from typing import Dict, List, Optional, Any
-from knowledge_base.retrieval.knn_retriever import KNNRetriever
-from knowledge_base.retrieval.similarity_retriever import SimilarityRetriever
+from knowledge_base.retrieval.milvus_retriever import MilvusRetriever
 from knowledge_base.retrieval.bm25_retriever import BM25Retriever
-from knowledge_base.retrieval.l2_retriever import L2Retriever
 from providers.embedding_provider import EmbeddingProvider
 from rag.query_processor import QueryProcessor
 from rag.context_builder import ContextBuilder
@@ -66,6 +64,8 @@ class RAGPipeline:
                 'reranker_model_provider': 'transformers',
                 'reranker_model_path': settings.embedding.reranker_model_path if hasattr(settings.embedding, 'reranker_model_path') else None,
                 'reranker_model_name': None,
+                'reranker_base_url': settings.reranker.base_url if hasattr(settings.reranker, 'base_url') else None,
+                'reranker_api_key': settings.reranker.api_key if hasattr(settings.reranker, 'api_key') else None,
                 'use_reranker': False,
                 'hybrid_weight': settings.retriever.default_weight if hasattr(settings, 'retriever') else 0.7,
                 'chunk_size': 500,
@@ -88,6 +88,8 @@ class RAGPipeline:
         self.reranker_model_provider: str = self.config.reranker_model_provider if hasattr(self.config, 'reranker_model_provider') else 'transformers'
         self.reranker_model_path: Optional[str] = self.config.reranker_model_path if hasattr(self.config, 'reranker_model_path') else None
         self.reranker_model_name: Optional[str] = self.config.reranker_model_name if hasattr(self.config, 'reranker_model_name') else None
+        self.reranker_base_url: Optional[str] = self.config.reranker_base_url if hasattr(self.config, 'reranker_base_url') else None
+        self.reranker_api_key: Optional[str] = self.config.reranker_api_key if hasattr(self.config, 'reranker_api_key') else None
         self.use_reranker: bool = self.config.use_reranker if hasattr(self.config, 'use_reranker') else False
         self.hybrid_weight: float = self.config.hybrid_weight if hasattr(self.config, 'hybrid_weight') else 0.7
         self.chunk_size: int = self.config.chunk_size if hasattr(self.config, 'chunk_size') else 500
@@ -111,24 +113,18 @@ class RAGPipeline:
         else:
             self.embedding_manager = None
 
-        # 根据类型初始化检索器
-        if self.retriever_type == "knn":
-            self.retriever = KNNRetriever(
-                embedding_manager=self.embedding_manager
-            )
-        elif self.retriever_type == "similarity":
-            self.retriever = SimilarityRetriever(
-                embedding_manager=self.embedding_manager
+        # 根据类型初始化检索器（统一使用 MilvusRetriever，无需 faiss）
+        if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
+            self.retriever = MilvusRetriever(
+                embedding_manager=self.embedding_manager,
+                collection_name="medical_kb"
             )
         elif self.retriever_type == "bm25":
             self.retriever = BM25Retriever()
-        elif self.retriever_type == "l2":
-            self.retriever = L2Retriever(
-                embedding_manager=self.embedding_manager
-            )
         elif self.retriever_type == "hybrid":
-            self.dense_retriever = KNNRetriever(
-                embedding_manager=self.embedding_manager
+            self.dense_retriever = MilvusRetriever(
+                embedding_manager=self.embedding_manager,
+                collection_name="medical_kb"
             )
             self.sparse_retriever = BM25Retriever()
             self.retriever = None
@@ -141,7 +137,9 @@ class RAGPipeline:
             chunk_overlap=self.chunk_overlap,
             reranker_model_provider=self.reranker_model_provider,
             reranker_model_path=self.reranker_model_path if self.use_reranker else None,
-            reranker_model_name=self.reranker_model_name if self.use_reranker else None
+            reranker_model_name=self.reranker_model_name if self.use_reranker else None,
+            reranker_base_url=self.reranker_base_url if self.use_reranker else None,
+            reranker_api_key=self.reranker_api_key if self.use_reranker else None
         )
         
         # 如果提供了模型，初始化响应生成器

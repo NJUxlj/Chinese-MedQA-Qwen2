@@ -1,208 +1,306 @@
 """
-评估服务路由
-提供模型和系统评估接口
+评估服务路由：直接实例化 evaluator，在线程池中运行，聚合指标。
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
-import time
-import numpy as np
-from sklearn.metrics import f1_score
-from sklearn.feature_extraction.text import CountVectorizer
-from difflib import SequenceMatcher
+from __future__ import annotations
 
-from services.model_service import get_model_service, ModelService
-from services.rag_service import get_rag_service, RAGService
-from utils.logger import setup_logger
+import json
+import os
+import time
+import uuid
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
+from utils.async_eval_queue import (
+    evaluation_task_queue,
+    get_task_snapshot,
+    register_pending_task,
+    set_evaluation_task_fn,
+    start_evaluation_worker,
+)
+from utils.inference_utils import display_model_name, is_valid_vllm_triple
+from utils.task_types import EvaluationTaskType
 
 router = APIRouter()
-logger = setup_logger(__name__, level="INFO")
+
+
+class EvaluatorConfig(BaseModel):
+    model_name_or_path: Optional[str] = Field(default=None)
+    device: str = Field(default="cpu")
+    max_new_tokens: int = Field(default=2048)
+    temperature: float = Field(default=0.7)
+    top_p: float = Field(default=0.9)
+    vllm_model_name: Optional[str] = Field(default=None)
+    vllm_base_url: Optional[str] = Field(default=None)
+    vllm_api_key: Optional[str] = Field(default=None)
+    prompt_key: str = Field(default="prompt")
+    ground_true_answer_key: str = Field(default="answer")
+    padding_side: str = Field(default="left")
+    use_fast: bool = Field(default=True)
+    enable_thinking: bool = Field(default=False)
+    max_length: int = Field(default=2048)
+    beta: float = Field(default=0.1)
+    query_key: str = Field(default="query")
+    chosen_key: str = Field(default="chosen")
+    rejected_key: str = Field(default="rejected")
+    execution_timeout: int = Field(default=30)
+    max_memory_mb: int = Field(default=256)
+    sandbox_working_dir: str = Field(default="/tmp/code_eval")
+    enable_security_check: bool = Field(default=True)
+
 
 class EvaluationRequest(BaseModel):
-    """评估请求"""
-    question: str
-    reference_answer: str
-    model_name: Optional[str] = None
-    use_rag: bool = False
-    kb_name: Optional[str] = None
-    metrics: List[str] = ["similarity", "f1", "rouge"]
+    evaluation_task_id: Optional[str] = Field(default=None)
+    task_type: EvaluationTaskType
+    dataset_path: str = Field(..., description="JSON 数据集路径")
+    question_key: str = Field(default="question")
+    model_answer_key: str = Field(default="output")
+    ground_true_answer_key: str = Field(default="answer")
+    evaluator_config: EvaluatorConfig = Field(default_factory=EvaluatorConfig)
+
 
 class EvaluationResponse(BaseModel):
-    """评估响应"""
-    question: str
-    reference_answer: str
-    model_answer: str
-    metrics: Dict[str, float]
-    model_name: str
-    process_time: float
+    evaluation_task_id: str
+    metrics: Dict[str, float] = Field(default_factory=dict)
+    model_name: str = ""
+    status: str = "pending"
+    process_time: float = 0.0
     additional_info: Optional[Dict[str, Any]] = None
 
-@router.post("/evaluate", response_model=EvaluationResponse)
-async def evaluate_model(
-    request: EvaluationRequest,
-    model_service: ModelService = Depends(get_model_service),
-    rag_service: RAGService = Depends(get_rag_service)
-):
-    """
-    评估模型回答质量
-    
-    Args:
-        request: 评估请求
-        model_service: 模型服务
-        rag_service: RAG服务
-    
-    Returns:
-        评估结果
-    """
-    start_time = time.time()
-    
+
+def _load_dataset(path: str) -> List[Dict[str, Any]]:
+    p = Path(path)
+    if not p.is_file():
+        raise FileNotFoundError(f"数据集文件不存在: {path}")
+    if not str(path).lower().endswith(".json"):
+        raise ValueError("仅支持 .json 数据集")
+    with open(p, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError("数据集 JSON 必须为对象数组")
+    return data
+
+
+def _normalize_rows(
+    rows: List[Dict[str, Any]],
+    question_key: str,
+    model_answer_key: str,
+    ground_true_answer_key: str,
+) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for row in rows:
+        merged = dict(row)
+        merged["question"] = row.get(question_key, "")
+        merged["output"] = row.get(model_answer_key, "")
+        merged["answer"] = row.get(ground_true_answer_key, "")
+        merged["prompt"] = merged["question"]
+        merged["code"] = merged["output"]
+        out.append(merged)
+    return out
+
+
+def _aggregate_medqa(rows: List[Dict[str, Any]]) -> Dict[str, float]:
+    if not rows:
+        return {}
+    acc = sum(1 for r in rows if r.get("is_correct")) / len(rows)
+    return {"accuracy": float(acc), "num_samples": float(len(rows))}
+
+
+def _aggregate_bleu(rows: List[Dict[str, Any]]) -> Dict[str, float]:
+    if not rows:
+        return {}
+    return {
+        "bleu": float(sum(r.get("bleu", 0) for r in rows) / len(rows)),
+        "rougeL": float(sum(r.get("rouge", 0) for r in rows) / len(rows)),
+        "perplexity": float(sum(r.get("perplexity", 0) for r in rows) / len(rows)),
+    }
+
+
+def _aggregate_math(rows: List[Dict[str, Any]]) -> Dict[str, float]:
+    if not rows:
+        return {}
+    acc = sum(float(r.get("math_accuracy", 0)) for r in rows) / len(rows)
+    return {"math_accuracy": float(acc), "num_samples": float(len(rows))}
+
+
+def _aggregate_code(rows: List[Dict[str, Any]]) -> Dict[str, float]:
+    if not rows:
+        return {}
+    passed = sum(1 for r in rows if r.get("success"))
+    return {
+        "sample_pass_rate": float(passed / len(rows)),
+        "mean_pass_rate": float(sum(float(r.get("pass_rate", 0)) for r in rows) / len(rows)),
+        "num_samples": float(len(rows)),
+    }
+
+
+def _aggregate_dpo(rows: List[Dict[str, Any]]) -> Dict[str, float]:
+    if not rows:
+        return {}
+    out: Dict[str, float] = {"num_samples": float(len(rows))}
+    for k in rows[0].keys():
+        vals = [float(r[k]) for r in rows if k in r and isinstance(r[k], (int, float))]
+        if vals:
+            out[k] = sum(vals) / len(vals)
+    return out
+
+
+def _get_evaluator_class(task_type: EvaluationTaskType):
+    if task_type == EvaluationTaskType.MEDQA_LLM:
+        from utils.medqa_llm_evaluator import MedQALLMEvaluator
+        return MedQALLMEvaluator
+    elif task_type == EvaluationTaskType.BLEU_ROUGE:
+        from utils.bleu_rouge_evaluator import BleuRougeEvaluator
+        return BleuRougeEvaluator
+    elif task_type == EvaluationTaskType.MATH:
+        from utils.math_evaluator import MathEvaluator
+        return MathEvaluator
+    elif task_type == EvaluationTaskType.CODE:
+        from utils.code_evaluator import CodeEvaluator
+        return CodeEvaluator
+    elif task_type == EvaluationTaskType.DPO_QUALITY:
+        from utils.dpo_quality_evaluator import DPOQualityEvaluator
+        return DPOQualityEvaluator
+    else:
+        raise ValueError(f"不支持的评估任务类型: {task_type}")
+
+
+def execute_evaluation_task(payload: Dict[str, Any]) -> Dict[str, Any]:
+    project_root = Path(__file__).resolve().parent.parent.parent.parent
+    prev_cwd = Path.cwd()
+    os.chdir(project_root)
+    t0 = time.time()
+
+    task_type = EvaluationTaskType(payload["task_type"])
+    dataset_path = payload["dataset_path"]
+    question_key = payload["question_key"]
+    model_answer_key = payload["model_answer_key"]
+    ground_true_answer_key = payload["ground_true_answer_key"]
+    eval_cfg = payload["evaluator_config"]
+
+    raw = _load_dataset(dataset_path)
+    samples = _normalize_rows(raw, question_key, model_answer_key, ground_true_answer_key)
+
+    vllm_ok = is_valid_vllm_triple(
+        eval_cfg.get("vllm_model_name"),
+        eval_cfg.get("vllm_base_url"),
+        eval_cfg.get("vllm_api_key"),
+    )
+    model_path = (eval_cfg.get("model_name_or_path") or "").strip()
+    if not vllm_ok and not model_path:
+        raise ValueError("vLLM 配置无效且未提供 model_name_or_path，无法评估")
+
+    config = dict(eval_cfg)
+    config["_vllm_config_valid"] = vllm_ok
+    config["_use_vllm_api"] = vllm_ok
+    if vllm_ok and not model_path:
+        config["model_name_or_path"] = "__vllm_only__"
+
+    _mt = os.environ.get("EVAL_MAX_NEW_TOKENS")
+    if _mt and str(_mt).strip().isdigit():
+        config["max_new_tokens"] = int(_mt)
+
+    if task_type == EvaluationTaskType.DPO_QUALITY:
+        config["query_key"] = "question"
+        config["chosen_key"] = "output"
+        config["rejected_key"] = "answer"
+
+    ev = None
+    additional: Dict[str, Any] = {"num_rows": len(samples), "use_vllm_api": vllm_ok}
+    metrics: Dict[str, float] = {}
+
     try:
-        # 获取模型回答
-        model_answer = ""
-        additional_info = {}
-        
-        if request.use_rag and request.kb_name:
-            # 使用RAG
-            response = rag_service.generate_response(
-                kb_name=request.kb_name,
-                query=request.question,
-                model_name=request.model_name
-            )
-            model_answer = response.get("answer", "")
-            additional_info["retrieved_contexts"] = response.get("contexts", [])
-            additional_info["sources"] = response.get("sources", [])
-        else:
-            # 直接使用模型
-            model = model_service.get_model(request.model_name)
-            model_answer = model.generate(
-                prompt=request.question,
-                max_new_tokens=1024,
-                temperature=0.7
-            )
-        
-        # 计算评估指标
-        metrics = {}
-        
-        # 简单相似度评分
-        if "similarity" in request.metrics:
-            similarity = SequenceMatcher(None, request.reference_answer, model_answer).ratio()
-            metrics["similarity"] = similarity
-        
-        # F1分数 (简化版)
-        if "f1" in request.metrics:
-            # 将文本转换为单词袋
-            vectorizer = CountVectorizer().fit([request.reference_answer, model_answer])
-            reference_vec = vectorizer.transform([request.reference_answer]).toarray()[0]
-            model_vec = vectorizer.transform([model_answer]).toarray()[0]
-            
-            # 二值化向量
-            reference_binary = np.where(reference_vec > 0, 1, 0)
-            model_binary = np.where(model_vec > 0, 1, 0)
-            
-            f1 = f1_score(reference_binary, model_binary, average='micro')
-            metrics["f1"] = f1
-        
-        # ROUGE分数 (需要rouge库)
-        if "rouge" in request.metrics:
+        eval_cls = _get_evaluator_class(task_type)
+        ev = eval_cls(config)
+        rows_out = [ev.evaluate_one_sample(s) for s in samples]
+
+        if task_type == EvaluationTaskType.MEDQA_LLM:
+            metrics = _aggregate_medqa(rows_out)
+        elif task_type == EvaluationTaskType.BLEU_ROUGE:
+            metrics = _aggregate_bleu(rows_out)
+        elif task_type == EvaluationTaskType.MATH:
+            metrics = _aggregate_math(rows_out)
+        elif task_type == EvaluationTaskType.CODE:
+            metrics = _aggregate_code(rows_out)
+        elif task_type == EvaluationTaskType.DPO_QUALITY:
+            metrics = _aggregate_dpo(rows_out)
+    finally:
+        if ev is not None and hasattr(ev, "cleanup") and callable(getattr(ev, "cleanup")):
             try:
-                from rouge import Rouge
-                rouge = Rouge()
-                scores = rouge.get_scores(model_answer, request.reference_answer)[0]
-                
-                metrics["rouge-1"] = scores["rouge-1"]["f"]
-                metrics["rouge-2"] = scores["rouge-2"]["f"]
-                metrics["rouge-l"] = scores["rouge-l"]["f"]
-            except ImportError:
-                logger.warning("rouge库未安装，跳过ROUGE指标计算")
-        
-        process_time = time.time() - start_time
-        
-        return EvaluationResponse(
-            question=request.question,
-            reference_answer=request.reference_answer,
-            model_answer=model_answer,
-            metrics=metrics,
-            model_name=request.model_name or "default",
-            process_time=process_time,
-            additional_info=additional_info
-        )
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+                ev.cleanup()
+            except Exception:
+                pass
+        os.chdir(prev_cwd)
 
-class BatchEvaluationRequest(BaseModel):
-    """批量评估请求"""
-    questions: List[Dict[str, str]]  # 包含question和reference_answer
-    model_name: Optional[str] = None
-    use_rag: bool = False
-    kb_name: Optional[str] = None
-    metrics: List[str] = ["similarity", "f1", "rouge"]
+    elapsed = time.time() - t0
+    mname = display_model_name(
+        vllm_valid=vllm_ok,
+        model_name=eval_cfg.get("vllm_model_name"),
+        model_path=model_path,
+    )
+    return {
+        "metrics": metrics,
+        "process_time": elapsed,
+        "additional_info": additional,
+        "model_name": mname,
+    }
 
-class BatchEvaluationResponse(BaseModel):
-    """批量评估响应"""
-    results: List[EvaluationResponse]
-    average_metrics: Dict[str, float]
-    total_time: float
 
-@router.post("/batch_evaluate", response_model=BatchEvaluationResponse)
-async def batch_evaluate_model(
-    request: BatchEvaluationRequest,
-    model_service: ModelService = Depends(get_model_service),
-    rag_service: RAGService = Depends(get_rag_service)
-):
-    """
-    批量评估模型回答质量
-    
-    Args:
-        request: 批量评估请求
-        model_service: 模型服务
-        rag_service: RAG服务
-    
-    Returns:
-        批量评估结果
-    """
-    start_time = time.time()
-    results = []
-    
-    for item in request.questions:
-        eval_request = EvaluationRequest(
-            question=item["question"],
-            reference_answer=item["reference_answer"],
-            model_name=request.model_name,
-            use_rag=request.use_rag,
-            kb_name=request.kb_name,
-            metrics=request.metrics
-        )
-        
-        try:
-            result = await evaluate_model(eval_request, model_service, rag_service)
-            results.append(result)
-        except Exception as e:
-            # 处理单个评估失败
-            logger.error(f"评估失败: {e}")
-    
-    # 计算平均指标
-    avg_metrics = {}
-    
-    if results:
-        # 收集所有指标名称
-        all_metric_names = set()
-        for result in results:
-            all_metric_names.update(result.metrics.keys())
-        
-        # 计算每个指标的平均值
-        for metric_name in all_metric_names:
-            values = [r.metrics.get(metric_name) for r in results if metric_name in r.metrics]
-            values = [v for v in values if isinstance(v, (int, float))]
-            
-            if values:
-                avg_metrics[metric_name] = sum(values) / len(values)
-    
-    total_time = time.time() - start_time
-    
-    return BatchEvaluationResponse(
-        results=results,
-        average_metrics=avg_metrics,
-        total_time=total_time
+set_evaluation_task_fn(execute_evaluation_task)
+
+
+@router.post("/evaluate_model", response_model=EvaluationResponse)
+async def evaluate_model(request: EvaluationRequest) -> EvaluationResponse:
+    await start_evaluation_worker()
+    task_id = (request.evaluation_task_id or "").strip() or str(uuid.uuid4())
+
+    vllm_ok = is_valid_vllm_triple(
+        request.evaluator_config.vllm_model_name,
+        request.evaluator_config.vllm_base_url,
+        request.evaluator_config.vllm_api_key,
+    )
+    display_name = display_model_name(
+        vllm_valid=vllm_ok,
+        model_name=request.evaluator_config.vllm_model_name,
+        model_path=request.evaluator_config.model_name_or_path or "",
+    )
+    register_pending_task(task_id, display_name)
+
+    await evaluation_task_queue.put({
+        "evaluation_task_id": task_id,
+        "task_type": request.task_type.value,
+        "dataset_path": request.dataset_path,
+        "question_key": request.question_key,
+        "model_answer_key": request.model_answer_key,
+        "ground_true_answer_key": request.ground_true_answer_key,
+        "evaluator_config": request.evaluator_config.model_dump(),
+    })
+
+    snap = get_task_snapshot(task_id) or {}
+    return EvaluationResponse(
+        evaluation_task_id=task_id,
+        metrics=snap.get("metrics") or {},
+        model_name=str(snap.get("model_name") or display_name),
+        status=snap.get("status", "pending"),
+        process_time=float(snap.get("process_time") or 0.0),
+        additional_info=snap.get("additional_info"),
+    )
+
+
+@router.get("/get_evaluation_result/{evaluation_task_id}", response_model=EvaluationResponse)
+async def get_evaluation_result(evaluation_task_id: str) -> EvaluationResponse:
+    snap = get_task_snapshot(evaluation_task_id)
+    if snap is None:
+        raise HTTPException(status_code=404, detail="未知的 evaluation_task_id")
+    return EvaluationResponse(
+        evaluation_task_id=evaluation_task_id,
+        metrics=snap.get("metrics") or {},
+        model_name=str(snap.get("model_name") or ""),
+        status=snap["status"],
+        process_time=float(snap.get("process_time") or 0.0),
+        additional_info=snap.get("additional_info"),
     )

@@ -12,6 +12,7 @@ tiktoken
 jieba
 rouge-chinese
 nltk
+rouge-score
 uvicorn
 pydantic
 fastapi

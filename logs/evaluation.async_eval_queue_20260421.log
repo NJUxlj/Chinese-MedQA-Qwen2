@@ -1,0 +1,261 @@
+2026-04-21 17:46:55,128 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 17:47:36,411 - evaluation.async_eval_queue - ERROR - 评估任务失败: Couldn't find a module script at /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/bleu/bleu.py. Module 'bleu' doesn't exist on the Hugging Face Hub either.
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 140, in execute_evaluation_task
+    ev = EvaluatorFactory.create(task_type, cfg)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluator_factory.py", line 35, in create
+    return eval_cls(config)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/bleu_rouge_evaluator.py", line 43, in __init__
+    self.bleu = evaluate.load("bleu")
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/evaluate/loading.py", line 748, in load
+    evaluation_module = evaluation_module_factory(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/evaluate/loading.py", line 681, in evaluation_module_factory
+    raise FileNotFoundError(
+FileNotFoundError: Couldn't find a module script at /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/bleu/bleu.py. Module 'bleu' doesn't exist on the Hugging Face Hub either.
+
+2026-04-21 17:47:37,458 - evaluation.async_eval_queue - ERROR - 评估任务失败: Missing key enable_thinking
+    full_key: enable_thinking
+    object_type=dict
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 149, in execute_evaluation_task
+    rows_out = [ev.evaluate_one_sample(s) for s in samples]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 82, in evaluate_one_sample
+    return self.evaluate_batch_samples([sample])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 240, in evaluate_batch_samples
+    if self.config.enable_thinking:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 355, in __getattr__
+    self._format_and_raise(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/base.py", line 231, in _format_and_raise
+    format_and_raise(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/_utils.py", line 899, in format_and_raise
+    _raise(ex, cause)
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/_utils.py", line 797, in _raise
+    raise ex.with_traceback(sys.exc_info()[2])  # set env var OC_CAUSE=1 for full trace
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 351, in __getattr__
+    return self._get_impl(
+           ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 442, in _get_impl
+    node = self._get_child(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/basecontainer.py", line 73, in _get_child
+    child = self._get_node(
+            ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 480, in _get_node
+    raise ConfigKeyError(f"Missing key {key!s}")
+omegaconf.errors.ConfigAttributeError: Missing key enable_thinking
+    full_key: enable_thinking
+    object_type=dict
+
+2026-04-21 17:59:18,340 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-21 17:59:31,185 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 17:59:40,705 - evaluation.async_eval_queue - ERROR - 评估任务失败: Couldn't find a module script at /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/bleu/bleu.py. Module 'bleu' doesn't exist on the Hugging Face Hub either.
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 153, in execute_evaluation_task
+    ev = EvaluatorFactory.create(task_type, cfg)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluator_factory.py", line 35, in create
+    return eval_cls(config)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/bleu_rouge_evaluator.py", line 43, in __init__
+    self.bleu = evaluate.load("bleu")
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/evaluate/loading.py", line 748, in load
+    evaluation_module = evaluation_module_factory(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/evaluate/loading.py", line 681, in evaluation_module_factory
+    raise FileNotFoundError(
+FileNotFoundError: Couldn't find a module script at /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/bleu/bleu.py. Module 'bleu' doesn't exist on the Hugging Face Hub either.
+
+2026-04-21 17:59:41,811 - evaluation.async_eval_queue - ERROR - 评估任务失败: Missing key enable_thinking
+    full_key: enable_thinking
+    object_type=dict
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 154, in execute_evaluation_task
+    rows_out = [ev.evaluate_one_sample(s) for s in samples]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 82, in evaluate_one_sample
+    return self.evaluate_batch_samples([sample])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 240, in evaluate_batch_samples
+    if self.config.enable_thinking:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 355, in __getattr__
+    self._format_and_raise(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/base.py", line 231, in _format_and_raise
+    format_and_raise(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/_utils.py", line 899, in format_and_raise
+    _raise(ex, cause)
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/_utils.py", line 797, in _raise
+    raise ex.with_traceback(sys.exc_info()[2])  # set env var OC_CAUSE=1 for full trace
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 351, in __getattr__
+    return self._get_impl(
+           ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 442, in _get_impl
+    node = self._get_child(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/basecontainer.py", line 73, in _get_child
+    child = self._get_node(
+            ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 480, in _get_node
+    raise ConfigKeyError(f"Missing key {key!s}")
+omegaconf.errors.ConfigAttributeError: Missing key enable_thinking
+    full_key: enable_thinking
+    object_type=dict
+
+2026-04-21 18:03:07,423 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-21 18:03:19,451 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 18:12:14,795 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-21 18:12:41,176 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 18:12:44,829 - evaluation.async_eval_queue - ERROR - 评估任务失败: Missing key enable_thinking
+    full_key: enable_thinking
+    object_type=dict
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 158, in execute_evaluation_task
+    rows_out = [ev.evaluate_one_sample(s) for s in samples]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 82, in evaluate_one_sample
+    return self.evaluate_batch_samples([sample])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 240, in evaluate_batch_samples
+    if self.config.enable_thinking:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 355, in __getattr__
+    self._format_and_raise(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/base.py", line 231, in _format_and_raise
+    format_and_raise(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/_utils.py", line 899, in format_and_raise
+    _raise(ex, cause)
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/_utils.py", line 797, in _raise
+    raise ex.with_traceback(sys.exc_info()[2])  # set env var OC_CAUSE=1 for full trace
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 351, in __getattr__
+    return self._get_impl(
+           ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 442, in _get_impl
+    node = self._get_child(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/basecontainer.py", line 73, in _get_child
+    child = self._get_node(
+            ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 480, in _get_node
+    raise ConfigKeyError(f"Missing key {key!s}")
+omegaconf.errors.ConfigAttributeError: Missing key enable_thinking
+    full_key: enable_thinking
+    object_type=dict
+
+2026-04-21 21:04:22,484 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-21 21:04:30,578 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 21:05:30,971 - evaluation.async_eval_queue - ERROR - 评估任务失败: argument 'ids': Can't extract `str` to `Vec`
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 158, in execute_evaluation_task
+    rows_out = [ev.evaluate_one_sample(s) for s in samples]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 82, in evaluate_one_sample
+    return self.evaluate_batch_samples([sample])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 261, in evaluate_batch_samples
+    decoded_labels = self.tokenizer.batch_decode(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 3831, in batch_decode
+    self.decode(
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 3870, in decode
+    return self._decode(
+           ^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/transformers/tokenization_utils_fast.py", line 668, in _decode
+    text = self._tokenizer.decode(token_ids, skip_special_tokens=skip_special_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument 'ids': Can't extract `str` to `Vec`
+
+2026-04-21 21:20:07,952 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-21 21:20:16,681 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 21:21:25,366 - evaluation.async_eval_queue - ERROR - 评估任务失败: no such group
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 31, in _worker_loop
+    result = await asyncio.to_thread(execute_evaluation_task, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 158, in execute_evaluation_task
+    rows_out = [ev.evaluate_one_sample(s) for s in samples]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 82, in evaluate_one_sample
+    return self.evaluate_batch_samples([sample])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 272, in evaluate_batch_samples
+    label_answer = self._extract_final_answer_from_text(label_text)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/math_evaluator.py", line 539, in _extract_final_answer_from_text
+    answer = match.group(1).strip()
+             ^^^^^^^^^^^^^^
+IndexError: no such group
+
+2026-04-21 21:40:55,045 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-21 21:41:03,415 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-21 22:48:12,449 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止

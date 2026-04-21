@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 
 from langchain_core.documents import Document
 
-from knowledge_base.reranker.reranker_service import RerankerService, RerankerConfig
+from knowledge_base.reranker.reranker_service import RerankerService
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -24,23 +24,29 @@ class ContextBuilder:
         reranker_model_provider: str = "huggingface",
         reranker_model_path: Optional[str] = None,
         reranker_model_name: Optional[str] = None,
+        reranker_base_url: Optional[str] = None,
+        reranker_api_key: Optional[str] = None,
         max_context_length: int = 4000,
         format_template: Optional[str] = None
     ):
         """
         初始化上下文构建器
-        
+
         Args:
             chunk_size: 上下文块大小
             chunk_overlap: 上下文块重叠大小
+            reranker_model_provider: 重排序模型 provider
+            reranker_model_path: 重排序模型本地路径
             reranker_model_name: 重排序模型名称
+            reranker_base_url: vLLM API 地址（优先于 model_path）
+            reranker_api_key: vLLM API 密钥
             max_context_length: 最大上下文长度
             format_template: 格式化模板
         """
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.max_context_length = max_context_length
-        
+
         # 设置格式化模板
         if format_template:
             self.format_template = format_template
@@ -49,15 +55,39 @@ class ContextBuilder:
                 "请根据以下信息回答问题。如果无法从提供的信息中找到答案，请基于可靠的医学知识回答，"
                 "并注明这是基于一般医学知识的回答。\n\n相关信息：\n{context}\n\n问题：{query}\n\n回答："
             )
-        
+
         # 初始化重排序模型
         self.reranker_service = None
-        if reranker_model_name:
+
+        # 优先使用 vLLM API（base_url 配置优先）
+        if reranker_base_url and reranker_model_name:
             try:
-                self.reranker_service = RerankerService(RerankerConfig(
-                    model_provider=reranker_model_provider,
-                    model_path=reranker_model_path,
-                    model_name=reranker_model_name))
+                # 构建临时 config 供 RerankerService 使用
+                class VLLMConfig:
+                    model_provider = "vllm"
+                    model_name = reranker_model_name
+                    base_url = reranker_base_url
+                    api_key = reranker_api_key or ""
+                    batch_size = 8
+                    normalize_scores = True
+
+                self.reranker_service = RerankerService(VLLMConfig())
+                logger.info(f"已加载 vLLM API reranker: {reranker_base_url}")
+            except Exception as e:
+                logger.error(f"加载 vLLM API reranker 失败: {e}")
+
+        # 回退到本地模型
+        elif reranker_model_name and reranker_model_path:
+            try:
+                class LocalConfig:
+                    model_provider = reranker_model_provider
+                    model_name = reranker_model_name
+                    model_path = reranker_model_path
+                    device = "cpu"
+                    batch_size = 8
+                    normalize_scores = True
+
+                self.reranker_service = RerankerService(LocalConfig())
                 logger.info(f"已加载重排序模型: {reranker_model_name}")
             except Exception as e:
                 logger.error(f"加载重排序模型失败: {e}")

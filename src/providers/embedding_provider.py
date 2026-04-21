@@ -161,11 +161,10 @@ class EmbeddingProvider:
 
         try:
             if self.mode == "openai":
-                api_key = self.api_key or str(settings.openai.api_key) if hasattr(settings, 'openai') else None
-                if not api_key:
+                if not self.api_key:
                     raise ValueError("API key is required for OpenAI embeddings mode")
                 from langchain_openai import OpenAIEmbeddings
-                self._lc_embeddings = OpenAIEmbeddings(model=self.model_name, openai_api_key=api_key)
+                self._lc_embeddings = OpenAIEmbeddings(model=self.model_name, openai_api_key=self.api_key)
 
             elif self.mode == "bge":
                 from langchain_community.embeddings import HuggingFaceBgeEmbeddings

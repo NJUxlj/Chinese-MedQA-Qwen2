@@ -1,0 +1,4 @@
+2026-04-21 18:03:32,177 - BleuRougeEvaluator - INFO - BLEU-ROUGE评估器初始化完成，模型路径: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 21:04:38,620 - BleuRougeEvaluator - INFO - BLEU-ROUGE评估器初始化完成，模型路径: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 21:20:22,839 - BleuRougeEvaluator - INFO - BLEU-ROUGE评估器初始化完成，模型路径: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 21:41:05,719 - BleuRougeEvaluator - INFO - BLEU-ROUGE评估器初始化完成，模型路径: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B

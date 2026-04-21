@@ -4,15 +4,11 @@
 """
 
 from typing import Dict, Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 import time
 import psutil
-import os
 import platform
 import torch
-
-from services.model_service import get_model_service, ModelService
-from services.embedding_service import get_embedding_service, EmbeddingService
 
 router = APIRouter()
 
@@ -20,7 +16,7 @@ router = APIRouter()
 async def health_check():
     """
     系统健康检查
-    
+
     Returns:
         系统状态信息
     """
@@ -36,7 +32,7 @@ async def health_check():
             "platform": platform.platform(),
             "python_version": platform.python_version(),
         }
-        
+
         # GPU信息 (CUDA 或 Apple Silicon MPS)
         if torch.cuda.is_available():
             system_info["cuda_available"] = True
@@ -64,7 +60,7 @@ async def health_check():
         else:
             system_info["cuda_available"] = False
             system_info["mps_available"] = False
-        
+
         return system_info
     except Exception as e:
         return {
@@ -77,33 +73,8 @@ async def health_check():
 async def ping():
     """
     简单的可用性检查
-    
+
     Returns:
         简单响应
     """
     return {"status": "pong", "timestamp": time.time()}
-
-@router.get("/models/status", response_model=Dict[str, Any])
-async def get_models_status(
-    model_service: ModelService = Depends(get_model_service),
-    embedding_service: EmbeddingService = Depends(get_embedding_service)
-):
-    """
-    获取模型加载状态
-    
-    Args:
-        model_service: 模型服务
-        embedding_service: 嵌入服务
-    
-    Returns:
-        模型状态信息
-    """
-    try:
-        return {
-            "llm_models": model_service.get_loaded_models(),
-            "embedding_models": embedding_service.get_available_models(),
-            "default_llm": model_service.default_model_name,
-            "default_embedding": embedding_service.default_model_name
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

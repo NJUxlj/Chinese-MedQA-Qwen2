@@ -1,0 +1,7 @@
+- 完全删除 /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/routers/evaluation.py 中的所有代码。
+- 在 /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/evaluation 这个目录下创建一个 EvaluatorFactory, 另外再定义一个 EvaluationTaskType 枚举类 （有哪些枚举值你自己定），EvaluatorFactory 会从枚举值映射到对应的 xxxEvaluator 类。
+- 所有的 xxxEvaluator 类应该同时支持评估本地模型（通过传入本地模型权重）和评估 vllm 上部署的模型（通过传入 model_name, base_url, api_key, 可能需要在每个 evaluator 中新增 evaluate_one_sample_by_api 和 evaluate_batch_samples_by_api）, 除此以外， 不支持其余的任何模式。
+- 重新开始写 /Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/routers/evaluation.py 中的 evaluate_model 接口 （完全抛弃 batch evaluate model）. 另外， 评估的时候不要用任何的知识库和 RAG 功能，删除所有的相关参数。另外，创建 get_evaluation_result 接口来实时查询当前的评估任务。
+- 用户可以开启多个评估任务， 所有的评估任务都应当被放在一个异步队列 asyncio.Queue 中
+- EvaluationRequest 请求中应该有 evluation_task_id, dataset_path, model_path, question_key, model_answer_key, ground_true_answer_key, model_name, base_url, api_key. 优先用 [model_name, base_url, api_key] 这一组 vllm 的配置， 如果无效的话再直接从 model_path 加载权重作为兜底。
+- EvaluationResponse 中应当包含 [evaluation_task_id, metrics, model_name, status (stop, pending, running), process_time, additional_info=additional_info]

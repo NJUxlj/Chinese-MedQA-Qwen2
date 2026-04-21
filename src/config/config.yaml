@@ -29,6 +29,7 @@ milvus:
   index_type: FLAT
   metric_type: L2
   consistency_level: Strong
+  collection_names: [web_crawled_texts, text_books, guidelines]
 
 # =============================================================================
 # Neo4j 配置
@@ -73,17 +74,18 @@ embedding:
   batch_size: 32
   dimension: 768
 
-# =============================================================================
-# 嵌入服务配置（FastAPI Service 层使用，与上面 embedding 共存：
-# embedding 偏向算法侧默认值，embedding_service 偏向 HTTP 服务侧默认值）
-# =============================================================================
-embedding_service:
-  default_model_name: Qwen3-Embedder-0.6B
-  default_dimension: 1024
-  cache_dir: embedding_cache
+
+reranker:
+  model_provider: sentence_transformers  # sentence_transformers / transformers / vllm
+  model_path: ""  # 本地模型路径，为空则不使用 reranker
+  model_name: ""  # 模型名称（vLLM 部署时使用）
+  device: cpu  # cuda / cpu
+  use_reranker: false
+  base_url: ""   # vLLM API 地址，如 http://localhost:8000
+  api_key: ""    # API 密钥（如 vLLM 未启用认证可留空）
 
 # =============================================================================
-# 推理配置
+# RAG 服务配置
 # =============================================================================
 inference:
   model_name_or_path: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
@@ -96,44 +98,6 @@ inference:
   top_p: 0.9
   top_k: 50
   dtype: auto
-  trust_remote_code: true
-
-# =============================================================================
-# 评估器配置
-# =============================================================================
-evaluator:
-  model_name_or_path: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
-  test_dataset_path: null
-  batch_size: 4
-  max_new_tokens: 2048
-  temperature: 0.7
-  top_p: 0.9
-  metrics: [bleu, rouge]
-  device: cpu
-  padding_side: left
-  use_fast: true
-  prompt_key: prompt
-  ground_true_answer_key: answer
-  eval_result_save_path: ./eval_results.json
-  dataloader_num_workers: 0
-  reference_model_path: null
-  output_dir: ./eval_output
-  beta: 0.1
-  max_length: 2048
-  query_key: query
-  chosen_key: chosen
-  rejected_key: rejected
-  execution_timeout: 30
-  max_memory_mb: 256
-  sandbox_working_dir: /tmp/code_eval
-  enable_security_check: true
-
-# =============================================================================
-# 本地模型配置
-# =============================================================================
-local_model:
-  model_path: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
-  device: cuda:0
   trust_remote_code: true
 
 # =============================================================================
@@ -171,13 +135,6 @@ api_server:
   admin_api_key: ""
 
 # =============================================================================
-# 模型服务配置（src/api/services/model_service.py）
-# =============================================================================
-model_service:
-  default_model_name: Qwen3-0.6B
-  default_model_path: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
-
-# =============================================================================
 # RAG 服务配置（src/api/services/rag_service.py）
 # default_kb 留空表示不预加载默认知识库
 # =============================================================================
@@ -187,11 +144,8 @@ rag_service:
   default_kb: ""
 
 # =============================================================================
-# 第三方接口密钥
+# PubMed API 配置
 # =============================================================================
-openai:
-  api_key: ""
-
 pubmed:
   api_key: ""
   email: ""
@@ -237,11 +191,6 @@ training:
   sft_model_name: qwen2_medical_sft
   dpo_model_name: qwen2_medical_dpo
   deepspeed_config_path: ./src/config/ds_config.json
-
-# Model
-model:
-  model_name_or_path: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
-  trust_remote_code: true
 
 # Method
 method:

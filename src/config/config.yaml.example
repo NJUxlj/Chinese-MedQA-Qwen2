@@ -55,11 +55,6 @@ embedding:
   batch_size: 32
   dimension: 768
 
-embedding_service:
-  default_model_name: paraphrase-multilingual-MiniLM-L12-v2
-  default_dimension: 384
-  cache_dir: embedding_cache
-
 inference:
   model_name_or_path: "<LOCAL_MODEL_PATH>"
   device: cuda:0
@@ -81,11 +76,6 @@ evaluator:
   max_new_tokens: 2048
   temperature: 0.7
   metrics: [bleu, rouge]
-
-local_model:
-  model_path: "<LOCAL_MODEL_PATH>"
-  device: cuda:0
-  trust_remote_code: true
 
 vllm:
   model_name_or_path: Qwen/Qwen3-4B
@@ -111,18 +101,14 @@ api_server:
     - http://localhost:8000
   admin_api_key: "<ADMIN_API_KEY>"
 
-model_service:
-  default_model_name: qwen2-7b-instruct
-  default_model_path: Qwen/Qwen2-7B-Instruct
-
 rag_service:
   kb_index_dir: knowledge_base/indices
   default_retriever: hybrid
   default_kb: ""
 
-openai:
-  api_key: ""
-
+# =============================================================================
+# PubMed API 配置
+# =============================================================================
 pubmed:
   api_key: ""
   email: ""
@@ -156,10 +142,9 @@ training:
   dpo_model_name: qwen2_medical_dpo
   deepspeed_config_path: ./src/config/ds_config.json
 
-model:
-  model_name_or_path: "<LOCAL_MODEL_PATH>"
-  trust_remote_code: true
-
+# =============================================================================
+# Method 配置
+# =============================================================================
 method:
   stage: sft
   do_train: true

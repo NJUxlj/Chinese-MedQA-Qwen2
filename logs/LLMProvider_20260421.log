@@ -108,3 +108,19 @@
 2026-04-21 11:52:39,001 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
 2026-04-21 11:52:42,779 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
 2026-04-21 11:52:42,780 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 17:47:37,808 - LLMProvider - INFO - [transformers] Loading model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 17:47:44,081 - LLMProvider - INFO - [transformers] Model loaded successfully
+2026-04-21 17:59:42,190 - LLMProvider - INFO - [transformers] Loading model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 17:59:47,272 - LLMProvider - INFO - [transformers] Model loaded successfully
+2026-04-21 18:12:45,629 - LLMProvider - INFO - [transformers] Loading model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 18:12:51,157 - LLMProvider - INFO - [transformers] Model loaded successfully
+2026-04-21 21:05:31,093 - LLMProvider - INFO - [transformers] Loading model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 21:05:33,427 - LLMProvider - INFO - [transformers] Model loaded successfully
+2026-04-21 21:21:26,121 - LLMProvider - INFO - [transformers] Loading model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 21:21:28,576 - LLMProvider - INFO - [transformers] Model loaded successfully
+2026-04-21 21:41:59,081 - LLMProvider - INFO - [transformers] Loading model from: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
+2026-04-21 21:42:01,204 - LLMProvider - INFO - [transformers] Model loaded successfully
+2026-04-21 23:45:11,993 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 23:45:11,994 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 23:45:11,994 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 23:45:11,994 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7

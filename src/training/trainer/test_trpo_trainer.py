@@ -16,9 +16,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from training.trainer.trpo_trainer import TRPOTrainer
-from config.settings import settings
-
-LOCAL_MODEL_PATH = str(settings.local_model.model_path)
+LOCAL_MODEL_PATH = "/Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B"
 
 def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """设置日志记录器"""
