@@ -1,0 +1,110 @@
+2026-04-21 11:39:59,849 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:39:59,849 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:40:50,072 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:40:50,073 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:40:50,073 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:40:50,073 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:41:41,939 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:41:41,939 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:41:41,939 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:41:41,939 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:41:45,880 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:41:45,880 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:42:19,337 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:42:19,338 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:43:48,321 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:43:48,321 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:43:48,321 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:43:48,321 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:43:53,231 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:43:53,231 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:44:26,055 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:44:26,055 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:44:26,055 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:44:26,055 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:44:44,933 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:44:44,934 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:45:28,996 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:45:28,996 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:45:28,996 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:45:28,996 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:45:44,623 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:45:44,623 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:45:44,623 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:45:44,623 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:45:48,046 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:45:48,046 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:45:48,046 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:45:48,046 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:45:52,477 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:45:52,478 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:45:52,481 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:45:52,481 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:46:27,452 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:46:27,452 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:47:14,688 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:47:14,689 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:47:14,689 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:47:14,689 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:47:30,264 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:47:30,265 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:47:30,265 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:47:30,265 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:47:35,786 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:47:35,787 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:47:35,787 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:47:35,787 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:47:40,162 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:47:40,163 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:47:40,169 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:47:40,169 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:48:19,784 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:48:19,785 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:48:19,785 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:48:19,785 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:48:36,014 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:48:36,014 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:48:36,014 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:48:36,015 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:48:43,202 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:48:43,202 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:48:43,203 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:48:43,203 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:48:49,352 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:48:49,352 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:48:49,449 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:48:49,449 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:49:54,495 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:49:54,495 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:49:54,495 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:49:54,495 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:50:08,135 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:50:08,135 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:50:08,135 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:50:08,135 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:50:14,622 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:50:14,623 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:50:14,623 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:50:14,623 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:50:19,440 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:50:19,440 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:50:20,919 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:50:20,919 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:51:20,279 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:51:20,280 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:52:17,430 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:52:17,430 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:52:17,430 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:52:17,430 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:52:30,423 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:52:30,423 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:52:30,423 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:52:30,423 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:52:35,091 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:52:35,092 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:52:35,092 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
+2026-04-21 11:52:35,092 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-21 11:52:39,001 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:52:39,001 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-21 11:52:42,779 - LLMProvider - INFO - Initializing openai LLM provider: MiniMax-M2.7
+2026-04-21 11:52:42,780 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1

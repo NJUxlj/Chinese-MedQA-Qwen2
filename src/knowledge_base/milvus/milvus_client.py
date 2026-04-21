@@ -28,6 +28,12 @@ from utils.logger import setup_logger
 from providers.embedding_provider import EmbeddingProvider
 from config.settings import settings
 
+try:
+    import torch as _torch
+    _CUDA_AVAILABLE = _torch.cuda.is_available()
+except ImportError:
+    _CUDA_AVAILABLE = False
+
 
 class MilvusClient:
     """
@@ -65,11 +71,14 @@ class MilvusClient:
         self.metric_type = self.milvus_config.metric_type
         self.consistency_level = self.milvus_config.consistency_level
         
-        # 初始化嵌入函数
+        # 初始化嵌入函数（优先使用本地 model_path，避免网络请求）
+        _model_path = getattr(self.embedding_config, "model_path", None)
+        _model_name = str(self.embedding_config.model_name)
         self.embedder = EmbeddingProvider(
-            mode="huggingface",
-            model_name=self.embedding_config.model_name,
-            device="cuda" if torch.cuda.is_available() else "cpu"
+            mode="local",
+            model_name=_model_name,
+            model_path=str(_model_path) if _model_path and str(_model_path) not in ("None", "null", "") else None,
+            device="cuda" if _CUDA_AVAILABLE else "cpu",
         )
 
         # 初始化 Milvus 向量存储

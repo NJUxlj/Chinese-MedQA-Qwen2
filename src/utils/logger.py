@@ -25,7 +25,8 @@ LOG_LEVELS = {
 DEFAULT_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 DETAILED_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
 
-# 默认日志配置
+# 默认日志目录：指向项目根目录下的 logs/ 文件夹（即 <project_root>/logs）
+# __file__ = src/utils/logger.py → 上溯三级得到 <project_root>
 DEFAULT_LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "logs")
 DEFAULT_LOG_CONFIG = {
     "level": "info",

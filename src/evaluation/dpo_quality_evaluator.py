@@ -15,65 +15,57 @@ from tqdm import tqdm
 
 from utils.logger import setup_logger
 from utils.metrics import DPOMetrics
-from config.evaluator_config import DPOQualityEvaluatorConfig
+from config.settings import settings
 from evaluation.base_evaluator import BaseEvaluator, EvaluatorDataset
 
 
-
-class EvaluatorDataset(Dataset):
-    def __init__(self, data: List[Dict[str, Any]]):
-        self.data = data
-        
-    def __len__(self):
-        return len(self.data)
-    
-    def __getitem__(self, idx):
-        return self.data[idx]
-
-
 class DPOQualityEvaluator(BaseEvaluator):
-    def __init__(
-        self,
-        config: DPOQualityEvaluatorConfig
-    ):
+    def __init__(self, config=None):
+        """
+        Args:
+            config: 评估器配置（默认使用 settings.evaluator）
+        """
         super().__init__(config)
-        
-        self.config = config
+
         self.logger = setup_logger(name=__class__.__name__, level="INFO")
-        
+
         self.reference_model: Optional[PreTrainedModel] = None
         self.reference_tokenizer: Optional[PreTrainedTokenizer] = None
-        
-        self.beta = config.beta
-        self.max_length = config.max_length
-        
+
+        self.beta = float(getattr(self.config, "beta", 0.1))
+        self.max_length = int(getattr(self.config, "max_length", 2048))
+
+        model_path = str(self.config.model_name_or_path)
+        device = str(getattr(self.config, "device", "cpu"))
+
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.config.model_name_or_path,
+            model_path,
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16
-        ).to(self.config.device)
-        
+            torch_dtype=torch.bfloat16,
+        ).to(device)
+
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.config.model_name_or_path,
-            trust_remote_code=True
+            model_path,
+            trust_remote_code=True,
         )
-        
-        if self.config.reference_model_path:
+
+        reference_model_path = getattr(self.config, "reference_model_path", None)
+        if reference_model_path and str(reference_model_path) not in ("None", "null", ""):
             self.reference_model = AutoModelForCausalLM.from_pretrained(
-                self.config.reference_model_path,
+                str(reference_model_path),
                 trust_remote_code=True,
-                torch_dtype=torch.bfloat16
-            ).to(self.config.device)
+                torch_dtype=torch.bfloat16,
+            ).to(device)
             self.reference_model.eval()
-        
-        # 确保模型处于评估模式
+
         self.model.eval()
-        
         self.metrics = DPOMetrics()
-        
-        os.makedirs(self.config.output_dir, exist_ok=True)
-        
-        self.logger.info(f"DPO质量评估器初始化完成，模型路径: {self.config.model_name_or_path}")
+
+        output_dir = str(getattr(self.config, "output_dir", "./eval_output"))
+        os.makedirs(output_dir, exist_ok=True)
+        self._output_dir = output_dir
+
+        self.logger.info(f"DPO质量评估器初始化完成，模型路径: {model_path}")
     
     def prepare_dpo_batch(
         self,
@@ -205,9 +197,12 @@ class DPOQualityEvaluator(BaseEvaluator):
         }
     
     def evaluate_one_sample(self, sample: Dict[str, Any]) -> Dict[str, float]:
-        query = sample.get(self.config.query_key, sample.get("query", ""))
-        chosen = sample.get(self.config.chosen_key, sample.get("chosen", ""))
-        rejected = sample.get(self.config.rejected_key, sample.get("rejected", ""))
+        query_key = str(getattr(self.config, "query_key", "query"))
+        chosen_key = str(getattr(self.config, "chosen_key", "chosen"))
+        rejected_key = str(getattr(self.config, "rejected_key", "rejected"))
+        query = sample.get(query_key, sample.get("query", ""))
+        chosen = sample.get(chosen_key, sample.get("chosen", ""))
+        rejected = sample.get(rejected_key, sample.get("rejected", ""))
         
         batch = self.prepare_dpo_batch(query, chosen, rejected)
         
@@ -357,13 +352,13 @@ class DPOQualityEvaluator(BaseEvaluator):
             plt.show()
     
     def save_evaluation_results(self, metrics: Dict[str, float]) -> None:
-        results_path = os.path.join(self.config.output_dir, "dpo_evaluation_results.json")
+        results_path = os.path.join(self._output_dir, "dpo_evaluation_results.json")
         with open(results_path, "w", encoding="utf-8") as f:
             json.dump(metrics, f, ensure_ascii=False, indent=2)
-        
+
         self.logger.info(f"评估结果已保存至: {results_path}")
-        
-        report_path = os.path.join(self.config.output_dir, "dpo_evaluation_report.txt")
+
+        report_path = os.path.join(self._output_dir, "dpo_evaluation_report.txt")
         with open(report_path, "w", encoding="utf-8") as f:
             f.write("DPO质量评估报告\n")
             f.write("=" * 50 + "\n\n")
@@ -403,21 +398,8 @@ class DPOQualityEvaluator(BaseEvaluator):
 
 
 def run():
-    config = DPOQualityEvaluatorConfig(
-        model_name_or_path="Qwen/Qwen3-4B",
-        device="cuda:0",
-        test_dataset_path="data/dpo/test.json",
-        query_key="query",
-        chosen_key="chosen",
-        rejected_key="rejected",
-        per_device_eval_batch_size=4,
-        output_dir="dpo_evaluation_results",
-        beta=0.1,
-        max_length=512
-    )
-    
-    evaluator = DPOQualityEvaluator(config)
-    
+    """运行 DPO 质量评估器（使用 settings.evaluator 配置）"""
+    evaluator = DPOQualityEvaluator()
     results = evaluator.evaluate()
     print("评估完成！")
     print(f"评估结果: {results}")

@@ -1,0 +1,13 @@
+2026-04-21 11:30:37,437 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:38:49,819 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:39:36,062 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:39:59,705 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:40:50,070 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:42:19,339 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:43:53,232 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:44:44,935 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:45:52,482 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:47:40,172 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:48:49,455 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:50:20,921 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）
+2026-04-21 11:52:42,791 - VLLMDeployer - WARNING - 未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）

@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import random
-from typing import List, Dict, Any, Union, Literal, Tuple
+from typing import List, Dict, Any, Literal, Tuple
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -10,7 +10,6 @@ from providers import LLMProvider
 from config.settings import settings
 from knowledge_base.milvus.milvus_client import MilvusClient
 from knowledge_base.lda.lda_pipeline import LDAPipeline
-from config.lda_config import LDAConfig
 from langchain_core.documents import Document
 
 
@@ -45,13 +44,8 @@ class MedEmbeddingDataGenerator:
         # 初始化 Milvus 客户端
         self.milvus_client = MilvusClient()
         
-        # 初始化 LDA 配置和管道
-        self.lda_config = LDAConfig(
-            embedding_model_name="paraphrase-multilingual-MiniLM-L12-v2",
-            language="chinese",
-            offline_mode=False
-        )
-        self.lda_pipeline = LDAPipeline(config=self.lda_config)
+        # 初始化 LDA 管道（从 settings.embedding 读取嵌入模型名）
+        self.lda_pipeline = LDAPipeline()
 
 
     def _connect_milvus(self) -> bool:
@@ -257,8 +251,7 @@ class MedEmbeddingDataGenerator:
             return []
         
         valid_texts = [texts[i] for i in valid_indices]
-        valid_docs = [documents[i] for i in valid_indices]
-        
+
         print(f"  有效文档数: {len(valid_texts)}")
         
         # LDA 主题建模
@@ -495,8 +488,7 @@ class MedEmbeddingDataGenerator:
             return []
         
         valid_texts = [texts[i] for i in valid_indices]
-        valid_docs = [documents[i] for i in valid_indices]
-        
+
         # LDA 主题建模
         try:
             result = self.lda_pipeline.modeling_documents(
@@ -703,7 +695,11 @@ class MedEmbeddingDataGenerator:
         random.shuffle(merged_data)
         
         # 确保保存目录存在
-        os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
+        if self.save_path is None:
+            raise ValueError("save_path 未设置，请在初始化时指定 save_path 参数")
+        dir_name = os.path.dirname(self.save_path)
+        if dir_name:
+            os.makedirs(dir_name, exist_ok=True)
         
         # 保存文件
         base_path = self.save_path
@@ -792,7 +788,7 @@ def run():
     from config.settings import settings
 
     # 配置（使用默认settings.llm）
-    save_path = "./data/embedding_training_data"
+    save_path = str(Path(__file__).parent.parent.parent / "data" / "embedding_training_data")
     data_num = 1000
 
     # 创建生成器

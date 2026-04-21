@@ -1,6 +1,5 @@
 import os
 import sys
-import signal
 import subprocess
 import time
 import requests
@@ -10,31 +9,44 @@ from typing import Optional, Dict, Any
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.logger import setup_logger
-from config.vllm_deployer_config import VLLMDeployerConfig
+from config.settings import settings
+
+
 
 
 class VLLMDeployer:
-    def __init__(self, config: VLLMDeployerConfig) -> None:
-        self.config = config
+    def __init__(self, vllm_config=None) -> None:
+        self.config = vllm_config if vllm_config is not None else settings.vllm
         self.process: Optional[subprocess.Popen] = None
         self.logger = setup_logger(name=__class__.__name__, level="INFO")
         self._validate_config()
 
     def _validate_config(self):
-        import torch
-        available_gpus = torch.cuda.device_count()
-        if self.config.tensor_parallel_size > available_gpus:
-            raise ValueError(
-                f"请求的张量并行度 ({self.config.tensor_parallel_size}) "
-                f"超过可用GPU数量 ({available_gpus})"
-            )
+        try:
+            import torch
+            available_gpus = torch.cuda.device_count()
+            if available_gpus == 0:
+                self.logger.warning("未检测到 CUDA GPU，将在 CPU / MPS 模式下运行（vLLM 可能不支持）")
+                return
+            if self.config.tensor_parallel_size > available_gpus:
+                raise ValueError(
+                    f"请求的张量并行度 ({self.config.tensor_parallel_size}) "
+                    f"超过可用GPU数量 ({available_gpus})"
+                )
+        except ImportError:
+            self.logger.warning("torch 未安装，跳过 GPU 数量验证")
+
+    def _get_base_url(self) -> str:
+        return str(self.config.base_url)
 
     def _build_command(self) -> list:
+        port = int(self.config.port)
+        host = str(self.config.host)
         cmd = [
             sys.executable, "-m", "vllm.entrypoints.openai.api_server",
-            "--model", self.config.model_name_or_path,
-            "--host", "0.0.0.0",
-            "--port", "8000",
+            "--model", str(self.config.model_name_or_path),
+            "--host", host,
+            "--port", str(port),
             "--tensor-parallel-size", str(self.config.tensor_parallel_size),
             "--gpu-memory-utilization", str(self.config.gpu_memory_utilization),
         ]
@@ -48,19 +60,19 @@ class VLLMDeployer:
         if self.config.max_num_seqs is not None:
             cmd.extend(["--max-num-seqs", str(self.config.max_num_seqs)])
 
-        if self.config.dtype != "auto":
-            cmd.extend(["--dtype", self.config.dtype])
+        if str(self.config.dtype) != "auto":
+            cmd.extend(["--dtype", str(self.config.dtype)])
 
         if self.config.quantization is not None:
-            cmd.extend(["--quantization", self.config.quantization])
+            cmd.extend(["--quantization", str(self.config.quantization)])
 
-        if self.config.trust_remote_code is False:
+        if self.config.trust_remote_code:
             cmd.append("--trust-remote-code")
 
         if self.config.enforce_eager:
             cmd.append("--enforce-eager")
 
-        if self.config.seed is not None and self.config.seed != 42:
+        if self.config.seed is not None and int(self.config.seed) != 42:
             cmd.extend(["--seed", str(self.config.seed)])
 
         return cmd
@@ -70,7 +82,7 @@ class VLLMDeployer:
             self.logger.warning("服务已启动，跳过重复部署")
             return self.process
 
-        self.logger.info(f"启动 vLLM API 服务器...")
+        self.logger.info("启动 vLLM API 服务器...")
         self.logger.info(f"模型: {self.config.model_name_or_path}")
         self.logger.info(f"张量并行度: {self.config.tensor_parallel_size}")
         self.logger.info(f"GPU显存利用率: {self.config.gpu_memory_utilization}")
@@ -96,12 +108,12 @@ class VLLMDeployer:
         return self.process
 
     def _wait_for_server_ready(self, timeout: int = 300):
-        url = "http://localhost:8000/health"
+        health_url = f"{self._get_base_url()}/health"
         start_time = time.time()
 
         while time.time() - start_time < timeout:
             try:
-                response = requests.get(url, timeout=5)
+                response = requests.get(health_url, timeout=5)
                 if response.status_code == 200:
                     self.logger.info("服务启动成功，API 服务器已就绪")
                     return
@@ -136,15 +148,17 @@ class VLLMDeployer:
         return self.process.poll() is None
 
     def health_check(self) -> Dict[str, Any]:
+        is_running = self.is_running()
         status = {
-            "is_running": self.is_running(),
-            "model": self.config.model_name_or_path,
+            "is_running": is_running,
+            "model": str(self.config.model_name_or_path),
             "tensor_parallel_size": self.config.tensor_parallel_size,
         }
 
-        if self.is_running():
+        if is_running:
+            health_url = f"{self._get_base_url()}/health"
             try:
-                response = requests.get("http://localhost:8000/health", timeout=5)
+                response = requests.get(health_url, timeout=5)
                 status["api_healthy"] = response.status_code == 200
             except requests.exceptions.RequestException:
                 status["api_healthy"] = False
@@ -154,8 +168,9 @@ class VLLMDeployer:
         return status
 
     def get_server_info(self) -> Optional[Dict[str, Any]]:
+        models_url = f"{self._get_base_url()}/v1/models"
         try:
-            response = requests.get("http://localhost:8000/v1/models", timeout=5)
+            response = requests.get(models_url, timeout=5)
             if response.status_code == 200:
                 return response.json()
         except requests.exceptions.RequestException:
@@ -169,34 +184,40 @@ class VLLMDeployer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.shutdown()
 
-    def __del__(self):
-        self.shutdown()
-
 
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="vLLM API 服务器部署工具")
-    parser.add_argument("--model", type=str, required=True, help="模型路径或名称")
-    parser.add_argument("--tensor-parallel-size", type=int, default=1, help="张量并行大小")
-    parser.add_argument("--gpu-memory-utilization", type=float, default=0.9, help="GPU显存利用率")
+    parser.add_argument("--model", type=str, default=None, help="模型路径或名称（默认读取config.yaml）")
+    parser.add_argument("--tensor-parallel-size", type=int, default=None, help="张量并行大小")
+    parser.add_argument("--gpu-memory-utilization", type=float, default=None, help="GPU显存利用率")
     parser.add_argument("--max-model-len", type=int, default=None, help="最大上下文长度")
-    parser.add_argument("--port", type=int, default=8000, help="服务端口")
     args = parser.parse_args()
 
-    config = VLLMDeployerConfig(
-        model_name_or_path=args.model,
-        tensor_parallel_size=args.tensor_parallel_size,
-        gpu_memory_utilization=args.gpu_memory_utilization,
-        max_model_len=args.max_model_len,
-    )
+    vllm_cfg = settings.vllm
+    if args.model:
+        from omegaconf import OmegaConf
+        vllm_cfg = OmegaConf.merge(vllm_cfg, {"model_name_or_path": args.model})
+    if args.tensor_parallel_size is not None:
+        from omegaconf import OmegaConf
+        vllm_cfg = OmegaConf.merge(vllm_cfg, {"tensor_parallel_size": args.tensor_parallel_size})
+    if args.gpu_memory_utilization is not None:
+        from omegaconf import OmegaConf
+        vllm_cfg = OmegaConf.merge(vllm_cfg, {"gpu_memory_utilization": args.gpu_memory_utilization})
+    if args.max_model_len is not None:
+        from omegaconf import OmegaConf
+        vllm_cfg = OmegaConf.merge(vllm_cfg, {"max_model_len": args.max_model_len})
 
-    with VLLMDeployer(config) as deployer:
-        deployer.logger.info("服务运行中，按 Ctrl+C 停止...")
-        try:
-            while deployer.is_running():
-                time.sleep(10)
-        except KeyboardInterrupt:
-            deployer.logger.info("收到停止信号")
+    deployer = VLLMDeployer(vllm_config=vllm_cfg)
+    deployer.logger.info("服务运行中，按 Ctrl+C 停止...")
+    deployer.deploy()
+    try:
+        while deployer.is_running():
+            time.sleep(10)
+    except KeyboardInterrupt:
+        deployer.logger.info("收到停止信号")
+    finally:
+        deployer.shutdown()
 
 
 if __name__ == "__main__":

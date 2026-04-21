@@ -149,13 +149,6 @@ ner:
   device: -1
   batch_size: 32
 
-azure_ai:
-  project_endpoint: ""
-  subscription_id: ""
-  resource_group: ""
-  service: ""
-  agent_model_deployment_name: ""
-  project_name: ""
 
 training:
   output_dir: ./output

@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 import re
-import numpy as np
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -23,36 +22,37 @@ from tqdm import tqdm
 
 from utils.logger import setup_logger
 from utils.metrics import DPOMetrics
-from config.evaluator_config import DPOQualityEvaluatorConfig, MathEvaluatorConfig
+from config.settings import settings
 from evaluation.base_evaluator import BaseEvaluator, EvaluatorDataset
 
 
 
 
 class MathEvaluator(BaseEvaluator):
-    def __init__(
-        self,
-        config: MathEvaluatorConfig
-    ):
+    def __init__(self, config=None):
+        """
+        Args:
+            config: 评估器配置（默认使用 settings.evaluator）
+        """
         super().__init__(config)
-        self.config = config
-
-
         self.load_model_and_tokenizer()
 
     def load_model_and_tokenizer(self):
-        """
-        加载模型和分词器
-        """
+        """加载模型和分词器"""
+        model_path = str(self.config.model_name_or_path)
+        device = str(getattr(self.config, "device", "cpu"))
+        padding_side = str(getattr(self.config, "padding_side", "left"))
+        use_fast = bool(getattr(self.config, "use_fast", True))
+
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.config.model_name_or_path,
+            model_path,
             torch_dtype=torch.bfloat16,
-            device_map=self.config.device
+            device_map=device,
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.config.model_name_or_path,
-            padding_side=self.config.padding_side,
-            use_fast=self.config.use_fast,
+            model_path,
+            padding_side=padding_side,
+            use_fast=use_fast,
         )
 
 
@@ -506,7 +506,10 @@ class MathEvaluator(BaseEvaluator):
 
 
 def run():
-    pass
+    """运行数学评估器（使用 settings.evaluator 配置）"""
+    evaluator = MathEvaluator()
+    results = evaluator.evaluate()
+    print(f"数学评估完成！结果: {results}")
 
 
 

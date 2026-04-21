@@ -1,0 +1,8 @@
+2026-04-21 11:47:40,165 - EmbeddingProvider - INFO - Loading LangChain embedding model: Qwen3-Embedder-0.6B (mode: huggingface)
+2026-04-21 11:48:49,356 - EmbeddingProvider - INFO - Loading LangChain embedding model: Qwen3-Embedder-0.6B (mode: huggingface)
+2026-04-21 11:50:19,442 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-21 11:50:20,573 - EmbeddingProvider - INFO - Local embedding model loaded successfully
+2026-04-21 11:51:20,280 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-21 11:51:21,127 - EmbeddingProvider - INFO - Local embedding model loaded successfully
+2026-04-21 11:52:39,002 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-21 11:52:39,904 - EmbeddingProvider - INFO - Local embedding model loaded successfully

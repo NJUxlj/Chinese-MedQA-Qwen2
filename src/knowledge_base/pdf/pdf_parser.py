@@ -1,7 +1,8 @@
 import os
+import re
 import logging
-from typing import List, Dict, Any, Optional
 from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
 
 import PyPDF2
 import pdfplumber
@@ -14,6 +15,30 @@ logger = logging.getLogger(__name__)
 
 class PdfParser:
     """PDF解析器，用于解析PDF文件并提取文本和结构化信息"""
+
+    # 从页面上下各裁掉的比例，用于弱化页眉页脚（pdfplumber 路径）
+    body_margin_frac: float = 0.08
+
+    # 任意行都可匹配的页码样式（不含「整行纯数字」，减少正文误删）
+    _PAGE_LINE_PATTERNS_ALWAYS: Tuple[str, ...] = (
+        r'^第\s*\d+\s*页$',
+        r'^第\s*\d+\s*页\s*[/／]\s*[Pp]age\s*\d+$',
+        r'^[Pp]age\s+\d+$',
+        r'^[Pp]age\s+\d+\s+of\s+\d+$',
+        r'^\d+\s+of\s+\d+$',
+        r'^[Pp]\.\s*\d+$',
+        r'^[Pp]p\.?\s*\d+$',
+        r'^[Pp]g\.?\s*\d+$',
+        r'^\d+\s*/\s*\d+$',
+        r'^[-–—·•]\s*\d+\s*[-–—·•]?$',
+        r'^[-–—]\s*\d+\s*[-–—]$',
+    )
+
+    # 仅首尾行启用：整行纯数字、多字符罗马数字页码
+    _PAGE_LINE_PATTERNS_EDGE_ONLY: Tuple[str, ...] = (
+        r'^\d+$',
+        r'^[IVXLCDM]{2,8}$',
+    )
 
     def __init__(self):
         """初始化解析器"""
@@ -115,7 +140,10 @@ class PdfParser:
                 
                 for page_num, page in enumerate(pdf.pages, 1):
                     try:
-                        page_text = page.extract_text()
+                        body_page = self._crop_page_body(page)
+                        page_text = body_page.extract_text()
+                        if not (page_text and page_text.strip()):
+                            page_text = page.extract_text()
                         if page_text:
                             # 清理页面文本
                             cleaned_text = self._clean_page_text(page_text)
@@ -160,45 +188,72 @@ class PdfParser:
         
         return text_content
 
+    def _crop_page_body(self, page: Any) -> Any:
+        """裁掉页面上下边距区域，减少页眉页脚进入正文提取结果。"""
+        b = page.bbox
+        if not b or len(b) != 4:
+            return page
+        x0, top, x1, bottom = b
+        h = bottom - top
+        if h <= 0:
+            return page
+        shrink = h * self.body_margin_frac
+        if shrink * 2 >= h * 0.5:
+            shrink = h * 0.04
+        new_top = top + shrink
+        new_bottom = bottom - shrink
+        if new_bottom <= new_top:
+            return page
+        try:
+            return page.crop((x0, new_top, x1, new_bottom))
+        except Exception:
+            return page
+
     def _clean_page_text(self, text: str) -> str:
-        """清理单页文本"""
+        """清理单页文本：空行丢弃；页码行丢弃（首尾行才允许「整行纯数字」判定）。"""
         if not text:
             return ""
-        
-        # 移除多余的空行
+
         lines = text.split('\n')
-        cleaned_lines = []
-        
-        for line in lines:
-            line = line.strip()
-            # 跳过空行和只有页码的行
-            if line and not self._is_page_number_line(line):
-                cleaned_lines.append(line)
-        
+        first_nonempty: Optional[int] = None
+        last_nonempty: Optional[int] = None
+        for i, line in enumerate(lines):
+            if line.strip():
+                if first_nonempty is None:
+                    first_nonempty = i
+                last_nonempty = i
+
+        cleaned_lines: List[str] = []
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            is_edge = (
+                first_nonempty is not None
+                and last_nonempty is not None
+                and (i == first_nonempty or i == last_nonempty)
+            )
+            if self._is_page_number_line(stripped, allow_standalone_digits=is_edge):
+                continue
+            cleaned_lines.append(stripped)
+
         return '\n'.join(cleaned_lines)
 
-    def _is_page_number_line(self, line: str) -> bool:
-        """判断是否为页码行"""
-        # 简单的页码判断逻辑
+    def _is_page_number_line(
+        self, line: str, *, allow_standalone_digits: bool = False
+    ) -> bool:
+        """判断是否为页码行。allow_standalone_digits 为 True 时允许整行纯数字（用于页内首尾行）。"""
         stripped = line.strip()
-        
-        # 纯数字行
-        if stripped.isdigit():
-            return True
-        
-        # 常见页码格式
-        page_patterns = [
-            r'^\d+$',                    # 纯数字
-            r'^第\s*\d+\s*页$',          # 第X页
-            r'^Page\s+\d+$',            # Page X
-            r'^\d+\s*/\s*\d+$',         # X/Y
-        ]
-        
-        import re
-        for pattern in page_patterns:
+        if not stripped:
+            return False
+
+        for pattern in self._PAGE_LINE_PATTERNS_ALWAYS:
             if re.match(pattern, stripped, re.IGNORECASE):
                 return True
-        
+        if allow_standalone_digits:
+            for pattern in self._PAGE_LINE_PATTERNS_EDGE_ONLY:
+                if re.match(pattern, stripped, re.IGNORECASE):
+                    return True
         return False
 
     def batch_parse_pdfs(self, pdf_dir: str) -> List[Document]:

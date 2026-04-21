@@ -27,7 +27,7 @@ from datetime import datetime
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.logger import setup_logger
-from config.evaluator_config import CodeEvaluatorConfig
+from config.settings import settings
 from evaluation.base_evaluator import BaseEvaluator, EvaluatorDataset
 
 
@@ -404,34 +404,25 @@ class CodeEvaluator(BaseEvaluator):
     
     使用方法:
     ```python
-    config = CodeEvaluatorConfig(
-        model_name_or_path="Qwen/Qwen3-4B",
-        test_dataset_path="data/test.json",
-        execution_timeout=10,
-        max_memory_mb=256,
-        enable_security_check=True
-    )
-    
-    evaluator = CodeEvaluator(config)
+    # 所有配置均从 config.yaml -> settings.evaluator 读取
+    evaluator = CodeEvaluator()
     results = evaluator.evaluate()
     ```
     '''
     
-    def __init__(self, config: CodeEvaluatorConfig):
+    def __init__(self, config=None):
         '''初始化代码评估器
-        
+
         Args:
-            config: 代码评估器配置
+            config: 评估器配置（默认使用 settings.evaluator）
         '''
         super().__init__(config)
-        
-        self.config = config
         self.logger = setup_logger(name=self.__class__.__name__, level="INFO")
-        
+
         self.executor = CodeExecutor(
-            timeout=config.execution_timeout,
-            max_memory_mb=config.max_memory_mb,
-            working_dir=config.sandbox_working_dir
+            timeout=int(getattr(self.config, "execution_timeout", 30)),
+            max_memory_mb=int(getattr(self.config, "max_memory_mb", 256)),
+            working_dir=str(getattr(self.config, "sandbox_working_dir", "/tmp/code_eval")),
         )
         
         self.supported_languages = ['python', 'python3', 'javascript', 'java', 'cpp', 'c']
@@ -660,28 +651,15 @@ class CodeEvaluator(BaseEvaluator):
 
 
 def run_evaluation():
-    '''运行评估的入口函数'''
-    config = CodeEvaluatorConfig(
-        model_name_or_path="Qwen/Qwen3-4B",
-        test_dataset_path="data/test.json",
-        execution_timeout=10,
-        max_memory_mb=256,
-        enable_security_check=True
-    )
-    
-    evaluator = CodeEvaluator(config)
-    
+    '''运行评估的入口函数（使用 settings.evaluator 配置）'''
+    evaluator = CodeEvaluator()
     try:
         results = evaluator.evaluate()
-        
-        save_path = config.eval_result_save_path
+        save_path = str(getattr(evaluator.config, "eval_result_save_path", "./eval_results.json"))
         with open(save_path, 'w', encoding='utf-8') as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
-        
         print(f"评估结果已保存到: {save_path}")
-        
         return results
-        
     finally:
         evaluator.cleanup()
 

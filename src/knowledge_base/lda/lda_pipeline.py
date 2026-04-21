@@ -25,7 +25,7 @@ from sentence_transformers import SentenceTransformer
 
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__)).parent.parent.parent)
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from config.settings import settings
 from utils.logger import setup_logger
@@ -80,15 +80,20 @@ class LDAPipeline:
         """
         self.logger = setup_logger(self.__class__.__name__)
         if config is None:
-            # Create a simple config object with default values
+            # 优先使用本地 model_path，若不存在则用 model_name（可能触发网络下载）
             from omegaconf import OmegaConf
+            _emb_cfg = settings.embedding if hasattr(settings, 'embedding') else None
+            _model_path = str(getattr(_emb_cfg, 'model_path', '') or '')
+            _model_name = str(getattr(_emb_cfg, 'model_name', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'))
+            _embedding_model = _model_path if _model_path and _model_path not in ('None', 'null', '') else _model_name
             config = OmegaConf.create({
-                'embedding_model_name': settings.embedding.model_name if hasattr(settings, 'embedding') else 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+                'embedding_model_name': _embedding_model,
                 'language': 'chinese',
-                'offline_mode': False
+                'offline_mode': False,
             })
         self.config = config
-        self.embedding_model_name = config.embedding_model_name if hasattr(config, 'embedding_model_name') else settings.embedding.model_name
+        _cfg_model = config.embedding_model_name if hasattr(config, 'embedding_model_name') else None
+        self.embedding_model_name = _cfg_model or str(settings.embedding.model_name)
         self.language = config.language if hasattr(config, 'language') else 'chinese'
         self.pdf_parser = PdfParser() if PdfParser else None
         self.embedding_model = None
