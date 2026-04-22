@@ -1,0 +1,2 @@
+2026-04-22 15:39:32,195 - evaluation.evaluation_runner - INFO - 开始评估任务 [5fc9f40b-3432-45ce-80b4-b827694678be] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/training/data/sft_data/sft_valid_data.json model=qwen2.5-7b-instruct
+2026-04-22 15:47:46,786 - evaluation.evaluation_runner - INFO - 开始评估任务 [0e2c178d-cdc5-46c7-91e3-5e1b6a21b3e2] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/training/data/sft_data/sft_valid_data.json model=MiniMax-M2.7

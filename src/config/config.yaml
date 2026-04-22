@@ -86,22 +86,6 @@ reranker:
   api_key: ""    # API 密钥（如 vLLM 未启用认证可留空）
 
 # =============================================================================
-# RAG 服务配置
-# =============================================================================
-inference:
-  model_name_or_path: /Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B
-  tensor_parallel_size: 1
-  pipeline_parallel_size: 1
-  gpu_memory_utilization: 0.9
-  max_model_len: null
-  max_new_tokens: 2048
-  temperature: 0.7
-  top_p: 0.9
-  top_k: 50
-  dtype: auto
-  trust_remote_code: true
-
-# =============================================================================
 # VLLM 部署配置
 # =============================================================================
 vllm:

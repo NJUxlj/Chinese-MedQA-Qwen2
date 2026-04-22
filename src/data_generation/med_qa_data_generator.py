@@ -9,133 +9,8 @@ from providers import LLMProvider
 from config.settings import settings
 from knowledge_base.milvus.milvus_client import MilvusClient
 from knowledge_base.lda.lda_pipeline import LDAPipeline
-
-
-class QACorrector:
-    """
-    医患对话修正器
-
-    接收当前轮次 + 历史对话 + 循证验证反馈，使用 LLM 对不符合医学事实的内容进行修正。
-    """
-
-    def __init__(self, llm_provider: LLMProvider):
-        self.llm = llm_provider
-
-    def correct(
-        self,
-        history: List[Dict[str, str]],
-        current_turn: Dict[str, str],
-        feedback: str,
-    ) -> Dict[str, str]:
-        """
-        修正当前轮次对话
-
-        Args:
-            history: 历史对话轮次列表 [{"role": ..., "content": ...}]
-            current_turn: 当前轮次 {"role": ..., "content": ...}
-            feedback: 循证验证的反馈意见
-
-        Returns:
-            修正后的当前轮次字典
-        """
-        history_text = "\n".join(
-            f"{t['role']}: {t['content']}" for t in history
-        )
-        prompt = f"""你是一名资深医疗质控专家，请根据以下信息修正本轮对话内容。
-
-## 历史对话
-{history_text}
-
-## 当前轮次（待修正）
-{current_turn['role']}: {current_turn['content']}
-
-## 验证反馈（需要修正的问题）
-{feedback}
-
-## 要求
-1. 仅修正与医学事实不符之处，保留对话风格。
-2. 只输出修正后的内容文本，不要包含角色前缀。
-3. 修正内容应简洁、准确，符合临床规范。
-
-请输出修正后的对话内容："""
-
-        corrected_content = self.llm.generate(prompt)
-        return {"role": current_turn["role"], "content": corrected_content.strip()}
-
-
-class EvidenceBasedVerifier:
-    """
-    基于循证医学的对话验证器
-
-    结合 Milvus 检索到的医学文档和 LLM 判断，验证生成对话是否符合医学事实。
-    """
-
-    def __init__(self, llm_provider: LLMProvider, milvus_client: MilvusClient):
-        self.llm = llm_provider
-        self.milvus_client = milvus_client
-
-    def verify(
-        self,
-        history: List[Dict[str, str]],
-        current_turn: Dict[str, str],
-        reference_docs: List[str],
-        collection_name: str,
-    ) -> Dict[str, Any]:
-        """
-        验证当前轮次是否符合循证医学规范
-
-        Args:
-            history: 历史对话轮次列表
-            current_turn: 当前轮次
-            reference_docs: 参考文档片段列表
-            collection_name: Milvus collection 名称
-
-        Returns:
-            {"passed": bool, "feedback": str}
-        """
-        history_text = "\n".join(
-            f"{t['role']}: {t['content']}" for t in history
-        )
-        ref_text = "\n\n".join(reference_docs[:5]) if reference_docs else "无参考文档"
-
-        prompt = f"""你是一名权威的医疗质控专家。请判断以下对话轮次是否符合循证医学规范。
-
-## 历史对话
-{history_text}
-
-## 本轮对话
-{current_turn['role']}: {current_turn['content']}
-
-## 参考医学文献摘要
-{ref_text}
-
-## 验证任务
-请判断本轮对话中的医学信息是否准确、是否存在潜在的医疗错误或不规范表述。
-
-## 输出格式（严格按 JSON 输出）
-{{
-  "passed": true 或 false,
-  "feedback": "如果不通过，请说明需要修正的具体问题；如果通过则为空字符串"
-}}
-
-请输出 JSON："""
-
-        response = self.llm.generate(prompt)
-        try:
-            # 提取 JSON
-            import re
-            match = re.search(r'\{.*\}', response, re.DOTALL)
-            if match:
-                result = json.loads(match.group())
-                return {
-                    "passed": bool(result.get("passed", False)),
-                    "feedback": str(result.get("feedback", "")),
-                }
-        except Exception:
-            pass
-
-        # 解析失败则默认通过（避免死循环）
-        return {"passed": True, "feedback": ""}
+from data_generation.qa_corrector import QACorrector
+from data_generation.evidence_based_verifier import EvidenceBasedVerifier
 
 
 class MedQaDataGenerator:
@@ -226,26 +101,28 @@ class MedQaDataGenerator:
 
         prompt = f"""请根据以下医学主题和 MBTI 人格类型，为一名医生创建详细的背景资料。
 
-## 医学主题
-{subtopic}
+            ## 医学主题
+            {subtopic}
 
-## 医生性格（MBTI）
-{mbti}
+            ## 医生性格（MBTI）
+            {mbti}
 
-## 参考文献摘要
-{context}
+            ## 参考文献摘要
+            {context}
 
-## 背景资料要求
-- 姓名（中文）
-- 职称与专科
-- 工作年限
-- 性格特点（符合 {mbti}）
-- 沟通风格
-- 擅长领域
+            ## 背景资料要求
+            - 姓名（中文）
+            - 职称与专科
+            - 工作年限
+            - 性格特点（符合 {mbti}）
+            - 沟通风格
+            - 擅长领域
 
-请输出医生背景资料："""
+            请输出医生背景资料："""
 
         return self.llm.generate(prompt).strip()
+
+
 
     def generate_patient(self, subtopic: str, mbti: str = "ISFP") -> str:
         """
@@ -267,24 +144,24 @@ class MedQaDataGenerator:
 
         prompt = f"""请根据以下医学主题和 MBTI 人格类型，为一名患者创建详细的背景资料。
 
-## 医学主题
-{subtopic}
+            ## 医学主题
+            {subtopic}
 
-## 患者性格（MBTI）
-{mbti}
+            ## 患者性格（MBTI）
+            {mbti}
 
-## 参考文献摘要
-{context}
+            ## 参考文献摘要
+            {context}
 
-## 背景资料要求
-- 姓名（中文）
-- 年龄、性别
-- 主诉（与主题相关的症状）
-- 病史摘要
-- 性格特点（符合 {mbti}）
-- 就医态度与沟通方式
+            ## 背景资料要求
+            - 姓名（中文）
+            - 年龄、性别
+            - 主诉（与主题相关的症状）
+            - 病史摘要
+            - 性格特点（符合 {mbti}）
+            - 就医态度与沟通方式
 
-请输出患者背景资料："""
+            请输出患者背景资料："""
 
         return self.llm.generate(prompt).strip()
 
@@ -344,18 +221,18 @@ class MedQaDataGenerator:
         """
         prompt = f"""请生成 {num_topics} 个不同的医疗问答主题，每个主题应覆盖临床诊疗的不同方面。
 
-## 要求
-- 主题应来自不同临床科室（如内科、外科、妇产科、儿科等）
-- 每个主题应包含 id（整数）和 name（简洁的主题名称）
-- 输出 JSON 列表格式
+            ## 要求
+            - 主题应来自不同临床科室（如内科、外科、妇产科、儿科等）
+            - 每个主题应包含 id（整数）和 name（简洁的主题名称）
+            - 输出 JSON 列表格式
 
-## 输出示例
-[
-  {{"id": 0, "name": "高血压的诊断与治疗"}},
-  {{"id": 1, "name": "糖尿病并发症管理"}}
-]
+            ## 输出示例
+            [
+            {{"id": 0, "name": "高血压的诊断与治疗"}},
+            {{"id": 1, "name": "糖尿病并发症管理"}}
+            ]
 
-请输出 {num_topics} 个主题："""
+            请输出 {num_topics} 个主题："""
 
         response = self.llm.generate(prompt)
         try:
@@ -385,14 +262,14 @@ class MedQaDataGenerator:
         """
         prompt = f"""请为以下医疗主题生成 {num_subtopics} 个子主题。
 
-## 父主题
-{topic}
+            ## 父主题
+            {topic}
 
-## 要求
-- 每个子主题应聚焦于父主题的某个具体方面（如病因、诊断、治疗方案、护理等）
-- 输出 JSON 列表格式，每项包含 id（整数）和 name（简洁的子主题名称）
+            ## 要求
+            - 每个子主题应聚焦于父主题的某个具体方面（如病因、诊断、治疗方案、护理等）
+            - 输出 JSON 列表格式，每项包含 id（整数）和 name（简洁的子主题名称）
 
-请输出子主题列表："""
+            请输出子主题列表："""
 
         response = self.llm.generate(prompt)
         try:
@@ -405,6 +282,7 @@ class MedQaDataGenerator:
             pass
 
         return [{"id": i, "name": f"{topic}_子主题_{i}"} for i in range(num_subtopics)]
+
 
     def retrive_subtopic_documents(
         self, subtopic: str, collection_name: str, top_k: int = 5
@@ -460,27 +338,30 @@ class MedQaDataGenerator:
 
         prompt = f"""你正在扮演一名 {role_cn}，请根据背景资料和当前对话，生成下一轮 {role_cn} 的对话内容。
 
-## {role_cn}背景资料
-{profile}
+            ## {role_cn}背景资料
+            {profile}
 
-## 当前对话主题
-{subtopic}
+            ## 当前对话主题
+            {subtopic}
 
-## 参考医学文献
-{ref_text}
+            ## 参考医学文献
+            {ref_text}
 
-## 历史对话
-{history_text if history_text else '（对话刚开始）'}
+            ## 历史对话
+            {history_text if history_text else '（对话刚开始）'}
 
-## 要求
-- 内容符合 {role_cn} 的身份和性格
-- 表述清晰、贴近真实临床场景
-- 不超过 200 字
-- 只输出 {role_cn} 说的内容，不要加角色前缀
+            ## 要求
+            - 内容符合 {role_cn} 的身份和性格
+            - 表述清晰、贴近真实临床场景
+            - 不超过 200 字
+            - 只输出 {role_cn} 说的内容，不要加角色前缀
 
-请输出 {role_cn} 的对话："""
+            请输出 {role_cn} 的对话："""
 
         return self.llm.generate(prompt).strip()
+
+
+        
 
     def generate_doc_pat_conversation_foreach_subtopic(
         self,

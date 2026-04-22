@@ -1,0 +1,6 @@
+2026-04-22 15:39:32,196 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-22 15:39:32,224 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: qwen2.5-7b-instruct
+2026-04-22 15:39:32,504 - MedQAEvaluator - ERROR - 样本 {'messages': [{'role': 'system', 'content': '你是一个数学助手，请帮助用户解决数学问题。请提供清晰、详细的解答步骤。'}, {'role': 'user', 'content': '计算 789 - 234 = ?'}, {'role': 'assistant', 'content': '我来帮您计算 789 - 234：\n\n789 - 234 = 555\n\n答案是 555。'}]} 处理失败: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+2026-04-22 15:47:46,787 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-22 15:47:46,788 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-22 15:47:47,213 - MedQAEvaluator - ERROR - 样本 {'messages': [{'role': 'system', 'content': '你是一个数学助手，请帮助用户解决数学问题。请提供清晰、详细的解答步骤。'}, {'role': 'user', 'content': '计算 789 - 234 = ?'}, {'role': 'assistant', 'content': '我来帮您计算 789 - 234：\n\n789 - 234 = 555\n\n答案是 555。'}]} 处理失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions

@@ -21,13 +21,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from config.settings import settings
 
-from routers import qa, admin, rag, health, evaluation, mdagents
-from utils.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
+from .routers import qa, admin, rag, health, evaluation, mdagents
+from .utils.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
 
-from services.rag_service import get_rag_service, RAGService
-from services.mdagents_service import get_mdagents_service, MDAgentsService
+from .services.rag_service import get_rag_service, RAGService
+from .services.mdagents_service import get_mdagents_service, MDAgentsService
 
-from ui.medagents_ui import MDAgentsUI
+from .ui.medagents_ui import MDAgentsUI
 
 # 配置日志
 logging.basicConfig(

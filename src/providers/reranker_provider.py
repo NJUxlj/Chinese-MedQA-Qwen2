@@ -9,13 +9,12 @@ from sentence_transformers import CrossEncoder
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from config.settings import settings
 from langchain_core.documents import Document
-from langchain_core.documents import Document
 
 
 logger = logging.getLogger(__name__)
 
 
-class RerankerService:
+class RerankerProvider:
     """ reranker 服务
 
     使用 reranker 模型，根据对 query 的相似度， 对已有的 document 列表进行重排序
@@ -82,36 +81,36 @@ class RerankerService:
                 logger.info(f"Successfully loaded CrossEncoder model: {self.config.model_name}")
             else:
                 raise ValueError(f"Invalid model provider: {self.model_provider}. Currently only 'sentence_transformers' is supported.")
-    
+
     def _setup_qwen3_reranker_tokens(self) -> None:
         """设置 Qwen3-Reranker 的 yes/no token ID"""
         try:
             tokenizer = self.tokenizer
-            
+
             yes_tokens = tokenizer.encode("yes", add_special_tokens=False)
             no_tokens = tokenizer.encode("no", add_special_tokens=False)
-            
+
             if yes_tokens:
                 self.true_token_id = yes_tokens[0]
             if no_tokens:
                 self.false_token_id = no_tokens[0]
-            
+
             logger.info(f"Qwen3-Reranker token IDs - 'yes': {self.true_token_id}, 'no': {self.false_token_id}")
-            
+
             if self.true_token_id is None or self.false_token_id is None:
                 logger.warning("Could not find 'yes' or 'no' token IDs. Output processing may not work correctly.")
-                
+
         except Exception as e:
             logger.error(f"Error setting up Qwen3-Reranker tokens: {str(e)}")
 
 
     def _format_query_document_pairs_for_qwen3(self,query: str, prefix, suffix, documents: List[Document], query_domain = "medical") -> List[str]:
         """格式化 query-document 对为 Qwen3-Reranker 所需的输入格式（使用聊天模板）
-        
+
         Args:
             query: 查询字符串
             documents: 文档列表
-            
+
         Returns:
             格式化后的文本列表
         """
@@ -120,47 +119,47 @@ class RerankerService:
 
         instruction = f'Given a {query_domain} search query, retrieve relevant passages that answer the query'
         basic_format = "<Instruct>: {instruction}\n<Query>: {query}\n<Document>: {doc}"
-        
+
         for doc in documents:
             basic_formatted_text = basic_format.format(
                 instruction=instruction,
                 query=query,
                 doc=doc.page_content
             )
-            
+
             formatted_text = prefix + basic_formatted_text + suffix
 
             formatted_pairs.append(formatted_text)
-        
+
         return formatted_pairs
 
 
     def _process_qwen3_reranker_scores(self, raw_outputs: torch.Tensor) -> torch.Tensor:
         """处理 Qwen3-Reranker 的原始输出，获取相关性分数
-        
+
         Qwen3-Reranker 的输出是一个 logits 向量，对应 "yes" 和 "no" 的分数
         我们需要计算 "yes" 的概率作为相关性分数
-        
+
         Args:
             raw_outputs: 模型的原始输出 (batch_size, vocab_size)  【取每个序列的最后一个 token】
-            
+
         Returns:
             相关性分数 (batch_size,)
         """
         if not isinstance(raw_outputs, torch.Tensor):
             raw_outputs = torch.tensor(raw_outputs)
-        
+
         if raw_outputs.dim() == 1:
             raw_outputs = raw_outputs.unsqueeze(0)
-        
+
         if self.true_token_id is not None and self.false_token_id is not None:
             true_scores = raw_outputs[:, self.true_token_id]
             false_scores = raw_outputs[:, self.false_token_id]
-            
+
             scores = torch.stack([false_scores, true_scores], dim=1)
             scores = torch.nn.functional.softmax(scores, dim=1)
             relevance_scores = scores[:, 1]
-            
+
             return relevance_scores.squeeze()
         else:
             logger.warning("True/False token IDs not found. Using raw output mean as score.")
@@ -169,11 +168,11 @@ class RerankerService:
 
     def _format_query_document_pairs(self, query: str, documents: List[Document]) -> List[str]:
         """格式化 query-document 对为传统 CrossEncoder 所需的输入格式
-        
+
         Args:
             query: 查询字符串
             documents: 文档列表
-            
+
         Returns:
             格式化后的文本对列表
         """
@@ -181,7 +180,7 @@ class RerankerService:
         for doc in documents:
             formatted_text = [query, doc.page_content]
             formatted_pairs.append(formatted_text)
-        
+
         return formatted_pairs
 
 
@@ -303,7 +302,7 @@ class RerankerService:
                 f"<Query>: {query}\n"
                 f"<Document>: {doc.page_content}"
                 f"<|im_end|>\n"
-                f"<|im_start|>assistant\n<think>\n\n\n\n"
+                f"<|im_start|>assistant\n<think>\n\n\n"
             )
             formatted_pairs.append(formatted_text)
 
@@ -384,11 +383,11 @@ class RerankerService:
 
     def _rerank_with_qwen3(self, query: str, documents: List[Document]) -> torch.Tensor:
         """使用 Qwen3-Reranker 方式进行重排序（通过 CrossEncoder 预测）
-        
+
         Args:
             query: 查询字符串
             documents: 文档列表
-            
+
         Returns:
             相关性分数
         """
@@ -396,21 +395,21 @@ class RerankerService:
         suffix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
 
         formatted_inputs = self._format_query_document_pairs_for_qwen3(query, prefix, suffix, documents)
-        
+
         logger.debug(f"Number of documents to rank: {len(formatted_inputs)}")
         logger.debug(f"Formatted input example (first): {formatted_inputs[0][:200]}...")
-        
+
         try:
             raw_outputs = self.reranker_model.predict(
                 formatted_inputs,
                 apply_softmax=True,
                 convert_to_tensor=True
             )
-            
+
             if isinstance(raw_outputs, torch.Tensor):
                 if raw_outputs.dim() == 1:
                     raw_outputs = raw_outputs.unsqueeze(0)
-                
+
                 if raw_outputs.shape[-1] == 1:
                     scores = raw_outputs.squeeze(-1)
                 elif raw_outputs.shape[-1] > 1:
@@ -431,9 +430,9 @@ class RerankerService:
                     else:
                         import numpy as np
                         scores = torch.tensor(np.argmax(raw_outputs, axis=1))
-            
+
             return scores
-            
+
         except Exception as e:
             logger.warning(f"Error in batch processing: {str(e)}")
             import traceback
@@ -442,19 +441,19 @@ class RerankerService:
 
     def _rerank_with_qwen3_transformers(self, query: str, documents: List[Document]) -> torch.Tensor:
         """使用 Qwen3-Reranker 方式进行重排序（通过 transformers 直接推理，批量处理）
-        
+
         Args:
             query: 查询字符串
             documents: 文档列表
-            
+
         Returns:
             相关性分数
         """
         prefix = "<|im_start|>system\nJudge whether the Document meets the requirements based on the Query and the Instruct provided. Note that the answer can only be \"yes\" or \"no\".<|im_end|>\n<|im_start|>user\n"
-        suffix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+        suffix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n\n</think>\n\n"
 
         formatted_inputs = self._format_query_document_pairs_for_qwen3(query, prefix, suffix, documents)
-        
+
         logger.debug(f"Number of documents to rank: {len(formatted_inputs)}")
         logger.debug(f"Formatted input example (first): {formatted_inputs[0][:200]}...")
 
@@ -470,38 +469,38 @@ class RerankerService:
                 truncation='longest_first',
                 max_length=2048 - len(prefix_tokens) - len(suffix_tokens)
             )
-            
+
             input_ids = inputs["input_ids"].to(self.reranker_model.device)
             attention_mask = inputs["attention_mask"].to(self.reranker_model.device)
-            
+
             with torch.no_grad():
                 outputs = self.reranker_model(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
                     use_cache=False
                 )
-            
+
             batch_logits = outputs.logits[:, -1, :]
-            
+
             yes_tokens = self.tokenizer.encode("yes", add_special_tokens=False)
             no_tokens = self.tokenizer.encode("no", add_special_tokens=False)
-            
+
             if yes_tokens and no_tokens:
                 yes_token_id = yes_tokens[0]
                 no_token_id = no_tokens[0]
-                
+
                 true_vector = batch_logits[:, yes_token_id]
                 false_vector = batch_logits[:, no_token_id]
-                
+
                 batch_scores = torch.stack([false_vector, true_vector], dim=1)
                 batch_scores = torch.nn.functional.log_softmax(batch_scores, dim=1)
                 scores = batch_scores[:, 1].exp()
-                
+
                 return scores
             else:
                 logger.warning("Could not find 'yes' or 'no' token IDs")
                 return torch.zeros(len(formatted_inputs))
-            
+
         except Exception as e:
             logger.warning(f"Error in batch processing: {str(e)}")
             import traceback
@@ -511,10 +510,10 @@ class RerankerService:
 
     def _process_single_qwen3_output(self, raw_output: Any) -> float:
         """处理单个 Qwen3-Reranker 输出
-        
+
         Args:
             raw_output: 模型的原始输出
-            
+
         Returns:
             相关性分数 (0-1)
         """
@@ -522,34 +521,34 @@ class RerankerService:
             if isinstance(raw_output, torch.Tensor):
                 if raw_output.dim() == 0:
                     raw_output = raw_output.unsqueeze(0)
-                
+
                 if raw_output.shape[-1] > 1:
                     if self.true_token_id is not None and self.false_token_id is not None:
                         true_scores = raw_output[:, self.true_token_id]
                         false_scores = raw_output[:, self.false_token_id]
-                        
+
                         scores = torch.stack([false_scores, true_scores], dim=1)
                         scores = torch.nn.functional.softmax(scores, dim=1)
                         relevance_score = scores[:, 1].item()
                         return relevance_score
-            
+
             if isinstance(raw_output, (list, torch.Tensor)):
                 if len(raw_output) >= 2:
                     true_score = float(raw_output[self.true_token_id]) if self.true_token_id is not None else 0.0
                     false_score = float(raw_output[self.false_token_id]) if self.false_token_id is not None else 0.0
-                    
+
                     import math
                     exp_true = math.exp(true_score)
                     exp_false = math.exp(false_score)
-                    
+
                     if exp_true + exp_false > 0:
                         return exp_true / (exp_true + exp_false)
-            
+
             if isinstance(raw_output, torch.Tensor) and raw_output.numel() == 1:
                 return raw_output.item()
-            
+
             return float(raw_output.mean()) if hasattr(raw_output, 'mean') else 0.5
-            
+
         except Exception as e:
             logger.warning(f"Error processing Qwen3 output: {str(e)}")
             return 0.0
@@ -557,30 +556,30 @@ class RerankerService:
 
     def print_reranked_documents_and_scores(self, doc_score_pairs: List[tuple]):
         """打印重排序后的文档和分数
-        
+
         Args:
             doc_score_pairs: 文档和分数的元组列表
         """
         if not doc_score_pairs:
             logger.info("No documents to display")
             return
-        
+
         logger.info("=" * 80)
         logger.info("Reranked Documents with Scores:")
         logger.info("=" * 80)
-        
+
         for i, (doc, score) in enumerate(doc_score_pairs, 1):
             doc_preview = doc.page_content[:100].replace('\n', ' ')
             logger.info(f"[{i}] Score: {score:.4f} | Preview: {doc_preview}...")
-        
+
         logger.info("=" * 80)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    reranker_service = RerankerService()
-    
-    
+    reranker_provider = RerankerProvider()
+
+
     test_query = "什么是高血压？"
     test_documents = [
         Document(page_content="高血压是一种常见的慢性疾病，特征是动脉血压持续升高。"),
@@ -589,6 +588,6 @@ if __name__ == "__main__":
         Document(page_content="心脏病是指心脏功能或结构的异常，可能导致心力衰竭。"),
         Document(page_content="适当的运动有助于控制血压水平。"),
     ]
-    
-    reranked_docs = reranker_service.rerank(test_query, test_documents, top_k=3)
+
+    reranked_docs = reranker_provider.rerank(test_query, test_documents, top_k=3)
     print(f"\nFinal reranked documents: {len(reranked_docs)}")

@@ -6,3 +6,91 @@
 2026-04-22 00:16:09,385 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
 2026-04-22 00:16:09,385 - LLMProvider - INFO - [openai] Sending request to https://api.minimaxi.com/v1
 2026-04-22 00:16:09,385 - LLMProvider - INFO - [openai] Model: MiniMax-M2.7
+2026-04-22 15:39:32,217 - LLMProvider - INFO - Initializing vllm LLM provider: qwen2.5-7b-instruct
+2026-04-22 15:39:32,223 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-22 15:39:32,254 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:32,256 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:32,504 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:32,504 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae3400d54f41efcf61f612913710"}
+2026-04-22 15:39:32,504 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:32,504 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:32,857 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:32,857 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae35c666918fc8afdc9e5ffd85a3"}
+2026-04-22 15:39:32,857 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:32,857 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,003 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,003 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae3502fc9a05df237f520d70f4a1"}
+2026-04-22 15:39:33,003 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,003 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,130 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,131 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae35b6dd51f36500d2a4936d1132"}
+2026-04-22 15:39:33,131 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,131 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,285 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,285 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae355e7b0dde650807a575fbedd8"}
+2026-04-22 15:39:33,285 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,285 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,444 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,444 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae35111efc4d595a48f6df142274"}
+2026-04-22 15:39:33,444 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,444 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,575 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,575 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae35d3928f371d259294a62cb30b"}
+2026-04-22 15:39:33,576 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,576 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,701 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,702 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae352e960db4b9d1d1a852b6a406"}
+2026-04-22 15:39:33,702 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,702 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,829 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,829 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae3549fddeffb7a6adaa962a32d2"}
+2026-04-22 15:39:33,829 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:39:33,829 - LLMProvider - INFO - [vllm] Model: qwen2.5-7b-instruct
+2026-04-22 15:39:33,977 - LLMProvider - ERROR - [vllm] Response status: 400
+2026-04-22 15:39:33,977 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"bad_request_error","message":"invalid params, unknown model 'qwen2.5-7b-instruct' (2013)","http_code":"400"},"request_id":"0637ae36595b1d870f9ca0a1e4c9a521"}
+2026-04-22 15:47:46,788 - LLMProvider - INFO - Initializing vllm LLM provider: MiniMax-M2.7
+2026-04-22 15:47:46,788 - LLMProvider - INFO - Base URL: https://api.minimaxi.com/v1
+2026-04-22 15:47:46,789 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:47:46,789 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:47:47,204 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:47:47,205 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b023432ffc4ab9044df03303c67e"}
+
+2026-04-22 15:47:47,206 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:47:47,208 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:47:47,679 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:47:47,680 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b023e0cd12b6ebcbdcb835d9e690"}
+
+2026-04-22 15:47:47,680 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:47:47,680 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:47:48,069 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:47:48,069 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b024997a209521ac8ee781a1ad4f"}
+
+2026-04-22 15:47:48,069 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:47:48,069 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:01,732 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:48:01,734 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:11,564 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:48:11,564 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:11,940 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:48:11,940 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b03b78db25a6b91e056f544c8388"}
+
+2026-04-22 15:48:11,941 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:48:11,941 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:12,377 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:48:12,377 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b03c134e5b20d2ce5e60f274ac8c"}
+
+2026-04-22 15:48:12,377 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:48:12,377 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:12,806 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:48:12,806 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b03c4f43985d71b8257197801e10"}
+
+2026-04-22 15:48:12,806 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:48:12,806 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:13,220 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:48:13,221 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b03d032ac2e7ebd0761f3c41c194"}
+
+2026-04-22 15:48:13,221 - LLMProvider - INFO - [vllm] Sending request to https://api.minimaxi.com/v1
+2026-04-22 15:48:13,221 - LLMProvider - INFO - [vllm] Model: MiniMax-M2.7
+2026-04-22 15:48:13,638 - LLMProvider - ERROR - [vllm] Response status: 529
+2026-04-22 15:48:13,638 - LLMProvider - ERROR - [vllm] Response body: {"type":"error","error":{"type":"overloaded_error","message":"当前时段请求拥挤，极速版套餐可使用highspeed模型，享受更稳定的响应体验。https://platform.minimaxi.com/subscribe/token-plan (2064)","http_code":"529"},"request_id":"0637b03d1f619b470a3c771ee6b418e2"}
+

@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 
 from langchain_core.documents import Document
 
-from knowledge_base.reranker.reranker_service import RerankerService
+from providers.reranker_provider import RerankerProvider
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -62,7 +62,7 @@ class ContextBuilder:
         # 优先使用 vLLM API（base_url 配置优先）
         if reranker_base_url and reranker_model_name:
             try:
-                # 构建临时 config 供 RerankerService 使用
+                # 构建临时 config 供 RerankerProvider 使用
                 class VLLMConfig:
                     model_provider = "vllm"
                     model_name = reranker_model_name
@@ -71,7 +71,7 @@ class ContextBuilder:
                     batch_size = 8
                     normalize_scores = True
 
-                self.reranker_service = RerankerService(VLLMConfig())
+                self.reranker_service = RerankerProvider(VLLMConfig())
                 logger.info(f"已加载 vLLM API reranker: {reranker_base_url}")
             except Exception as e:
                 logger.error(f"加载 vLLM API reranker 失败: {e}")
@@ -87,7 +87,7 @@ class ContextBuilder:
                     batch_size = 8
                     normalize_scores = True
 
-                self.reranker_service = RerankerService(LocalConfig())
+                self.reranker_service = RerankerProvider(LocalConfig())
                 logger.info(f"已加载重排序模型: {reranker_model_name}")
             except Exception as e:
                 logger.error(f"加载重排序模型失败: {e}")
