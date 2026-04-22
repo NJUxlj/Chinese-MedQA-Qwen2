@@ -30,27 +30,7 @@ class BaseEvaluator:
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
         self.logger = setup_logger(name=self.__class__.__name__, level="INFO")
-        self.model = None
-        self.tokenizer = None
 
-    def load_model_and_tokenizer(self):
-        from transformers import AutoModelForCausalLM, AutoTokenizer
-        model_path = str(self.config.get("model_name_or_path", ""))
-        device = str(self.config.get("device", "cpu"))
-        padding_side = str(self.config.get("padding_side", "left"))
-        use_fast = bool(self.config.get("use_fast", True))
-
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_path,
-            torch_dtype=torch.bfloat16,
-            device_map=device,
-        )
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_path,
-            padding_side=padding_side,
-            use_fast=use_fast,
-        )
-        self.tokenizer.pad_token = self.tokenizer.eos_token
 
     def load_test_dataset(self, dataset_path: str) -> List[Dict[str, Any]]:
         if not dataset_path or dataset_path == "None":
@@ -66,8 +46,8 @@ class BaseEvaluator:
     def evaluate_one_sample(self, sample: Dict[str, Any]) -> Dict[str, float]:
         raise NotImplementedError("子类必须实现 evaluate_one_sample 方法")
 
-    def evaluate_batch_examples(self, samples: List[Dict[str, Any]]) -> Dict[str, float]:
-        raise NotImplementedError("子类必须实现 evaluate_batch_examples 方法")
+    def evaluate_batch_samples(self, samples: List[Dict[str, Any]]) -> Dict[str, float]:
+        raise NotImplementedError("子类必须实现 evaluate_batch_samples 方法")
 
     def evaluate(self) -> Dict[str, float]:
         raise NotImplementedError("子类必须实现 evaluate 方法")
