@@ -21,11 +21,7 @@ class ContextBuilder:
         self,
         chunk_size: int = 500,
         chunk_overlap: int = 100,
-        reranker_model_provider: str = "huggingface",
-        reranker_model_path: Optional[str] = None,
-        reranker_model_name: Optional[str] = None,
-        reranker_base_url: Optional[str] = None,
-        reranker_api_key: Optional[str] = None,
+        reranker_provider: RerankerProvider = None,
         max_context_length: int = 4000,
         format_template: Optional[str] = None
     ):
@@ -35,62 +31,26 @@ class ContextBuilder:
         Args:
             chunk_size: 上下文块大小
             chunk_overlap: 上下文块重叠大小
-            reranker_model_provider: 重排序模型 provider
-            reranker_model_path: 重排序模型本地路径
-            reranker_model_name: 重排序模型名称
-            reranker_base_url: vLLM API 地址（优先于 model_path）
-            reranker_api_key: vLLM API 密钥
+            reranker_provider: 重排序模型 provider
             max_context_length: 最大上下文长度
             format_template: 格式化模板
         """
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.max_context_length = max_context_length
-
         # 设置格式化模板
         if format_template:
             self.format_template = format_template
         else:
             self.format_template = (
-                "请根据以下信息回答问题。如果无法从提供的信息中找到答案，请基于可靠的医学知识回答，"
+                "请根据下面的 [相关信息] 来回答 [问题]。如果无法从提供的信息中找到答案，请基于可靠的医学知识回答，"
                 "并注明这是基于一般医学知识的回答。\n\n相关信息：\n{context}\n\n问题：{query}\n\n回答："
             )
 
         # 初始化重排序模型
-        self.reranker_service = None
+        self.reranker_provider = reranker_provider
 
-        # 优先使用 vLLM API（base_url 配置优先）
-        if reranker_base_url and reranker_model_name:
-            try:
-                # 构建临时 config 供 RerankerProvider 使用
-                class VLLMConfig:
-                    model_provider = "vllm"
-                    model_name = reranker_model_name
-                    base_url = reranker_base_url
-                    api_key = reranker_api_key or ""
-                    batch_size = 8
-                    normalize_scores = True
-
-                self.reranker_service = RerankerProvider(VLLMConfig())
-                logger.info(f"已加载 vLLM API reranker: {reranker_base_url}")
-            except Exception as e:
-                logger.error(f"加载 vLLM API reranker 失败: {e}")
-
-        # 回退到本地模型
-        elif reranker_model_name and reranker_model_path:
-            try:
-                class LocalConfig:
-                    model_provider = reranker_model_provider
-                    model_name = reranker_model_name
-                    model_path = reranker_model_path
-                    device = "cpu"
-                    batch_size = 8
-                    normalize_scores = True
-
-                self.reranker_service = RerankerProvider(LocalConfig())
-                logger.info(f"已加载重排序模型: {reranker_model_name}")
-            except Exception as e:
-                logger.error(f"加载重排序模型失败: {e}")
+        
     
     def split_document(self, text: str) -> List[str]:
         """
@@ -165,7 +125,7 @@ class ContextBuilder:
         Returns:
             重新排序后的文档列表
         """
-        if not self.reranker_service:
+        if not self.reranker_provider:
             logger.warning("未初始化重排序模型，跳过重排序")
             return documents
         
@@ -176,7 +136,7 @@ class ContextBuilder:
         documents = [Document(page_content=text, metadata=meta) for text, meta in zip(document_texts, original_metadata)]
         
         # 重排序
-        reranked_documents = self.reranker_service.rerank(query = query, documents = documents, top_k = len(documents))
+        reranked_documents = self.reranker_provider.rerank(query = query, documents = documents, top_k = len(documents))
         
         # 将 Document 对象转换回字典格式
         reranked_dicts = []
@@ -194,7 +154,6 @@ class ContextBuilder:
         self,
         query: str,
         documents: List[Dict[str, Any]],
-        use_reranker: bool = False
     ) -> str:
         """
         从文档列表构建上下文
@@ -202,7 +161,6 @@ class ContextBuilder:
         Args:
             query: 查询文本
             documents: 文档列表
-            use_reranker: 是否使用重排序
             
         Returns:
             构建的上下文
@@ -212,7 +170,7 @@ class ContextBuilder:
             return ""
         
         # 如果要使用重排序
-        if use_reranker and self.reranker_service:
+        if self.reranker_provider:
             documents = self.rerank_documents(query, documents)
         
         # 构建上下文
@@ -283,6 +241,8 @@ class ContextBuilder:
             logger.warning(f"上下文过长，已截断至 {self.max_context_length} 字符")
         
         return context.strip()
+
+
     
     def format_prompt(self, query: str, context: str) -> str:
         """
@@ -327,12 +287,12 @@ class ContextBuilder:
             return context
         
         # 如果有重排序模型，使用它来选择最相关的段落
-        if self.reranker_service:
+        if self.reranker_provider:
             # 准备输入
             documents = [Document(page_content = content) for content in doc_contents]
             
             # 计算相关性分数
-            sorted_contents = self.reranker_service.rerank(query = query, documents = documents, top_k = len(documents))
+            sorted_contents = self.reranker_provider.rerank(query = query, documents = documents, top_k = len(documents))
 
             sorted_contents = [doc.page_content for doc in sorted_contents]
 
@@ -351,7 +311,7 @@ class ContextBuilder:
             return key_info.strip()
         else:
             # 如果没有重排序模型，简单连接前几个文档内容
-            combined_content = "\n\n".join(doc_contents[:3])
+            combined_content = "\n\n".join(doc_contents[:10])
             
             # 如果内容过长，截断
             if len(combined_content) > self.max_context_length // 2:

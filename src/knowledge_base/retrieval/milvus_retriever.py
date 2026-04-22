@@ -33,7 +33,7 @@ class MilvusRetriever(BaseRetriever):
     def __init__(
         self,
         config=None,
-        embedding_manager: EmbeddingProvider = None,
+        embedding_provider: EmbeddingProvider = None,
         collection_names: List[str] = None,
     ):
         """
@@ -41,12 +41,12 @@ class MilvusRetriever(BaseRetriever):
 
         Args:
             config: 检索器配置
-            embedding_manager: 嵌入管理器（用于生成查询向量）
+            embedding_provider: 嵌入提供者（用于生成查询向量）
             collection_names: Milvus Collection 名称列表，默认使用 config 中的 3 个
         """
         super().__init__(config=config)
 
-        self.embedding_manager = embedding_manager or EmbeddingProvider()
+        self.embedding_provider = embedding_provider or EmbeddingProvider()
 
         # 默认使用 config 中配置的 3 个 collection
         self.collection_names = collection_names or (

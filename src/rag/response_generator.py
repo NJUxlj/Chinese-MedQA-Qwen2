@@ -15,8 +15,8 @@ class ResponseGenerator:
     
     def __init__(  
         self,  
-        model: LLMProvider,  
-        max_new_tokens: int = 1024,  
+        llm_provider: LLMProvider,  
+        max_tokens: int = 1024,  
         temperature: float = 0.7,  
         top_p: float = 0.9,  
         template: Optional[str] = None,  
@@ -26,16 +26,16 @@ class ResponseGenerator:
         初始化响应生成器  
         
         Args:  
-            model: 生成模型  
-            max_new_tokens: 生成的最大token数量  
+            llm_provider: LLM提供者  
+            max_tokens: 生成的最大token数量  
             temperature: 生成温度  
             top_p: 生成top_p值  
             template: 响应模板  
             use_chatml_format: 是否使用ChatML格式  
         """  
-        self.model = model  
-        self.max_new_tokens = max_new_tokens  
-        self.temperature = temperature  
+        self.llm_provider = llm_provider  
+        self.max_tokens = max_tokens  
+        self.temperature = temperature if temperature is not None else 0.7
         self.top_p = top_p  
         self.use_chatml_format = use_chatml_format  
         
@@ -138,9 +138,9 @@ class ResponseGenerator:
         
         try:
             # 使用模型生成回答
-            raw_response = self.model.generate(
+            raw_response = self.llm_provider.generate(
                 formatted_prompt,
-                max_new_tokens=self.max_new_tokens,
+                max_tokens=self.max_tokens,
                 temperature=self.temperature,
                 top_p=self.top_p
             )
@@ -160,10 +160,10 @@ class ResponseGenerator:
                 "source_documents": prompt.get("documents", []),
                 "metadata": {
                     "generation_time": generation_time,
-                    "model": getattr(self.model, "model_name", "unknown"),
+                    "model": getattr(self.llm_provider, "model_name", "unknown"),
                     "temperature": self.temperature,
                     "top_p": self.top_p,
-                    "max_new_tokens": self.max_new_tokens
+                    "max_tokens": self.max_tokens
                 }
             }
             
@@ -204,7 +204,7 @@ class ResponseGenerator:
         start_time = time.time()
         
         # 检查模型是否支持流式输出
-        if not hasattr(self.model, "generate_streaming"):
+        if not hasattr(self.llm_provider, "generate_streaming"):
             logger.warning("模型不支持流式输出，回退到标准生成")
             return self.generate(prompt)
         
@@ -213,9 +213,9 @@ class ResponseGenerator:
             full_response = ""
             
             # 使用模型的流式生成方法
-            for response_chunk in self.model.generate_streaming(
+            for response_chunk in self.llm_provider.generate_streaming(
                 formatted_prompt,
-                max_new_tokens=self.max_new_tokens,
+                max_tokens=self.max_tokens,
                 temperature=self.temperature,
                 top_p=self.top_p
             ):
@@ -241,10 +241,10 @@ class ResponseGenerator:
                 "source_documents": prompt.get("documents", []),
                 "metadata": {
                     "generation_time": generation_time,
-                    "model": getattr(self.model, "model_name", "unknown"),
+                    "model": getattr(self.llm_provider, "model_name", "unknown"),
                     "temperature": self.temperature,
                     "top_p": self.top_p,
-                    "max_new_tokens": self.max_new_tokens,
+                    "max_tokens": self.max_tokens,
                     "streaming": True
                 }
             }
@@ -264,65 +264,7 @@ class ResponseGenerator:
                 "source_documents": prompt.get("documents", [])
             }
     
-    def evaluate_response_quality(self, response: str, context: str, query: str) -> Dict[str, float]:
-        """
-        评估生成响应的质量
-        
-        Args:
-            response: 生成的响应
-            context: 上下文
-            query: 查询
-            
-        Returns:
-            质量评分字典
-        """
-        # 一个简单的质量评估实现
-        scores = {}
-        
-        # 响应长度评分
-        response_length = len(response)
-        if response_length < 50:
-            length_score = 0.5
-        elif response_length < 100:
-            length_score = 0.7
-        elif response_length < 300:
-            length_score = 1.0
-        else:
-            length_score = 0.9  # 过长可能不够精炼
-        
-        scores["length_score"] = length_score
-        
-        # 上下文利用评分
-        # 检查响应中是否包含上下文中的关键信息
-        context_words = set(re.findall(r'\w+', context.lower()))
-        response_words = set(re.findall(r'\w+', response.lower()))
-        
-        # 计算交集比例
-        if context_words:
-            context_score = len(context_words.intersection(response_words)) / min(len(context_words), 100)
-            context_score = min(context_score * 2, 1.0)  # 归一化，最高1.0
-        else:
-            context_score = 0.5
-        
-        scores["context_score"] = context_score
-        
-        # 查询相关性评分
-        query_words = set(re.findall(r'\w+', query.lower()))
-        
-        # 检查响应中是否提及查询中的关键词
-        if query_words:
-            query_score = len(query_words.intersection(response_words)) / len(query_words)
-            query_score = min(query_score * 1.5, 1.0)  # 归一化，最高1.0
-        else:
-            query_score = 0.7
-        
-        scores["query_score"] = query_score
-        
-        # 计算总体质量分数
-        overall_score = (length_score * 0.2 + context_score * 0.4 + query_score * 0.4)
-        scores["overall_score"] = overall_score
-        
-        return scores
+
     
     def handle_citations(self, response: str, documents: List[Dict[str, Any]]) -> str:
         """

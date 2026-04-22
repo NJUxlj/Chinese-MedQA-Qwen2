@@ -11,6 +11,7 @@
 # =============================================================================
 llm:
   model_provider: openai
+  model_path: ""
   model_name: MiniMax-M2.7
   api_key: "sk-cp-oEWm76En3Nne3Jz7CsDBtEPZjb4R59ygrKzbDXkge5vV-fuIUBpM1_AgkGZuDcbzIFHpgYA0Vv_FwxC0ueri7UX1Ibl7uOlJmFcH4X23YloJ3OohY2lAO9o"
   base_url: https://api.minimaxi.com/v1
@@ -69,9 +70,12 @@ agent:
 # 嵌入配置（核心库使用）
 # =============================================================================
 embedding:
+  model_provider: sentence_transformers
   model_name: Qwen3-Embedder-0.6B
   model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B"
-  reranker_model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-Reranker-0.6B"
+  device: cpu
+  base_url: ""
+  api_key: ""
   batch_size: 32
   dimension: 768
 
