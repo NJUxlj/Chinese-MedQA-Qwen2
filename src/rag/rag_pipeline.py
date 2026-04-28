@@ -5,8 +5,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 
-from langchain_core.documents import Document
-
 from typing import Dict, List, Optional, Any
 from knowledge_base.retrieval.milvus_retriever import MilvusRetriever
 from knowledge_base.retrieval.bm25_retriever import BM25Retriever
@@ -197,27 +195,6 @@ class RAGPipeline:
         )
 
     
-    def _get_variant_index_path(self, index_path: str, variant: str) -> str:
-        """
-        获取变体索引路径
-        
-        Args:
-            index_path: 原始索引路径
-            variant: 变体类型 ("dense" 或 "sparse")
-            
-        Returns:
-            变体索引路径
-        """
-        if variant not in ["dense", "sparse"]:
-            raise ValueError(f"不支持的变体类型: {variant}")
-        
-        base_path = Path(index_path)
-        if index_path.endswith(".bin"):
-            new_name = base_path.stem.replace("_hybrid", "") + f"_{variant}.bin"
-        else:
-            new_name = base_path.stem + f"_{variant}.bin"
-        
-        return str(base_path.parent / new_name)
     
     
 
@@ -436,43 +413,3 @@ class RAGPipeline:
 
         
     
-    def update_retriever_index(self, documents: List[Dict[str, Any]], save_path: Optional[str] = None) -> None:
-        """
-        更新检索器索引
-        
-        Args:
-            documents: 文档列表
-            save_path: 保存路径
-        """
-        
-        doc_objects = [
-            Document(page_content=doc.get("text", doc.get("content", "")), metadata=doc.get("metadata", {}))
-            for doc in documents
-        ]
-        
-        if self.retriever_type == "hybrid":
-            self.dense_retriever.add_documents(doc_objects)
-            self.sparse_retriever.add_documents(doc_objects)
-            
-            if save_path:
-                dense_save_path = self._get_variant_index_path(save_path, "dense")
-                sparse_save_path = self._get_variant_index_path(save_path, "sparse")
-                self.dense_retriever.save(dense_save_path)
-                self.sparse_retriever.save(sparse_save_path)
-        else:
-            self.retriever.add_documents(doc_objects)
-            
-            if save_path:
-                self.retriever.save(save_path)
-        
-        logger.info(f"检索器索引已更新")
-
-    def build_index(self, documents: List[Dict[str, Any]], save_path: Optional[str] = None) -> None:
-        """
-        构建检索器索引
-
-        Args:
-            documents: 文档列表
-            save_path: 保存路径
-        """
-        self.update_retriever_index(documents, save_path)
