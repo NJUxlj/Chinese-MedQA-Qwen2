@@ -260,6 +260,7 @@ python -m vllm.entrypoints.openai.api_server \
   - **QA Router 修复**：`routers/qa.py` 中 `_build_llm_provider()` 新增对 `local` 模式的支持（传入 `model_path` 和 `local_backend`）；修复 `max_new_tokens` → `max_tokens` 参数名不匹配问题
   - **Config 配置更新**：`llm`、`agent`、`vllm` 配置段均新增 `streaming: false` 字段
   - **QA API 测试**：非流式、流式、模型列表接口均通过本地模型（Qwen3-0.6B）测试验证
+  - **RAG Service 修复**：`generate_response()` 现正确调用 `RAGPipeline` 而非绕过；修复 hybrid 检索器初始化逻辑（`dense_retriever` 未创建）；`rag_minimal_main.py` 添加 lifespan 初始化 rag_service；`config.yaml` 新增缺失的 `retriever.bm25` 配置段
 - **2026-04-14**: 修复 17 项严重问题（P0），包括导入路径修正、配置安全加固、训练逻辑修复、LoggerManager 统一、训练 YAML 配置创建。详见 [docs/修复文档/FIX_1.md](docs/修复文档/FIX_1.md)
 
 ## License

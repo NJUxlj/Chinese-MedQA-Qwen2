@@ -198,3 +198,4 @@ RuntimeError: [vllm] API request failed: 529 Server Error: Unknown Status Code f
 2026-04-28 15:23:30,908 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
 2026-04-28 15:28:34,546 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
 2026-04-28 15:28:52,509 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-28 19:14:41,581 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止

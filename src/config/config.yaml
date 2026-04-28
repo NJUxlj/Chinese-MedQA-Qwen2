@@ -126,14 +126,7 @@ api_server:
     - http://localhost:8000
   admin_api_key: ""
 
-# =============================================================================
-# RAG 服务配置（src/api/services/rag_service.py）
-# default_kb 留空表示不预加载默认知识库
-# =============================================================================
-rag_service:
-  kb_index_dir: knowledge_base/indices
-  default_retriever: hybrid
-  default_kb: ""
+
 
 # =============================================================================
 # PubMed API 配置
@@ -163,6 +156,10 @@ retriever:
   knn_n_list: 100
   knn_m: 16
   l2_distance_threshold: 0.5
+  bm25:
+    score_threshold: 0.1
+    use_jieba: true
+    tokenizer: null
 
 # =============================================================================
 # NER 配置

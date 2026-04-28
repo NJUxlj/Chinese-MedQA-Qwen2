@@ -4,57 +4,52 @@ RAG服务
 """
 
 from typing import Dict, Any, List, Optional
+import sys
 import threading
 import logging
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from config.settings import settings
 from providers.llm_provider import LLMProvider
-
-logger = logging.getLogger(__name__)
+from rag.rag_pipeline import RAGPipeline
+from utils.logger import setup_logger
 
 class RAGService:
-    """RAG服务类"""
+    """RAG服务类, 专门用于为 rag http api 提供服务"""
 
-    def __init__(self):
+    def __init__(
+        self,
+        llm_provider: LLMProvider):
         """初始化RAG服务"""
         self._pipelines_lock = threading.RLock()
-
-        cfg = settings.rag_service
-        self.default_retriever_type = str(cfg.default_retriever)
-        self._default_kb = str(cfg.default_kb) if cfg.default_kb else ""
+        self.llm_provider = llm_provider
+        self.logger = setup_logger(name=self.__class__.__name__, level="INFO")
 
         self.initialized = False
+        self.rag_pipeline = None
+
+        self.initialize()
 
     def initialize(self) -> None:
         """初始化RAG服务"""
         if self.initialized:
             return
-        logger.info("初始化RAG服务")
+        self.logger.info("正在初始化RAG服务 ...")
+        self.rag_pipeline = RAGPipeline(llm_provider=self.llm_provider)
         self.initialized = True
-        logger.info("RAG服务初始化成功")
+        self.logger.info("RAG服务初始化成功, 模型: %s", self.llm_provider.model_name)
 
-    def _build_llm_provider(self, model_name: str = None) -> LLMProvider:
-        """从 settings.llm 配置构建 LLMProvider"""
-        cfg = settings.llm
-        return LLMProvider(
-            provider=str(cfg.model_provider),
-            model_name=model_name or str(cfg.model_name),
-            base_url=str(cfg.base_url) if hasattr(cfg, 'base_url') and cfg.base_url else None,
-            api_key=str(cfg.api_key) if hasattr(cfg, 'api_key') and cfg.api_key else None,
-            max_tokens=int(cfg.max_tokens) if hasattr(cfg, 'max_tokens') and cfg.max_tokens else 2048,
-            temperature=float(cfg.temperature) if hasattr(cfg, 'temperature') and cfg.temperature else 0.7,
-            top_p=float(cfg.top_p) if hasattr(cfg, 'top_p') and cfg.top_p else 0.9,
-            timeout=int(cfg.timeout) if hasattr(cfg, 'timeout') and cfg.timeout else 60,
-        )
 
-    def generate_response(self, kb_name: str, query: str,
+
+    def generate_response(self, query: str,
                           model_name: Optional[str] = None,
                           top_k: int = 5) -> Dict[str, Any]:
         """
-        生成RAG增强响应（知识库功能暂时禁用，直接用LLM回答）
+        生成RAG增强响应
 
         Args:
-            kb_name: 知识库名称
             query: 查询文本
             model_name: 模型名称
             top_k: 检索文档数量
@@ -62,54 +57,35 @@ class RAGService:
         Returns:
             响应结果
         """
-        model = self._build_llm_provider(model_name)
+        if not self.rag_pipeline:
+            raise ValueError("RAGPipeline 未初始化")
 
-        prompt = f"""<|im_start|>system
-你是一个专业的医疗助手，请基于可靠的医学知识回答用户的问题。
-<|im_end|>
-<|im_start|>user
-{query}
-<|im_end|>
-<|im_start|>assistant
-"""
-        answer = model.generate(prompt=prompt)
+        result = self.rag_pipeline.generate_response(query_text=query, top_k=top_k)
 
         return {
-            "answer": answer,
-            "contexts": [],
-            "sources": [],
+            "response": result.get("response", ""),
+            "context": result.get("context", ""),
+            "source_documents": result.get("source_documents", []),
         }
 
-    def retrieve(self, kb_name: str, query: str, top_k: int = 5, filter: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """检索文档（暂时返回空列表）"""
-        return []
 
-    def get_available_knowledge_bases(self) -> List[Dict[str, Any]]:
-        """获取可用知识库列表（暂时返回空）"""
-        return []
 
-    def create_knowledge_base(self, kb_name: str, description: str) -> bool:
-        """创建知识库（暂时返回False）"""
-        return False
-
-    def delete_knowledge_base(self, kb_name: str) -> bool:
-        """删除知识库（暂时返回False）"""
-        return False
-
-    def add_documents(self, kb_name: str, documents: List[Dict[str, Any]]) -> bool:
-        """添加文档（暂时返回False）"""
-        return False
 
 # 单例模式
 _rag_service = None
 _lock = threading.Lock()
 
-def get_rag_service() -> RAGService:
-    """获取RAG服务单例"""
+def get_rag_service(llm_provider: LLMProvider = None) -> RAGService:
+    """获取RAG服务单例
+
+    Args:
+        llm_provider: LLM提供者，如果单例未初始化则必须提供
+    """
     global _rag_service
     if _rag_service is None:
+        if llm_provider is None:
+            raise ValueError("首次调用 get_rag_service 必须提供 llm_provider")
         with _lock:
             if _rag_service is None:
-                _rag_service = RAGService()
-                _rag_service.initialize()
+                _rag_service = RAGService(llm_provider=llm_provider)
     return _rag_service

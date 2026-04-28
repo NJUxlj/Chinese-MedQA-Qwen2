@@ -1,0 +1,3 @@
+2026-04-28 19:20:43,373 - MilvusClient - INFO - 成功连接到 Milvus 服务器: http://localhost:19530
+2026-04-28 19:20:43,386 - MilvusClient - INFO - 成功初始化向量存储: medical_qa
+2026-04-28 19:20:43,387 - MilvusClient - INFO - 相似度搜索（带分数）完成，返回 0 个结果

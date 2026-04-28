@@ -29,6 +29,7 @@ class RAGPipeline:
 
     def __init__(
         self,
+        llm_provider: LLMProvider,
         config=None
     ):
         """
@@ -135,15 +136,7 @@ class RAGPipeline:
         # 初始化查询处理器
         self.query_processor = QueryProcessor()
 
-        self.llm_provider = LLMProvider(
-            provider=self.model_provider,
-            model_name=self.model_name,
-            model_path=self.model_path,
-            base_url=self.model_base_url,
-            api_key=self.model_api_key,
-            max_tokens=self.model_max_tokens,
-            temperature=self.model_temperature
-        )
+        self.llm_provider = llm_provider
 
         # 初始化嵌入管理器 (对于某些检索器需要)
         if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
@@ -159,7 +152,7 @@ class RAGPipeline:
             self.embedding_provider = None
 
         # 根据类型初始化检索器（统一使用 MilvusRetriever，无需 faiss）
-        if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
+        if self.retriever_type in ["knn", "similarity", "l2"]:
             self.retriever = MilvusRetriever(
                 embedding_provider=self.embedding_provider,
                 collection_names=self.collection_names
