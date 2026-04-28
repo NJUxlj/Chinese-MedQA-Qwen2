@@ -11,7 +11,7 @@ class NERService:
     def __init__(self, config=None):
         """初始化命名实体识别服务"""
         self.config = config if config is not None else settings.ner
-        self.model_provider = self.config.model_provider
+        self.provider = self.config.provider
 
         self.ner_model = None
         self.transformers_pipeline = None
@@ -19,12 +19,12 @@ class NERService:
 
     def _load_ner_model(self) -> None:
         """加载命名实体识别模型"""
-        if self.model_provider == "spacy":
+        if self.provider == "spacy":
             self._load_spacy_model()
-        elif self.model_provider == "transformers":
+        elif self.provider == "transformers":
             self._load_transformers_model()
         else:
-            raise ValueError(f"Invalid model provider: {self.model_provider}")
+            raise ValueError(f"Invalid provider: {self.provider}")
 
     def _load_spacy_model(self) -> None:
         """加载 spaCy 模型"""
@@ -53,12 +53,12 @@ class NERService:
 
     def extract_entities(self, text: str) -> List[Dict[str, Any]]:
         """从文本中提取命名实体"""
-        if self.model_provider == "spacy":
+        if self.provider == "spacy":
             return self._extract_entities_spacy(text)
-        elif self.model_provider == "transformers":
+        elif self.provider == "transformers":
             return self._extract_entities_transformers(text)
         else:
-            raise ValueError(f"Invalid model provider: {self.model_provider}")
+            raise ValueError(f"Invalid provider: {self.provider}")
 
     def _extract_entities_spacy(self, text: str) -> List[Dict[str, Any]]:
         """使用 spaCy 提取实体"""
@@ -112,7 +112,7 @@ class NERService:
 
     def batch_extract_entities(self, texts: List[str]) -> List[List[Dict[str, Any]]]:
         """批量提取实体"""
-        if self.model_provider == "transformers":
+        if self.provider == "transformers":
             batch_size = self.config.batch_size
             all_results = []
 

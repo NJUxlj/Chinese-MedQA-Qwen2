@@ -22,12 +22,12 @@ class RerankerProvider:
         - 用于从本地加载 Qwen3-reranker 这样的模型进行重排序
         - Qwen3-Reranker 使用特殊的输入格式和输出机制
         - 根据模型名称自动选择使用传统 CrossEncoder 方式、Qwen3-Reranker 特殊方式、或 vLLM API 方式
-        - 优先级：若配置了 base_url，则优先使用 vLLM API 方式；否则根据 model_provider 决定本地加载方式
+        - 优先级：若配置了 base_url，则优先使用 vLLM API 方式；否则根据 provider 决定本地加载方式
     """
     def __init__(self, config=None):
         """初始化 reranker 服务"""
         self.config = config if config is not None else settings.reranker
-        self.model_provider = self.config.model_provider
+        self.provider = self.config.provider
         self.reranker_model = None
         self.tokenizer = None
         self.is_qwen3_reranker = "qwen3" in self.config.model_name.lower()
@@ -71,7 +71,7 @@ class RerankerProvider:
             self._setup_qwen3_reranker_tokens()
             logger.info(f"Successfully loaded Qwen3-Reranker model: {self.config.model_name}")
         else:
-            if self.model_provider == "sentence_transformers":
+            if self.provider == "sentence_transformers":
                 logger.info("Using sentence_transformers CrossEncoder")
                 self.reranker_model = CrossEncoder(
                     model_name=model_path,
@@ -80,7 +80,7 @@ class RerankerProvider:
                 )
                 logger.info(f"Successfully loaded CrossEncoder model: {self.config.model_name}")
             else:
-                raise ValueError(f"Invalid model provider: {self.model_provider}. Currently only 'sentence_transformers' is supported.")
+                raise ValueError(f"Invalid provider: {self.provider}. Currently only 'sentence_transformers' is supported.")
 
     def _setup_qwen3_reranker_tokens(self) -> None:
         """设置 Qwen3-Reranker 的 yes/no token ID"""

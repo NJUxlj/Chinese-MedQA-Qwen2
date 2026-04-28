@@ -28,6 +28,8 @@ class RAGPipeline:
     def __init__(
         self,
         llm_provider: LLMProvider,
+        embedding_provider: EmbeddingProvider,
+        reranker_provider: RerankerProvider,
         config=None
     ):
         """
@@ -63,7 +65,7 @@ class RAGPipeline:
                 'embedding_device': settings.embedding.device if hasattr(settings.embedding, 'device') else None,
                 'index_path': None,
                 'top_k': 3,
-                'model_provider': settings.llm.model_provider if hasattr(settings.llm, 'model_provider') else 'openai',
+                'provider': settings.llm.provider if hasattr(settings.llm, 'provider') else 'openai',
                 'model_name': settings.llm.model_name if hasattr(settings.llm, 'model_name') else 'Qwen3-235B',
                 'model_path': settings.llm.model_path if hasattr(settings.llm, 'model_path') else None,
                 'model_base_url': settings.llm.base_url if hasattr(settings.llm, 'base_url') else None,
@@ -71,7 +73,7 @@ class RAGPipeline:
                 'model_max_tokens': settings.llm.max_tokens if hasattr(settings.llm, 'max_tokens') else 2048,
                 'model_temperature': settings.llm.temperature if hasattr(settings.llm, 'temperature') else 0.7,
                 'cache_dir': None,
-                'reranker_model_provider': 'transformers',
+                'reranker_provider': 'transformers',
                 'reranker_model_path': settings.reranker.model_path if hasattr(settings.reranker, 'model_path') else None,
                 'reranker_model_name': settings.reranker.model_name if hasattr(settings.reranker, 'model_name') else None,
                 'reranker_base_url': settings.reranker.base_url if hasattr(settings.reranker, 'base_url') else None,
@@ -102,7 +104,7 @@ class RAGPipeline:
         self.top_k: int = self.config.top_k if hasattr(self.config, 'top_k') else 3
 
         # 获取 LLMProvider 相关配置
-        self.model_provider: str = self.config.model_provider if hasattr(self.config, 'model_provider') else 'openai'
+        self.provider: str = self.config.provider if hasattr(self.config, 'provider') else 'openai'
         self.model_name: str = self.config.model_name if hasattr(self.config, 'model_name') else 'Qwen3-235B'
         self.model_path: Optional[str] = self.config.model_path if hasattr(self.config, 'model_path') else None
         self.model_base_url: Optional[str] = self.config.model_base_url if hasattr(self.config, 'model_base_url') else None
@@ -114,7 +116,7 @@ class RAGPipeline:
         self.cache_dir: Optional[str] = self.config.cache_dir if hasattr(self.config, 'cache_dir') else None
 
         # 获取重排序模型相关配置
-        self.reranker_model_provider: str = self.config.reranker_model_provider if hasattr(self.config, 'reranker_model_provider') else 'transformers'
+        self.reranker_provider: str = self.config.reranker_provider if hasattr(self.config, 'reranker_provider') else 'transformers'
         self.reranker_model_path: Optional[str] = self.config.reranker_model_path if hasattr(self.config, 'reranker_model_path') else None
         self.reranker_model_name: Optional[str] = self.config.reranker_model_name if hasattr(self.config, 'reranker_model_name') else None
         self.reranker_base_url: Optional[str] = self.config.reranker_base_url if hasattr(self.config, 'reranker_base_url') else None
@@ -135,19 +137,21 @@ class RAGPipeline:
         self.query_processor = QueryProcessor()
 
         self.llm_provider = llm_provider
+        self.embedding_provider = embedding_provider
+        self.reranker_provider = reranker_provider
 
         # 初始化嵌入管理器 (对于某些检索器需要)
-        if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
-            self.embedding_provider = EmbeddingProvider(
-                model_name=self.embedding_model_name,
-                model_path=self.embedding_model_path,
-                base_url=self.embedding_base_url,
-                api_key=self.embedding_api_key,
-                device=self.embedding_device,
-                cache_dir=self.cache_dir
-            )
-        else:
-            self.embedding_provider = None
+        # if self.retriever_type in ["knn", "similarity", "l2", "hybrid"]:
+        #     self.embedding_provider = EmbeddingProvider(
+        #         model_name=self.embedding_model_name,
+        #         model_path=self.embedding_model_path,
+        #         base_url=self.embedding_base_url,
+        #         api_key=self.embedding_api_key,
+        #         device=self.embedding_device,
+        #         cache_dir=self.cache_dir
+        #     )
+        # else:
+        #     self.embedding_provider = None
 
         # 根据类型初始化检索器（统一使用 MilvusRetriever，无需 faiss）
         if self.retriever_type in ["knn", "similarity", "l2"]:
@@ -169,13 +173,13 @@ class RAGPipeline:
 
 
 
-        self.reranker_provider = RerankerProvider(
-            model_provider=self.reranker_model_provider,
-            model_path=self.reranker_model_path if self.use_reranker else None,
-            model_name=self.reranker_model_name if self.use_reranker else None,
-            base_url=self.reranker_base_url if self.use_reranker else None,
-            api_key=self.reranker_api_key if self.use_reranker else None
-        ) if self.use_reranker else None
+        # self.reranker_provider = RerankerProvider(
+        #     model_provider=self.reranker_provider,
+        #     model_path=self.reranker_model_path if self.use_reranker else None,
+        #     model_name=self.reranker_model_name if self.use_reranker else None,
+        #     base_url=self.reranker_base_url if self.use_reranker else None,
+        #     api_key=self.reranker_api_key if self.use_reranker else None
+        # ) if self.use_reranker else None
         
         # 初始化上下文构建器
         self.context_builder = ContextBuilder(

@@ -75,7 +75,7 @@ class MilvusClient:
         _model_path = getattr(self.embedding_config, "model_path", None)
         _model_name = str(self.embedding_config.model_name)
         self.embedder = EmbeddingProvider(
-            mode="local",
+            provider="local",
             model_name=_model_name,
             model_path=str(_model_path) if _model_path and str(_model_path) not in ("None", "null", "") else None,
             device="cuda" if _CUDA_AVAILABLE else "cpu",

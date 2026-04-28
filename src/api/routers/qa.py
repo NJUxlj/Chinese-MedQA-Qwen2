@@ -19,7 +19,7 @@ router = APIRouter()
 def _build_llm_provider(model_name: str = None) -> LLMProvider:
     """从 settings.llm 配置构建 LLMProvider"""
     cfg = settings.llm
-    provider = str(cfg.model_provider)
+    provider = str(cfg.provider)
 
     kwargs = dict(
         provider=provider,

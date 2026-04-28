@@ -7,7 +7,7 @@
 # =============================================================================
 
 llm:
-  model_provider: AzureOpenAI
+  provider: AzureOpenAI
   model_name: glm-4.6
   api_key: "<YOUR_LLM_API_KEY>"
   base_url: https://open.bigmodel.cn/api/paas/v4
@@ -133,7 +133,7 @@ retriever:
   l2_distance_threshold: 0.5
 
 ner:
-  model_provider: spacy
+  provider: spacy
   model_name: zh_core_web_sm
   device: -1
   batch_size: 32

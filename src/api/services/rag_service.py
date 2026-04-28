@@ -13,6 +13,8 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from config.settings import settings
 from providers.llm_provider import LLMProvider
+from providers.embedding_provider import EmbeddingProvider
+from providers.reranker_provider import RerankerProvider
 from rag.rag_pipeline import RAGPipeline
 from utils.logger import setup_logger
 
@@ -21,10 +23,14 @@ class RAGService:
 
     def __init__(
         self,
-        llm_provider: LLMProvider):
+        llm_provider: LLMProvider,
+        embedding_provider: Optional[EmbeddingProvider] = None,
+        reranker_provider: Optional[RerankerProvider] = None):
         """初始化RAG服务"""
         self._pipelines_lock = threading.RLock()
         self.llm_provider = llm_provider
+        self.embedding_provider = embedding_provider
+        self.reranker_provider = reranker_provider
         self.logger = setup_logger(name=self.__class__.__name__, level="INFO")
 
         self.initialized = False
@@ -37,7 +43,10 @@ class RAGService:
         if self.initialized:
             return
         self.logger.info("正在初始化RAG服务 ...")
-        self.rag_pipeline = RAGPipeline(llm_provider=self.llm_provider)
+        self.rag_pipeline = RAGPipeline(
+            llm_provider=self.llm_provider,
+            embedding_provider=self.embedding_provider,
+            reranker_provider=self.reranker_provider)
         self.initialized = True
         self.logger.info("RAG服务初始化成功, 模型: %s", self.llm_provider.model_name)
 
@@ -75,7 +84,10 @@ class RAGService:
 _rag_service = None
 _lock = threading.Lock()
 
-def get_rag_service(llm_provider: LLMProvider = None) -> RAGService:
+def get_rag_service(
+    llm_provider: LLMProvider = None,
+    embedding_provider: Optional[EmbeddingProvider] = None,
+    reranker_provider: Optional[RerankerProvider] = None) -> RAGService:
     """获取RAG服务单例
 
     Args:
@@ -83,9 +95,13 @@ def get_rag_service(llm_provider: LLMProvider = None) -> RAGService:
     """
     global _rag_service
     if _rag_service is None:
-        if llm_provider is None:
-            raise ValueError("首次调用 get_rag_service 必须提供 llm_provider")
+        if llm_provider is None or embedding_provider is None or reranker_provider is None:
+            raise ValueError("首次调用 get_rag_service 必须提供 llm_provider, embedding_provider, reranker_provider")
         with _lock:
             if _rag_service is None:
-                _rag_service = RAGService(llm_provider=llm_provider)
+                _rag_service = RAGService(
+                    llm_provider=llm_provider,
+                    embedding_provider=embedding_provider,
+                    reranker_provider=reranker_provider)    
+                    
     return _rag_service

@@ -45,7 +45,7 @@ class EmbeddingProvider:
 
     def __init__(
         self,
-        mode: Literal["vllm", "local", "openai", "bge", "modelscope", "huggingface"] = "local",
+        provider: Literal["vllm", "local", "openai", "bge", "modelscope", "huggingface"] = "local",
         model_name: Optional[str] = None,
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,
@@ -75,7 +75,7 @@ class EmbeddingProvider:
             use_cache: 是否使用磁盘缓存
             **kwargs: 额外参数
         """
-        self.mode = mode
+        self.provider = provider
         self.model_name = model_name
         self.base_url = base_url.rstrip("/") if base_url else None
         self.api_key = api_key
@@ -104,9 +104,9 @@ class EmbeddingProvider:
         self._lc_embeddings = None
 
         # Initialize
-        if self.mode == "local":
+        if self.provider == "local":
             self._init_local_model()
-        elif self.mode == "vllm":
+        elif self.provider == "vllm":
             self._init_vllm_client()
         elif self.mode in ["openai", "bge", "modelscope", "huggingface"]:
             self._init_langchain_embeddings()
@@ -160,13 +160,13 @@ class EmbeddingProvider:
         self.logger.info(f"Loading LangChain embedding model: {self.model_name} (mode: {self.mode})")
 
         try:
-            if self.mode == "openai":
+            if self.provider == "openai":
                 if not self.api_key:
                     raise ValueError("API key is required for OpenAI embeddings mode")
                 from langchain_openai import OpenAIEmbeddings
                 self._lc_embeddings = OpenAIEmbeddings(model=self.model_name, openai_api_key=self.api_key)
 
-            elif self.mode == "bge":
+            elif self.provider == "bge":
                 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
                 self._lc_embeddings = HuggingFaceBgeEmbeddings(
                     model_name=self.model_name,
@@ -174,11 +174,11 @@ class EmbeddingProvider:
                     encode_kwargs={"normalize_embeddings": self.normalize_embeddings}
                 )
 
-            elif self.mode == "modelscope":
+            elif self.provider == "modelscope":
                 from langchain_community.embeddings import ModelScopeEmbeddings
                 self._lc_embeddings = ModelScopeEmbeddings(model_name=self.model_name)
 
-            elif self.mode == "huggingface":
+            elif self.provider == "huggingface":
                 from langchain_community.embeddings import HuggingFaceEmbeddings
                 self._lc_embeddings = HuggingFaceEmbeddings(
                     model_name=self.model_name,
@@ -254,7 +254,7 @@ class EmbeddingProvider:
         Returns:
             np.ndarray: 嵌入向量数组，shape 为 (n, embedding_dim)
         """
-        if self.mode == "local":
+        if self.provider == "local":
             return self._encode_local(
                 texts,
                 batch_size=batch_size,
@@ -262,7 +262,7 @@ class EmbeddingProvider:
                 normalize_embeddings=normalize_embeddings,
                 **kwargs,
             )
-        elif self.mode == "vllm":
+        elif self.provider == "vllm":
             return self._encode_vllm(texts, normalize_embeddings=normalize_embeddings, **kwargs)
         else:
             # LangChain modes (openai, bge, modelscope, huggingface)
@@ -395,9 +395,9 @@ class EmbeddingProvider:
 
         # Get embedding
         try:
-            if self.mode == "local":
+            if self.provider == "local":
                 embedding = self._encode_local([text], **kwargs)[0].tolist()
-            elif self.mode == "vllm":
+            elif self.provider == "vllm":
                 embedding = self._encode_vllm([text], **kwargs)[0].tolist()
             else:
                 embedding = self._lc_embeddings.embed_query(text)
@@ -468,10 +468,10 @@ class EmbeddingProvider:
             try:
                 start_time = time.time()
 
-                if self.mode == "local":
+                if self.provider == "local":
                     uncached_embeddings = self._encode_local(texts_to_embed, **kwargs)
                     uncached_embeddings = uncached_embeddings.tolist()
-                elif self.mode == "vllm":
+                elif self.provider == "vllm":
                     uncached_embeddings = self._encode_vllm(texts_to_embed, **kwargs).tolist()
                 else:
                     uncached_embeddings = self._encode_langchain(texts_to_embed)
@@ -535,9 +535,9 @@ class EmbeddingProvider:
 
                 # Embed uncached texts
                 if texts_to_embed:
-                    if self.mode == "local":
+                    if self.provider == "local":
                         uncached_embeddings = self._encode_local(texts_to_embed, **kwargs).tolist()
-                    elif self.mode == "vllm":
+                    elif self.provider == "vllm":
                         uncached_embeddings = self._encode_vllm(texts_to_embed, **kwargs).tolist()
                     else:
                         uncached_embeddings = self._encode_langchain(texts_to_embed)
@@ -566,7 +566,7 @@ class EmbeddingProvider:
     @property
     def embedding_dim(self) -> int:
         """获取嵌入向量的维度。"""
-        if self.mode == "local" and self._model is not None:
+        if self.provider == "local" and self._model is not None:
             return self._model.get_sentence_embedding_dimension()
         elif self._lc_embeddings is not None:
             # Try to get dimension from LangChain embeddings
@@ -586,6 +586,6 @@ class EmbeddingProvider:
 
     def __repr__(self) -> str:
         return (
-            f"EmbeddingProvider(mode={self.mode}, model_name={self.model_name}, "
+            f"EmbeddingProvider(provider={self.provider}, model_name={self.model_name}, "
             f"model_path={self.model_path}, device={self.device})"
         )

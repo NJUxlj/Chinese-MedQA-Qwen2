@@ -10,7 +10,7 @@
 # LLM 配置（默认对接智谱 GLM-4.6 接口，按需修改）
 # =============================================================================
 llm:
-  model_provider: openai
+  provider: openai
   model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B"
   model_name: MiniMax-M2.7
   api_key: "sk-cp-oEWm76En3Nne3Jz7CsDBtEPZjb4R59ygrKzbDXkge5vV-fuIUBpM1_AgkGZuDcbzIFHpgYA0Vv_FwxC0ueri7UX1Ibl7uOlJmFcH4X23YloJ3OohY2lAO9o"
@@ -72,7 +72,7 @@ agent:
 # 嵌入配置（核心库使用）
 # =============================================================================
 embedding:
-  model_provider: sentence_transformers
+  provider: sentence_transformers
   model_name: Qwen3-Embedder-0.6B
   model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B"
   device: cpu
@@ -83,7 +83,7 @@ embedding:
 
 
 reranker:
-  model_provider: sentence_transformers  # sentence_transformers / transformers / vllm
+  provider: sentence_transformers  # sentence_transformers / transformers / vllm
   model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B"  # 本地模型路径，为空则不使用 reranker
   model_name: ""  # 模型名称（vLLM 部署时使用）
   device: cpu  # cuda / cpu
@@ -165,7 +165,7 @@ retriever:
 # NER 配置
 # =============================================================================
 ner:
-  model_provider: spacy
+  provider: spacy
   model_name: zh_core_web_sm
   device: -1
   batch_size: 32

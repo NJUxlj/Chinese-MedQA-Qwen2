@@ -51,7 +51,7 @@ class MedQaDataGenerator:
         self.data_num = data_num
         self.llm_config = llm_config if llm_config is not None else settings.llm
         self.llm_provider = LLMProvider(
-            provider=str(self.llm_config.model_provider),
+            provider=str(self.llm_config.provider),
             model_name=str(self.llm_config.model_name),
             base_url=str(self.llm_config.base_url),
             api_key=str(self.llm_config.api_key),

@@ -48,7 +48,7 @@ class ApiIntegrationManager:
         """初始化LLM Provider"""
         try:
             return LLMProvider(
-                provider=self.llm_config.model_provider,
+                provider=self.llm_config.provider,
                 model_name=self.llm_config.model_name,
                 base_url=self.llm_config.base_url,
                 api_key=self.llm_config.api_key,
