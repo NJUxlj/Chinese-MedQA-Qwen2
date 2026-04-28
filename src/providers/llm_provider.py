@@ -10,7 +10,7 @@ LLM Provider - 统一的大语言模型调用接口
 
 import sys
 import logging
-from typing import Dict, List, Optional, Union, Any, Literal
+from typing import Dict, List, Optional, Union, Any, Literal, Iterator
 from pathlib import Path
 
 import requests
@@ -313,20 +313,22 @@ class LLMProvider:
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        streaming: bool = False,
         **kwargs,
-    ) -> str:
+    ) -> Union[str, Iterator[str]]:
         """使用本地模型生成文本，根据后端分发到对应生成逻辑。"""
         if self.local_backend == "transformers":
             return self._generate_transformers(
-                prompt, max_tokens, temperature, top_p, top_k, **kwargs
+                prompt, max_tokens, temperature, top_p, top_k, stop, streaming, **kwargs
             )
         elif self.local_backend == "vllm":
             return self._generate_vllm(
-                prompt, max_tokens, temperature, top_p, top_k, **kwargs
+                prompt, max_tokens, temperature, top_p, top_k, stop, streaming, **kwargs
             )
         elif self.local_backend == "ollama":
             return self._generate_ollama(
-                prompt, max_tokens, temperature, top_p, top_k, **kwargs
+                prompt, max_tokens, temperature, top_p, top_k, stop, streaming, **kwargs
             )
         else:
             raise ValueError(f"Unknown local_backend: {self.local_backend}")
@@ -338,8 +340,10 @@ class LLMProvider:
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        streaming: bool = False,
         **kwargs,
-    ) -> str:
+    ) -> Union[str, Iterator[str]]:
         """使用 transformers 模型生成文本。"""
         if self._model is None or self._tokenizer is None:
             raise RuntimeError("Transformers model not loaded.")
@@ -369,30 +373,55 @@ class LLMProvider:
                 "input_ids": input_ids,
                 "attention_mask": torch.ones_like(input_ids, device=self.device),
             }
+            prompt_text_for_strip = None
         else:
             if isinstance(prompt, list):
-                prompt = "\n".join(prompt)
+                prompt_text_for_strip = "\n".join(prompt)
+            else:
+                prompt_text_for_strip = prompt
 
             inputs = self._tokenizer(
-                prompt,
+                prompt_text_for_strip,
                 return_tensors="pt",
                 padding=True,
                 truncation=True,
                 max_length=self.max_context_length,
             ).to(self.device)
 
+        gen_kwargs = dict(
+            max_new_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            do_sample=temperature > 0,
+            pad_token_id=self._tokenizer.pad_token_id,
+            attention_mask=inputs["attention_mask"],
+            eos_token_id=self._tokenizer.eos_token_id,
+            **kwargs,
+        )
+
+        if streaming:
+            from transformers import TextIteratorStreamer
+            from threading import Thread
+
+            streamer = TextIteratorStreamer(
+                self._tokenizer,
+                skip_prompt=True,
+                skip_special_tokens=True,
+            )
+            gen_kwargs["streamer"] = streamer
+
+            thread = Thread(
+                target=self._model.generate,
+                kwargs=dict(input_ids=inputs["input_ids"], **gen_kwargs),
+            )
+            thread.start()
+            return streamer
+
         with torch.no_grad():
             outputs = self._model.generate(
                 input_ids=inputs["input_ids"],
-                max_new_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k,
-                do_sample=temperature > 0,
-                pad_token_id=self._tokenizer.pad_token_id,
-                attention_mask=inputs["attention_mask"],
-                eos_token_id=self._tokenizer.eos_token_id,
-                **kwargs,
+                **gen_kwargs,
             )
 
         if use_chat_template:
@@ -405,8 +434,8 @@ class LLMProvider:
                         response = response[1:].strip()
         else:
             response = self._tokenizer.decode(outputs[0], skip_special_tokens=True)
-            if isinstance(prompt, str) and response.startswith(prompt):
-                response = response[len(prompt):].strip()
+            if prompt_text_for_strip and response.startswith(prompt_text_for_strip):
+                response = response[len(prompt_text_for_strip):].strip()
 
         return response
 
@@ -417,8 +446,10 @@ class LLMProvider:
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        streaming: bool = False,
         **kwargs,
-    ) -> str:
+    ) -> Union[str, Iterator[str]]:
         """使用 vLLM 引擎生成文本。"""
         if self._llm is None:
             raise RuntimeError("vLLM model not loaded.")
@@ -427,7 +458,6 @@ class LLMProvider:
         temperature = temperature if temperature is not None else self.temperature
         top_p = top_p if top_p is not None else self.top_p
         top_k = top_k if top_k is not None else self.top_k
-        stop = kwargs.get("stop")
 
         # vLLM 的 SamplingParams
         from vllm import SamplingParams
@@ -439,6 +469,7 @@ class LLMProvider:
             top_k=-1 if top_k is None else top_k,
             stop=stop or ["<|im_end|>"],
             echo=False,
+            stream=streaming,
         )
 
         # 处理 prompt 格式
@@ -453,8 +484,14 @@ class LLMProvider:
         else:
             prompt_text = prompt
 
-        outputs = self._llm.generate(prompt_text, sampling_params)
-        return outputs[0].outputs[0].text
+        if streaming:
+            results = self._llm.generate(prompt_text, sampling_params)
+            for output in results:
+                if output.outputs and output.outputs[0].text:
+                    yield output.outputs[0].text
+        else:
+            outputs = self._llm.generate(prompt_text, sampling_params)
+            return outputs[0].outputs[0].text
 
     def _generate_ollama(
         self,
@@ -463,51 +500,86 @@ class LLMProvider:
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        streaming: bool = False,
         **kwargs,
-    ) -> str:
+    ) -> Union[str, Iterator[str]]:
         """使用 Ollama 服务生成文本。"""
         import ollama
 
         max_tokens = max_tokens or self.max_tokens
         temperature = temperature if temperature is not None else self.temperature
 
-        # 处理 prompt 格式
         if isinstance(prompt, list) and all(
             isinstance(msg, dict) and "role" in msg and "content" in msg
             for msg in prompt
         ):
-            # Ollama chat 模式
             messages = [
                 {"role": msg["role"], "content": msg["content"]}
                 for msg in prompt
             ]
-            response = ollama.chat(
-                model=self.model_name,
-                messages=messages,
-                options={
-                    "temperature": temperature,
-                    "top_p": top_p,
-                    "num_predict": max_tokens,
-                    "stop": kwargs.get("stop"),
-                },
-                stream=False,
-            )
-            return response["message"]["content"]
+            if streaming:
+                response = ollama.chat(
+                    model=self.model_name,
+                    messages=messages,
+                    options={
+                        "temperature": temperature,
+                        "top_p": top_p,
+                        "num_predict": max_tokens,
+                        "stop": stop,
+                    },
+                    stream=True,
+                )
+                for chunk in response:
+                    content = chunk.get("message", {}).get("content", "")
+                    if content:
+                        yield content
+                return
+            else:
+                response = ollama.chat(
+                    model=self.model_name,
+                    messages=messages,
+                    options={
+                        "temperature": temperature,
+                        "top_p": top_p,
+                        "num_predict": max_tokens,
+                        "stop": stop,
+                    },
+                    stream=False,
+                )
+                return response["message"]["content"]
         else:
-            # Ollama generate 模式
             prompt_text = prompt if isinstance(prompt, str) else "\n".join(prompt)
-            response = ollama.generate(
-                model=self.model_name,
-                prompt=prompt_text,
-                options={
-                    "temperature": temperature,
-                    "top_p": top_p,
-                    "num_predict": max_tokens,
-                    "stop": kwargs.get("stop"),
-                },
-                stream=False,
-            )
-            return response["response"]
+            if streaming:
+                response = ollama.generate(
+                    model=self.model_name,
+                    prompt=prompt_text,
+                    options={
+                        "temperature": temperature,
+                        "top_p": top_p,
+                        "num_predict": max_tokens,
+                        "stop": stop,
+                    },
+                    stream=True,
+                )
+                for chunk in response:
+                    content = chunk.get("response", "")
+                    if content:
+                        yield content
+                return
+            else:
+                response = ollama.generate(
+                    model=self.model_name,
+                    prompt=prompt_text,
+                    options={
+                        "temperature": temperature,
+                        "top_p": top_p,
+                        "num_predict": max_tokens,
+                        "stop": stop,
+                    },
+                    stream=False,
+                )
+                return response["response"]
 
     def _build_chat_prompt(self, messages: List[Dict[str, str]]) -> str:
         """将消息列表构建为纯文本 prompt（用于不支持 chat template 的后端）。"""
@@ -527,8 +599,9 @@ class LLMProvider:
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
         stop: Optional[List[str]] = None,
+        streaming: bool = False,
         **kwargs,
-    ) -> str:
+    ) -> Union[str, Iterator[str]]:
         """
         生成文本。
 
@@ -539,10 +612,11 @@ class LLMProvider:
             top_p: 核采样参数
             top_k: top-k 采样参数
             stop: 停止词列表
+            streaming: 是否使用流式输出（返回迭代器）
             **kwargs: 额外参数
 
         Returns:
-            生成的文本
+            生成的文本（非 streaming 时），或文本块迭代器（streaming 时）
         """
         if self.provider == "local":
             return self._generate_local(
@@ -552,6 +626,7 @@ class LLMProvider:
                 top_p=top_p,
                 top_k=top_k,
                 stop=stop,
+                streaming=streaming,
                 **kwargs,
             )
         else:
@@ -562,8 +637,31 @@ class LLMProvider:
                 top_p=top_p,
                 top_k=top_k,
                 stop=stop,
+                streaming=streaming,
                 **kwargs,
             )
+
+    def generate_streaming(
+        self,
+        prompt: Union[str, List[Dict[str, str]]],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        top_k: Optional[int] = None,
+        stop: Optional[List[str]] = None,
+        **kwargs,
+    ) -> Iterator[str]:
+        """流式生成文本的便捷方法，等价于 generate(..., streaming=True)。"""
+        return self.generate(
+            prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            stop=stop,
+            streaming=True,
+            **kwargs,
+        )
 
     def _generate_api(
         self,
@@ -573,8 +671,9 @@ class LLMProvider:
         top_p: Optional[float] = None,
         top_k: Optional[int] = None,
         stop: Optional[List[str]] = None,
+        streaming: bool = False,
         **kwargs,
-    ) -> str:
+    ) -> Union[str, Iterator[str]]:
         """通过 API 生成文本（openai/aliyun/vllm 供应商）。"""
         max_tokens = max_tokens or self.max_tokens
         temperature = temperature if temperature is not None else self.temperature
@@ -598,7 +697,7 @@ class LLMProvider:
             "max_tokens": max_tokens,
             "temperature": temperature,
             "top_p": top_p,
-            "stream": self.stream,
+            "stream": self.stream or streaming,
         }
 
         if top_k != 50:
@@ -621,37 +720,12 @@ class LLMProvider:
 
         try:
             self.logger.info(f"[{self.provider}] Sending request to {self.base_url}")
-            self.logger.info(f"[{self.provider}] Model: {self.model_name}")
+            self.logger.info(f"[{self.provider}] Model: {self.model_name}, streaming={streaming}")
 
-            response = requests.post(
-                f"{self.base_url}/chat/completions",
-                headers=headers,
-                json=payload,
-                timeout=min(self.timeout, 200),
-            )
-
-            if response.status_code != 200:
-                self.logger.error(f"[{self.provider}] Response status: {response.status_code}")
-                self.logger.error(f"[{self.provider}] Response body: {response.text}")
-                response.raise_for_status()
-
-            response_data = response.json()
-
-            if "error" in response_data:
-                raise ValueError(f"[{self.provider}] API Error: {response_data['error']}")
-
-            if "choices" not in response_data or not response_data["choices"]:
-                raise ValueError(f"[{self.provider}] Empty choices in response: {response_data}")
-
-            choice = response_data["choices"][0]
-
-            if "message" in choice and "content" in choice["message"]:
-                return choice["message"]["content"]
-
-            if "delta" in choice and "content" in choice["delta"]:
-                return choice["delta"]["content"]
-
-            raise ValueError(f"[{self.provider}] No content in response: {response_data}")
+            if streaming:
+                return self._stream_api_response(payload, headers)
+            else:
+                return self._non_stream_api_response(payload, headers)
 
         except requests.exceptions.Timeout:
             raise TimeoutError(f"[{self.provider}] API request timeout ({self.timeout}s)")
@@ -659,6 +733,71 @@ class LLMProvider:
             raise RuntimeError(f"[{self.provider}] API request failed: {e}")
         except Exception as e:
             raise RuntimeError(f"[{self.provider}] Generation error: {e}")
+
+    def _non_stream_api_response(self, payload: Dict, headers: Dict) -> str:
+        """非流式 API 响应处理。"""
+        response = requests.post(
+            f"{self.base_url}/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=min(self.timeout, 200),
+        )
+
+        if response.status_code != 200:
+            self.logger.error(f"[{self.provider}] Response status: {response.status_code}")
+            self.logger.error(f"[{self.provider}] Response body: {response.text}")
+            response.raise_for_status()
+
+        response_data = response.json()
+
+        if "error" in response_data:
+            raise ValueError(f"[{self.provider}] API Error: {response_data['error']}")
+
+        if "choices" not in response_data or not response_data["choices"]:
+            raise ValueError(f"[{self.provider}] Empty choices in response: {response_data}")
+
+        choice = response_data["choices"][0]
+
+        if "message" in choice and "content" in choice["message"]:
+            return choice["message"]["content"]
+
+        if "delta" in choice and "content" in choice["delta"]:
+            return choice["delta"]["content"]
+
+        raise ValueError(f"[{self.provider}] No content in response: {response_data}")
+
+    def _stream_api_response(self, payload: Dict, headers: Dict) -> Iterator[str]:
+        """流式 API 响应处理，yield 每块内容。"""
+        response = requests.post(
+            f"{self.base_url}/chat/completions",
+            headers=headers,
+            json=payload,
+            stream=True,
+            timeout=min(self.timeout, 200),
+        )
+
+        if response.status_code != 200:
+            self.logger.error(f"[{self.provider}] Stream response status: {response.status_code}")
+            self.logger.error(f"[{self.provider}] Stream response body: {response.text}")
+            response.raise_for_status()
+
+        for line in response.iter_lines():
+            if not line:
+                continue
+            line = line.decode("utf-8", errors="replace")
+            if line.startswith("data: "):
+                data_str = line[6:]
+                if data_str.strip() == "[DONE]":
+                    break
+                try:
+                    import json as _json
+                    data = _json.loads(data_str)
+                    delta = data.get("choices", [{}])[0].get("delta", {})
+                    content = delta.get("content", "")
+                    if content:
+                        yield content
+                except Exception:
+                    continue
 
     def prepare_inputs_for_rag(
         self, query: str, context: List[str]

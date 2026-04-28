@@ -1,0 +1,13 @@
+2026-04-28 14:54:04,448 - evaluation.evaluation_runner - INFO - 开始评估任务 [7daaabb7-d86c-44be-999e-a93eb439778c] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=qwen2.5-7b-instruct
+2026-04-28 14:54:37,612 - evaluation.evaluation_runner - INFO - 开始评估任务 [my-custom-task-id] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=qwen2.5-7b-instruct
+2026-04-28 15:00:39,883 - evaluation.evaluation_runner - INFO - 开始评估任务 [b6d21d30-235a-4416-87dd-b20d991a75fe] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:00:41,648 - evaluation.evaluation_runner - INFO - 评估任务 [b6d21d30-235a-4416-87dd-b20d991a75fe] 完成，耗时 1.76s，指标: {'accuracy': 0.0}
+2026-04-28 15:07:29,846 - evaluation.evaluation_runner - INFO - 开始评估任务 [793e7ed2-d944-4b71-9502-eb34a1f0cd28] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:08:21,580 - evaluation.evaluation_runner - INFO - 开始评估任务 [3c6e4720-3137-4cfe-b1e1-c8a2593f870c] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:09:43,753 - evaluation.evaluation_runner - INFO - 开始评估任务 [e42c765b-fa02-4706-b01a-d9aebbffb82f] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:11:57,176 - evaluation.evaluation_runner - INFO - 开始评估任务 [a209ddf7-3fe4-4008-ab6b-0f881b73e581] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:12:04,081 - evaluation.evaluation_runner - INFO - 评估任务 [a209ddf7-3fe4-4008-ab6b-0f881b73e581] 完成，耗时 6.90s，指标: {'accuracy': 0.0}
+2026-04-28 15:23:42,471 - evaluation.evaluation_runner - INFO - 开始评估任务 [44889370-6d09-46fa-8051-e03eebf65e2f] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:23:56,055 - evaluation.evaluation_runner - INFO - 评估任务 [44889370-6d09-46fa-8051-e03eebf65e2f] 完成，耗时 13.58s，指标: {'accuracy': 0.0}
+2026-04-28 15:28:59,938 - evaluation.evaluation_runner - INFO - 开始评估任务 [5e43aa08-1f28-4f17-b089-5089070da94d] task_type=medqa dataset=/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json model=MiniMax-M2.7
+2026-04-28 15:29:07,641 - evaluation.evaluation_runner - INFO - 评估任务 [5e43aa08-1f28-4f17-b089-5089070da94d] 完成，耗时 7.70s，指标: {'accuracy': 1.0}

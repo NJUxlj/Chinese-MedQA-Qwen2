@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 import numpy as np
 from pathlib import Path
@@ -17,7 +18,8 @@ from concurrent.futures import as_completed, ThreadPoolExecutor
 class MedQAEvaluator(BaseEvaluator):
     """使用 LLM 作为裁判，判断模型输出是否与标准答案一致。
 
-    仅支持两种推理后端：（1）vLLM/OpenAI 兼容 API；（2）本地 transformers 权重。
+    支持语义匹配，允许同义词替换。
+    支持带思考能力的推理模型（如 MiniMax-M2.7），通过 <answer> 标签解析最终结果。
     """
 
     def __init__(self, config=None):
@@ -40,44 +42,50 @@ class MedQAEvaluator(BaseEvaluator):
 
         self.logger.info(f"MedQAEvaluator 初始化完成，模型名称: {self.config.get('model_name', '')}")
 
-
-
     def format_prompt(self, sample: Dict[str, Any]) -> str:
-        system_prompt = f"""
-        ## 角色
-        你是一个拥有丰富临床经验的医疗专家，你的任务是根据用户的问题和上下文，判断模型的回答是否与标准答案一致。
+        prompt = f"""你是一个拥有丰富临床经验的医疗专家，请判断模型回答是否与标准答案一致（语义相同即可，不要求字面完全一致）。
 
-        ## 任务：
-        请根据用户问题，判断模型回答是否与标准答案一致。
+## 用户问题
+{sample.get(self.question_key, "")}
 
-        ## 规则:
-        - 模型回答必须与标准答案完全一致，包括大小写、标点符号等。
-        - 如果模型回答中包含多个选项，必须全部选择正确。
-        - 如果模型回答中包含数值，必须与标准答案完全一致。
+## 模型回答
+{sample.get(self.model_answer_key, "")}
 
-        ## 用户问题
-        {sample.get(self.question_key, "")}
+## 标准答案
+{sample.get(self.ground_true_answer_key, '')}
 
-        ## 模型回答
-        {sample.get(self.model_answer_key, "")}
+## 判断规则
+- 语义相同即可通过，允许同义词替换（如"体重减轻"="体重下降"、"mmHg"="毫米汞柱"）
+- 允许表达方式不同（如"或"="和/或"）
+- 允许轻微的表述差异
+- 数值必须等价
 
-        ## 标准答案
-        {sample.get(self.ground_true_answer_key, '')}
+## 输出要求
+请在 <answer>True</answer> 或 <answer>False</answer> 标签中输出最终判断结果。
+例如：<answer>True</answer>
 
-        ## 输出格式
-        你只能输出 True 或 False， 除此以外不能输出任何东西。
+请开始判断："""
+        return prompt
 
-        ## 请你开始判断
+    def _extract_answer(self, response: str) -> str:
+        """从响应中提取 <answer>True/False</answer> 标签内的结果。"""
+        if not response:
+            return "False"
+        match = re.search(r"<answer>\s*(True|False)\s*</answer>", response, re.IGNORECASE)
+        if match:
+            return match.group(1)
+        stripped = response.strip().lower()
+        if stripped == "true":
+            return "True"
+        if stripped == "false":
+            return "False"
+        self.logger.warning(f"无法从响应中提取答案标签，返回 False。响应内容: {response[:200]}")
+        return "False"
 
-        """
-        return system_prompt
-
-    
-    
     def evaluate_one_sample(self, sample: Dict[str, Any]) -> Dict[str, Any]:
         prompt = self.format_prompt(sample)
         response = self.llm_provider.generate(prompt)
-        verdict = response.strip() if response else "False"
+        verdict = self._extract_answer(response)
         is_correct = verdict.lower() == "true"
         return {
             "is_correct": is_correct,
@@ -92,7 +100,6 @@ class MedQAEvaluator(BaseEvaluator):
         }
 
 
-    
     def evaluate(self) -> Dict[str, float]:
 
         # load_dataset
@@ -110,7 +117,7 @@ class MedQAEvaluator(BaseEvaluator):
                     except Exception as e:
                         self.logger.error(f"样本 {future_to_sample[future]} 处理失败: {e}")
                         raise
-        
+
         # calculate accuracy
         accuracy = float(np.mean([r["is_correct"] for r in results])) if results else 0.0
         self.logger.info(f"在测试数据集 [{self.config.get('dataset_path', '')}] 上，模型的准确率为: {accuracy}")

@@ -253,6 +253,13 @@ python -m vllm.entrypoints.openai.api_server \
 
 ## 修复日志
 
+
+- **2026-04-28**:
+  - **MedQAEvaluator 评估器**：`format_prompt` 改为语义匹配（允许同义词），新增 `_extract_answer()` 方法解析 `<answer>True/False</answer>` 标签，适配带思考过程的推理模型（MiniMax-M2.7）
+  - **LLMProvider 流式输出**：`generate()` 新增 `streaming` 参数（默认 False），新增 `generate_streaming()` 便捷方法；`_generate_api()` 支持流式 SSE 响应；`_generate_local()` 向各本地后端传递 streaming 参数；`_generate_transformers()` 支持 `TextIteratorStreamer`；`_generate_vllm()` 支持 `SamplingParams(stream=True)`；`_generate_ollama()` 支持 `stream=True`
+  - **QA Router 修复**：`routers/qa.py` 中 `_build_llm_provider()` 新增对 `local` 模式的支持（传入 `model_path` 和 `local_backend`）；修复 `max_new_tokens` → `max_tokens` 参数名不匹配问题
+  - **Config 配置更新**：`llm`、`agent`、`vllm` 配置段均新增 `streaming: false` 字段
+  - **QA API 测试**：非流式、流式、模型列表接口均通过本地模型（Qwen3-0.6B）测试验证
 - **2026-04-14**: 修复 17 项严重问题（P0），包括导入路径修正、配置安全加固、训练逻辑修复、LoggerManager 统一、训练 YAML 配置创建。详见 [docs/修复文档/FIX_1.md](docs/修复文档/FIX_1.md)
 
 ## License

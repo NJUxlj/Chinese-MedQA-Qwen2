@@ -1,0 +1,200 @@
+2026-04-28 14:53:16,928 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-28 14:54:04,673 - evaluation.async_eval_queue - ERROR - 评估任务失败: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 636, in _generate_api
+    response.raise_for_status()
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/requests/models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 38, in _worker_loop
+    result = await asyncio.to_thread(_evaluation_task_fn, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 69, in run_evaluation_task
+    metrics: Dict[str, float] = evaluator.evaluate()
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 107, in evaluate
+    result = future.result()
+             ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 79, in evaluate_one_sample
+    response = self.llm_provider.generate(prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 558, in generate
+    return self._generate_api(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 659, in _generate_api
+    raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+RuntimeError: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+
+2026-04-28 14:54:37,793 - evaluation.async_eval_queue - ERROR - 评估任务失败: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 636, in _generate_api
+    response.raise_for_status()
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/site-packages/requests/models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 38, in _worker_loop
+    result = await asyncio.to_thread(_evaluation_task_fn, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 69, in run_evaluation_task
+    metrics: Dict[str, float] = evaluator.evaluate()
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 107, in evaluate
+    result = future.result()
+             ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 79, in evaluate_one_sample
+    response = self.llm_provider.generate(prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 558, in generate
+    return self._generate_api(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 659, in _generate_api
+    raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+RuntimeError: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+
+2026-04-28 15:00:05,732 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-28 15:00:22,041 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-28 15:07:30,292 - evaluation.async_eval_queue - ERROR - 评估任务失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 636, in _generate_api
+    response.raise_for_status()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/site-packages/requests/models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 38, in _worker_loop
+    result = await asyncio.to_thread(_evaluation_task_fn, payload)
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 69, in run_evaluation_task
+    metrics: Dict[str, float] = evaluator.evaluate()
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 107, in evaluate
+    result = future.result()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 79, in evaluate_one_sample
+    response = self.llm_provider.generate(prompt)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 558, in generate
+    return self._generate_api(
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 659, in _generate_api
+    raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+RuntimeError: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+
+2026-04-28 15:08:22,245 - evaluation.async_eval_queue - ERROR - 评估任务失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 636, in _generate_api
+    response.raise_for_status()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/site-packages/requests/models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 38, in _worker_loop
+    result = await asyncio.to_thread(_evaluation_task_fn, payload)
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 69, in run_evaluation_task
+    metrics: Dict[str, float] = evaluator.evaluate()
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 107, in evaluate
+    result = future.result()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 79, in evaluate_one_sample
+    response = self.llm_provider.generate(prompt)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 558, in generate
+    return self._generate_api(
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 659, in _generate_api
+    raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+RuntimeError: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+
+2026-04-28 15:09:44,157 - evaluation.async_eval_queue - ERROR - 评估任务失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 636, in _generate_api
+    response.raise_for_status()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/site-packages/requests/models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 38, in _worker_loop
+    result = await asyncio.to_thread(_evaluation_task_fn, payload)
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 69, in run_evaluation_task
+    metrics: Dict[str, float] = evaluator.evaluate()
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 107, in evaluate
+    result = future.result()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/opt/homebrew/Caskroom/miniforge/base/envs/rag/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 79, in evaluate_one_sample
+    response = self.llm_provider.generate(prompt)
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 558, in generate
+    return self._generate_api(
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../providers/llm_provider.py", line 659, in _generate_api
+    raise RuntimeError(f"[{self.provider}] API request failed: {e}")
+RuntimeError: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+
+2026-04-28 15:23:13,111 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-28 15:23:30,908 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-28 15:28:34,546 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-28 15:28:52,509 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动

@@ -1,0 +1,32 @@
+2026-04-28 14:54:04,450 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 14:54:04,451 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: qwen2.5-7b-instruct
+2026-04-28 14:54:04,603 - MedQAEvaluator - ERROR - 样本 {'question': '高血压的诊断标准是多少？', 'output': '收缩压≥140mmHg或舒张压≥90mmHg', 'answer': '收缩压≥140mmHg和/或舒张压≥90mmHg'} 处理失败: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+2026-04-28 14:54:37,612 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 14:54:37,613 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: qwen2.5-7b-instruct
+2026-04-28 14:54:37,751 - MedQAEvaluator - ERROR - 样本 {'question': '糖尿病的典型症状是什么？', 'output': '多饮、多尿、多食和体重减轻', 'answer': '多饮、多尿、多食、体重下降'} 处理失败: [vllm] API request failed: 400 Client Error: Bad Request for url: https://api.minimaxi.com/v1/chat/completions
+2026-04-28 15:00:39,887 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:00:39,889 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:00:41,648 - MedQAEvaluator - INFO - 在测试数据集 [/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json] 上，模型的准确率为: 0.0
+2026-04-28 15:07:29,847 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:07:29,848 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:07:30,261 - MedQAEvaluator - ERROR - 样本 {'question': '糖尿病的典型症状是什么？', 'output': '多饮、多尿、多食和体重减轻', 'answer': '多饮、多尿、多食、体重下降'} 处理失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+2026-04-28 15:08:21,586 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:08:21,590 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:08:22,243 - MedQAEvaluator - ERROR - 样本 {'question': '高血压的诊断标准是多少？', 'output': '收缩压≥140mmHg或舒张压≥90mmHg', 'answer': '收缩压≥140mmHg和/或舒张压≥90mmHg'} 处理失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+2026-04-28 15:09:43,754 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:09:43,755 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:09:44,152 - MedQAEvaluator - ERROR - 样本 {'question': '糖尿病的典型症状是什么？', 'output': '多饮、多尿、多食和体重减轻', 'answer': '多饮、多尿、多食、体重下降'} 处理失败: [vllm] API request failed: 529 Server Error: Unknown Status Code for url: https://api.minimaxi.com/v1/chat/completions
+2026-04-28 15:11:57,178 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:11:57,190 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:12:04,080 - MedQAEvaluator - INFO - 在测试数据集 [/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json] 上，模型的准确率为: 0.0
+2026-04-28 15:23:42,477 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:23:42,478 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:23:56,055 - MedQAEvaluator - INFO - 在测试数据集 [/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json] 上，模型的准确率为: 0.0
+2026-04-28 15:25:42,313 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:25:42,314 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:26:02,267 - MedQAEvaluator - INFO - 在测试数据集 [/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json] 上，模型的准确率为: 0.0
+2026-04-28 15:26:15,924 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:26:15,925 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:28:59,944 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成
+2026-04-28 15:28:59,948 - MedQAEvaluator - INFO - MedQAEvaluator 初始化完成，模型名称: MiniMax-M2.7
+2026-04-28 15:29:07,640 - MedQAEvaluator - INFO - 在测试数据集 [/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/data/eval_test_data.json] 上，模型的准确率为: 1.0

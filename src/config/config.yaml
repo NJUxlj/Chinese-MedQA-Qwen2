@@ -11,7 +11,7 @@
 # =============================================================================
 llm:
   model_provider: openai
-  model_path: ""
+  model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B"
   model_name: MiniMax-M2.7
   api_key: "sk-cp-oEWm76En3Nne3Jz7CsDBtEPZjb4R59ygrKzbDXkge5vV-fuIUBpM1_AgkGZuDcbzIFHpgYA0Vv_FwxC0ueri7UX1Ibl7uOlJmFcH4X23YloJ3OohY2lAO9o"
   base_url: https://api.minimaxi.com/v1
@@ -19,6 +19,7 @@ llm:
   temperature: 0.7
   top_p: 0.9
   timeout: 60
+  streaming: false
   max_workers: 10
 
 # =============================================================================
@@ -65,6 +66,7 @@ agent:
   max_tokens: 2048
   temperature: 0.7
   timeout: 60
+  streaming: false
 
 # =============================================================================
 # 嵌入配置（核心库使用）
@@ -82,7 +84,7 @@ embedding:
 
 reranker:
   model_provider: sentence_transformers  # sentence_transformers / transformers / vllm
-  model_path: ""  # 本地模型路径，为空则不使用 reranker
+  model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-0.6B"  # 本地模型路径，为空则不使用 reranker
   model_name: ""  # 模型名称（vLLM 部署时使用）
   device: cpu  # cuda / cpu
   use_reranker: false
@@ -108,6 +110,7 @@ vllm:
   swap_space: 4
   trust_remote_code: true
   seed: 42
+  streaming: false
 
 # =============================================================================
 # API 服务（FastAPI 主入口）配置

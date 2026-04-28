@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from utils.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
+from evaluation.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
 from routers import evaluation
 
 

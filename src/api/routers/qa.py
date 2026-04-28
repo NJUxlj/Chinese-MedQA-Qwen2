@@ -19,8 +19,10 @@ router = APIRouter()
 def _build_llm_provider(model_name: str = None) -> LLMProvider:
     """从 settings.llm 配置构建 LLMProvider"""
     cfg = settings.llm
-    return LLMProvider(
-        provider=str(cfg.model_provider),
+    provider = str(cfg.model_provider)
+
+    kwargs = dict(
+        provider=provider,
         model_name=model_name or str(cfg.model_name),
         base_url=str(cfg.base_url) if hasattr(cfg, 'base_url') and cfg.base_url else None,
         api_key=str(cfg.api_key) if hasattr(cfg, 'api_key') and cfg.api_key else None,
@@ -29,6 +31,14 @@ def _build_llm_provider(model_name: str = None) -> LLMProvider:
         top_p=float(cfg.top_p) if hasattr(cfg, 'top_p') and cfg.top_p else 0.9,
         timeout=int(cfg.timeout) if hasattr(cfg, 'timeout') and cfg.timeout else 60,
     )
+
+    # local 模式需要 model_path
+    if provider == "local":
+        model_path = str(cfg.model_path) if hasattr(cfg, 'model_path') and cfg.model_path else ""
+        local_backend = str(cfg.local_backend) if hasattr(cfg, 'local_backend') and cfg.local_backend else "transformers"
+        kwargs.update(model_path=model_path, local_backend=local_backend)
+
+    return LLMProvider(**kwargs)
 
 @router.post("/ask", response_model=QuestionResponse)
 async def ask_question(request: QuestionRequest):
@@ -48,22 +58,23 @@ async def ask_question(request: QuestionRequest):
 
         # 准备提示词
         if request.use_template:
-            prompt = f"""<|im_start|>system
-你是一个专业的医疗助手，请基于可靠的医学知识回答用户的问题。
-请提供准确、清晰的回答，并在必要时说明信息来源或建议就医。
-<|im_end|>
-<|im_start|>user
-{request.question}
-<|im_end|>
-<|im_start|>assistant
-"""
+            prompt = [
+                {
+                    "role": "system",
+                    "content": (
+                        "你是一个专业的医疗助手，请基于可靠的医学知识回答用户的问题。"
+                        "请提供准确、清晰的回答，并在必要时说明信息来源或建议就医。"
+                    ),
+                },
+                {"role": "user", "content": request.question},
+            ]
         else:
             prompt = request.question
 
         # 生成回答
         answer = model.generate(
             prompt=prompt,
-            max_new_tokens=request.max_tokens,
+            max_tokens=request.max_tokens,
             temperature=request.temperature,
             top_p=request.top_p
         )
@@ -106,15 +117,16 @@ async def ask_question_stream(request: StreamQuestionRequest):
             model = _build_llm_provider(request.model_name)
 
             if request.use_template:
-                prompt = f"""<|im_start|>system
-你是一个专业的医疗助手，请基于可靠的医学知识回答用户的问题。
-请提供准确、清晰的回答，并在必要时说明信息来源或建议就医。
-<|im_end|>
-<|im_start|>user
-{request.question}
-<|im_end|>
-<|im_start|>assistant
-"""
+                prompt = [
+                    {
+                        "role": "system",
+                        "content": (
+                            "你是一个专业的医疗助手，请基于可靠的医学知识回答用户的问题。"
+                            "请提供准确、清晰的回答，并在必要时说明信息来源或建议就医。"
+                        ),
+                    },
+                    {"role": "user", "content": request.question},
+                ]
             else:
                 prompt = request.question
 
@@ -122,7 +134,7 @@ async def ask_question_stream(request: StreamQuestionRequest):
 
             for chunk in model.generate_streaming(
                 prompt=prompt,
-                max_new_tokens=request.max_tokens,
+                max_tokens=request.max_tokens,
                 temperature=request.temperature,
                 top_p=request.top_p
             ):
