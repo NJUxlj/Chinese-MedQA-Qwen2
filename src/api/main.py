@@ -19,9 +19,10 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from config.settings import settings
-from .routers import qa, admin, rag, health, evaluation
+from .routers import qa, rag, health, evaluation
 from evaluation.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
 from api.services.rag_service import init_rag_service
+from api.services.rag_async_queue import start_rag_worker, stop_rag_worker
 from providers.llm_provider import LLMProvider
 from providers.embedding_provider import EmbeddingProvider
 from providers.reranker_provider import RerankerProvider
@@ -77,6 +78,7 @@ async def lifespan(app: FastAPI):
     init_rag_service(llm_provider, embedding_provider, reranker_provider)
 
     await start_evaluation_worker()
+    await start_rag_worker()
     logger.info("API服务初始化完成")
 
     yield
@@ -84,6 +86,7 @@ async def lifespan(app: FastAPI):
     # 关闭时释放资源
     logger.info("API服务关闭，释放资源...")
     await stop_evaluation_worker()
+    await stop_rag_worker()
 
 
 # 创建 FastAPI 应用
@@ -114,7 +117,6 @@ app.include_router(health.router, tags=["健康检查"])
 app.include_router(qa.router, prefix="/api/qa", tags=["问答服务"])
 app.include_router(rag.router, prefix="/api/rag", tags=["知识检索"])
 app.include_router(evaluation.router, prefix="/api/evaluation", tags=["评估服务"])
-app.include_router(admin.router, prefix="/api/admin", tags=["管理接口"])
 
 # 注意: MDAgents 路由已暂时禁用（服务未修复）
 # app.include_router(mdagents.router, prefix="/api/mdagents", tags=["MDAgents医疗多智能体系统"])

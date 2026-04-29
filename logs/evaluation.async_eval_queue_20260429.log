@@ -23,3 +23,13 @@ Traceback (most recent call last):
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 FileNotFoundError: [Errno 2] No such file or directory: '/tmp/test.json'
 
+2026-04-29 10:52:51,876 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 10:53:59,593 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-29 10:54:26,989 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 10:54:27,105 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-29 10:54:48,923 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 10:55:57,043 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-29 10:56:20,997 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 11:13:12,625 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 11:14:48,185 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 11:17:29,723 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止

@@ -184,6 +184,11 @@ cd src/api
 python main.py
 # 或
 uvicorn main:app --host 0.0.0.0 --port 8000
+
+
+# 或
+cd Chinese-MedQA-Qwen2
+uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 4. 运行 SFT 训练

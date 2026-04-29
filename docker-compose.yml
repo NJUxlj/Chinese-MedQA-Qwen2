@@ -84,9 +84,6 @@ services:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/neo4j/plugins:/plugins
     environment:
       - NEO4J_AUTH=neo4j/neo4j123
-      - NEO4J_dbms_memory_heap_initial__size=512M
-      - NEO4J_dbms_memory_heap_max__size=2G
-      - NEO4J_dbms_pagecache_size=512M
       - NEO4J_server_default__listen__address=0.0.0.0
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "localhost:7474"]

@@ -1,0 +1,36 @@
+2026-04-29 10:52:39,289 - api.services.rag_async_queue - INFO - RAG 服务函数已注册
+2026-04-29 10:52:51,877 - api.services.rag_async_queue - INFO - RAG Worker 已启动
+2026-04-29 10:52:51,880 - api.services.rag_async_queue - INFO - RAG 线程池已创建，max_workers=4
+2026-04-29 10:52:51,880 - api.services.rag_async_queue - INFO - RAG Worker 循环已启动
+2026-04-29 10:53:59,595 - api.services.rag_async_queue - INFO - RAG Worker 循环收到取消信号
+2026-04-29 10:53:59,608 - api.services.rag_async_queue - INFO - RAG Worker 已停止
+2026-04-29 10:53:59,613 - api.services.rag_async_queue - INFO - RAG 线程池已关闭
+2026-04-29 10:54:11,440 - api.services.rag_async_queue - INFO - RAG 服务函数已注册
+2026-04-29 10:54:26,989 - api.services.rag_async_queue - INFO - RAG Worker 已启动
+2026-04-29 10:54:26,996 - api.services.rag_async_queue - INFO - RAG 线程池已创建，max_workers=4
+2026-04-29 10:54:26,996 - api.services.rag_async_queue - INFO - RAG Worker 循环已启动
+2026-04-29 10:54:27,105 - api.services.rag_async_queue - INFO - RAG Worker 循环收到取消信号
+2026-04-29 10:54:27,105 - api.services.rag_async_queue - INFO - RAG Worker 已停止
+2026-04-29 10:54:27,106 - api.services.rag_async_queue - INFO - RAG 线程池已关闭
+2026-04-29 10:54:38,320 - api.services.rag_async_queue - INFO - RAG 服务函数已注册
+2026-04-29 10:54:48,925 - api.services.rag_async_queue - INFO - RAG Worker 已启动
+2026-04-29 10:54:48,944 - api.services.rag_async_queue - INFO - RAG 线程池已创建，max_workers=4
+2026-04-29 10:54:48,944 - api.services.rag_async_queue - INFO - RAG Worker 循环已启动
+2026-04-29 10:55:57,044 - api.services.rag_async_queue - INFO - RAG Worker 循环收到取消信号
+2026-04-29 10:55:57,044 - api.services.rag_async_queue - INFO - RAG Worker 已停止
+2026-04-29 10:55:57,044 - api.services.rag_async_queue - INFO - RAG 线程池已关闭
+2026-04-29 10:56:10,217 - api.services.rag_async_queue - INFO - RAG 服务函数已注册
+2026-04-29 10:56:20,999 - api.services.rag_async_queue - INFO - RAG Worker 已启动
+2026-04-29 10:56:21,002 - api.services.rag_async_queue - INFO - RAG 线程池已创建，max_workers=4
+2026-04-29 10:56:21,002 - api.services.rag_async_queue - INFO - RAG Worker 循环已启动
+2026-04-29 11:12:57,458 - api.services.rag_async_queue - INFO - RAG 服务函数已注册
+2026-04-29 11:13:12,625 - api.services.rag_async_queue - INFO - RAG Worker 已启动
+2026-04-29 11:13:12,626 - api.services.rag_async_queue - INFO - RAG 线程池已创建，max_workers=4
+2026-04-29 11:13:12,626 - api.services.rag_async_queue - INFO - RAG Worker 循环已启动
+2026-04-29 11:14:31,763 - api.services.rag_async_queue - INFO - RAG 服务函数已注册
+2026-04-29 11:14:48,188 - api.services.rag_async_queue - INFO - RAG Worker 已启动
+2026-04-29 11:14:48,200 - api.services.rag_async_queue - INFO - RAG 线程池已创建，max_workers=4
+2026-04-29 11:14:48,201 - api.services.rag_async_queue - INFO - RAG Worker 循环已启动
+2026-04-29 11:17:29,724 - api.services.rag_async_queue - INFO - RAG Worker 循环收到取消信号
+2026-04-29 11:17:29,724 - api.services.rag_async_queue - INFO - RAG Worker 已停止
+2026-04-29 11:17:29,725 - api.services.rag_async_queue - INFO - RAG 线程池已关闭
