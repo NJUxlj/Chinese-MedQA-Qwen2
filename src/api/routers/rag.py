@@ -7,12 +7,12 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, Path
 import time
 
-from schemas.rag import (
+from api.schemas.rag import (
     RagQuestionRequest,
     RagQuestionResponse
 )
 
-from services.rag_service import get_rag_service, RAGService
+from api.services.rag_service import get_rag_service, RAGService
 
 router = APIRouter()
 

@@ -1,0 +1,4 @@
+2026-04-29 09:52:39,988 - rag.rag_pipeline - WARNING - 处理后的查询为空，使用原始查询: 什么是高血压
+2026-04-29 09:52:50,053 - rag.rag_pipeline - WARNING - 没有检索到相关文档
+2026-04-29 10:06:37,025 - rag.rag_pipeline - WARNING - 处理后的查询为空，使用原始查询: 什么是高血压
+2026-04-29 10:06:37,230 - rag.rag_pipeline - WARNING - 没有检索到相关文档

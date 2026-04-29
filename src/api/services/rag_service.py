@@ -84,24 +84,25 @@ class RAGService:
 _rag_service = None
 _lock = threading.Lock()
 
-def get_rag_service(
-    llm_provider: LLMProvider = None,
-    embedding_provider: Optional[EmbeddingProvider] = None,
-    reranker_provider: Optional[RerankerProvider] = None) -> RAGService:
-    """获取RAG服务单例
 
-    Args:
-        llm_provider: LLM提供者，如果单例未初始化则必须提供
-    """
+def init_rag_service(
+    llm_provider: LLMProvider,
+    embedding_provider: EmbeddingProvider,
+    reranker_provider: RerankerProvider) -> RAGService:
+    """初始化 RAG 服务单例（仅在应用启动时调用一次）"""
+    global _rag_service
+    with _lock:
+        if _rag_service is None:
+            _rag_service = RAGService(
+                llm_provider=llm_provider,
+                embedding_provider=embedding_provider,
+                reranker_provider=reranker_provider)
+    return _rag_service
+
+
+def get_rag_service() -> RAGService:
+    """获取RAG服务单例（providers 在应用启动时已初始化）"""
     global _rag_service
     if _rag_service is None:
-        if llm_provider is None or embedding_provider is None or reranker_provider is None:
-            raise ValueError("首次调用 get_rag_service 必须提供 llm_provider, embedding_provider, reranker_provider")
-        with _lock:
-            if _rag_service is None:
-                _rag_service = RAGService(
-                    llm_provider=llm_provider,
-                    embedding_provider=embedding_provider,
-                    reranker_provider=reranker_provider)    
-                    
+        raise RuntimeError("RAG服务未初始化")
     return _rag_service

@@ -10,7 +10,7 @@ import time
 import json
 import asyncio
 
-from schemas.qa import QuestionRequest, QuestionResponse, StreamQuestionRequest
+from api.schemas.qa import QuestionRequest, QuestionResponse, StreamQuestionRequest
 from providers.llm_provider import LLMProvider
 from config.settings import settings
 

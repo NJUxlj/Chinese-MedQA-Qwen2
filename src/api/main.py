@@ -20,11 +20,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from config.settings import settings
 from .routers import qa, admin, rag, health, evaluation
-from .evaluation.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
-from .services.rag_service import get_rag_service
-from .providers.llm_provider import LLMProvider
-from .providers.embedding_provider import EmbeddingProvider
-from .providers.reranker_provider import RerankerProvider
+from evaluation.async_eval_queue import start_evaluation_worker, stop_evaluation_worker
+from api.services.rag_service import init_rag_service
+from providers.llm_provider import LLMProvider
+from providers.embedding_provider import EmbeddingProvider
+from providers.reranker_provider import RerankerProvider
 
 # 配置日志
 logging.basicConfig(
@@ -74,7 +74,7 @@ async def lifespan(app: FastAPI):
     llm_provider = LLMProvider(**llm_kwargs)
     embedding_provider = EmbeddingProvider(**embedding_kwargs)
     reranker_provider = RerankerProvider(**reranker_kwargs)
-    get_rag_service(llm_provider, embedding_provider, reranker_provider)
+    init_rag_service(llm_provider, embedding_provider, reranker_provider)
 
     await start_evaluation_worker()
     logger.info("API服务初始化完成")

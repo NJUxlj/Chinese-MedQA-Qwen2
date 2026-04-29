@@ -108,10 +108,10 @@ class EmbeddingProvider:
             self._init_local_model()
         elif self.provider == "vllm":
             self._init_vllm_client()
-        elif self.mode in ["openai", "bge", "modelscope", "huggingface"]:
+        elif self.provider in ["openai", "bge", "modelscope", "huggingface"]:
             self._init_langchain_embeddings()
         else:
-            raise ValueError(f"Unknown embedding mode: {mode}. Supported: vllm, local, openai, bge, modelscope, huggingface")
+            raise ValueError(f"Unknown embedding mode: {self.provider}. Supported: vllm, local, openai, bge, modelscope, huggingface")
 
         # Load cache if enabled
         if self.use_cache and self.cache_dir:
@@ -157,7 +157,7 @@ class EmbeddingProvider:
         if not self.model_name:
             raise ValueError("model_name is required for LangChain embedding mode")
 
-        self.logger.info(f"Loading LangChain embedding model: {self.model_name} (mode: {self.mode})")
+        self.logger.info(f"Loading LangChain embedding model: {self.model_name} (mode: {self.provider})")
 
         try:
             if self.provider == "openai":
@@ -186,9 +186,9 @@ class EmbeddingProvider:
                     encode_kwargs={"normalize_embeddings": self.normalize_embeddings}
                 )
 
-            self.logger.info(f"LangChain embedding model loaded successfully in {self.mode} mode")
+            self.logger.info(f"LangChain embedding model loaded successfully in {self.provider} mode")
         except ImportError as e:
-            raise ImportError(f"Failed to load {self.mode} embeddings. Required package may not be installed: {e}")
+            raise ImportError(f"Failed to load {self.provider} embeddings. Required package may not be installed: {e}")
 
     def _get_cache_path(self) -> Path:
         """获取缓存文件路径。"""

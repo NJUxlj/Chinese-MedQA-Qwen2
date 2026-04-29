@@ -1,0 +1,4 @@
+2026-04-29 09:52:50,052 - MilvusClient - ERROR - 连接 Milvus 失败: <MilvusException: (code=2, message=Fail connecting to server on localhost:19530, illegal connection params or server unavailable)>
+2026-04-29 10:06:37,186 - MilvusClient - INFO - 成功连接到 Milvus 服务器: http://localhost:19530
+2026-04-29 10:06:37,226 - MilvusClient - INFO - 成功初始化向量存储: medical_qa
+2026-04-29 10:06:37,228 - MilvusClient - INFO - 相似度搜索（带分数）完成，返回 0 个结果

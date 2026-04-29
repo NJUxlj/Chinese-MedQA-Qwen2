@@ -72,7 +72,7 @@ agent:
 # 嵌入配置（核心库使用）
 # =============================================================================
 embedding:
-  provider: sentence_transformers
+  provider: local
   model_name: Qwen3-Embedder-0.6B
   model_path: "/Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B"
   device: cpu

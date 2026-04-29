@@ -1,0 +1,25 @@
+2026-04-29 09:50:04,683 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 09:51:44,957 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已停止
+2026-04-29 09:52:13,637 - evaluation.async_eval_queue - INFO - 评估异步队列 worker 已启动
+2026-04-29 09:53:22,699 - evaluation.async_eval_queue - ERROR - 评估任务失败: [Errno 2] No such file or directory: '/tmp/test.json'
+Traceback (most recent call last):
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/async_eval_queue.py", line 38, in _worker_loop
+    result = await asyncio.to_thread(_evaluation_task_fn, payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniforge/base/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/evaluation_runner.py", line 69, in run_evaluation_task
+    metrics: Dict[str, float] = evaluator.evaluate()
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/medqa_evaluator.py", line 106, in evaluate
+    self.test_dataset = self.load_test_dataset(self.config.get("dataset_path", ""))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiniuyiliao/Desktop/code/Chinese-MedQA-Qwen2/src/api/../evaluation/base_evaluator.py", line 41, in load_test_dataset
+    with open(dataset_path, "r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/test.json'
+

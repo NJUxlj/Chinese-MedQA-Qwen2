@@ -1,0 +1,1 @@
+2026-04-29 09:53:22,659 - evaluation.evaluation_runner - INFO - 开始评估任务 [7b1dba10-d65e-4048-b2c6-ea08547ad177] task_type=medqa dataset=/tmp/test.json model=MiniMax-M2.7

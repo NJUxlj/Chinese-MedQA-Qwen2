@@ -9,7 +9,7 @@ from fastapi.security import APIKeyHeader
 import time
 
 from config.settings import settings
-from services.rag_service import get_rag_service, RAGService
+from api.services.rag_service import get_rag_service, RAGService
 
 router = APIRouter()
 
@@ -25,26 +25,14 @@ def get_api_key(api_key: str = Security(api_key_header)):
         )
     return api_key
 
-@router.get("/status", response_model=Dict[str, Any])
+@router.get("/status", response_model=None)
 async def get_admin_status(
     rag_service: RAGService = Depends(get_rag_service),
     api_key: str = Depends(get_api_key)
 ):
-    """
-    获取系统全面状态
-
-    Args:
-        rag_service: RAG服务
-        api_key: API密钥
-
-    Returns:
-        系统状态信息
-    """
+    """获取系统全面状态"""
     try:
-        knowledge_bases = rag_service.get_available_knowledge_bases()
-
         return {
-            "knowledge_bases": knowledge_bases,
             "server_time": time.strftime("%Y-%m-%d %H:%M:%S")
         }
     except Exception as e:

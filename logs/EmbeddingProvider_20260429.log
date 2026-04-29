@@ -1,0 +1,10 @@
+2026-04-29 09:48:34,128 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-29 09:48:38,403 - EmbeddingProvider - INFO - Local embedding model loaded successfully
+2026-04-29 09:49:50,337 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-29 09:49:55,066 - EmbeddingProvider - INFO - Local embedding model loaded successfully
+2026-04-29 09:50:00,079 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-29 09:50:04,665 - EmbeddingProvider - INFO - Local embedding model loaded successfully
+2026-04-29 09:52:03,967 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-29 09:52:06,463 - EmbeddingProvider - INFO - Local embedding model loaded successfully
+2026-04-29 09:52:09,525 - EmbeddingProvider - INFO - Loading sentence-transformers model: /Users/xiniuyiliao/Desktop/code/models/Qwen3-Embedder-0.6B
+2026-04-29 09:52:13,626 - EmbeddingProvider - INFO - Local embedding model loaded successfully
